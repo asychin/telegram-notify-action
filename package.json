@@ -16,9 +16,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/telegram-notify-action.git"
+    "url": "https://github.com/asychin/telegram-notify-action.git"
   },
-  "author": "Your Name",
+  "author": "Sychin Andrey",
   "license": "MIT",
   "engines": {
     "node": ">=16"

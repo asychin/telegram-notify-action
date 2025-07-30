@@ -1,52 +1,52 @@
-name: 'Telegram Notify'
-description: 'Send or update Telegram notifications with support for message threads'
-author: 'Custom Action'
+name: "Telegram Notify"
+description: "Send or update Telegram notifications with support for message threads"
+author: "Sychin Andrey"
 
 inputs:
   telegram_token:
-    description: 'Telegram Bot Token'
+    description: "Telegram Bot Token"
     required: true
   chat_id:
-    description: 'Telegram Chat ID'
+    description: "Telegram Chat ID"
     required: true
   message:
-    description: 'Message to send'
+    description: "Message to send"
     required: true
   message_thread_id:
-    description: 'Message thread ID (for topics/forums)'
+    description: "Message thread ID (for topics/forums)"
     required: false
   message_id:
-    description: 'Message ID to edit (if provided, will edit existing message)'
+    description: "Message ID to edit (if provided, will edit existing message)"
     required: false
   parse_mode:
-    description: 'Parse mode (HTML, Markdown, MarkdownV2)'
+    description: "Parse mode (HTML, Markdown, MarkdownV2)"
     required: false
-    default: 'HTML'
+    default: "HTML"
   disable_web_page_preview:
-    description: 'Disable web page preview'
+    description: "Disable web page preview"
     required: false
-    default: 'true'
+    default: "true"
   disable_notification:
-    description: 'Send message silently'
+    description: "Send message silently"
     required: false
-    default: 'false'
+    default: "false"
 
 outputs:
   message_id:
-    description: 'ID of the sent/edited message'
+    description: "ID of the sent/edited message"
     value: ${{ steps.telegram.outputs.message_id }}
   success:
-    description: 'Whether the operation was successful'
+    description: "Whether the operation was successful"
     value: ${{ steps.telegram.outputs.success }}
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        
+        node-version: "20"
+
     - name: Send/Update Telegram Message
       id: telegram
       shell: bash
@@ -63,5 +63,5 @@ runs:
         DISABLE_NOTIFICATION: ${{ inputs.disable_notification }}
 
 branding:
-  icon: 'send'
-  color: 'blue'
+  icon: "send"
+  color: "blue"

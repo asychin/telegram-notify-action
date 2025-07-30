@@ -16,7 +16,7 @@ A powerful GitHub Action for sending and editing Telegram notifications with sup
 
 ```yaml
 - name: Send Telegram notification
-  uses: your-username/telegram-notify-action@v1
+  uses: asychin/telegram-notify-action@v1
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
@@ -68,7 +68,7 @@ chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
 
 ### Basic Usage
 ```yaml
-- uses: your-username/telegram-notify-action@v1
+- uses: asychin/telegram-notify-action@v1
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
@@ -79,14 +79,14 @@ chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
 ```yaml
 - name: Send initial message
   id: initial
-  uses: your-username/telegram-notify-action@v1
+  uses: asychin/telegram-notify-action@v1
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
     message: "🔄 Process starting..."
 
 - name: Update message
-  uses: your-username/telegram-notify-action@v1
+  uses: asychin/telegram-notify-action@v1
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
@@ -96,7 +96,7 @@ chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
 
 ### Send to Topic
 ```yaml
-- uses: your-username/telegram-notify-action@v1
+- uses: asychin/telegram-notify-action@v1
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
@@ -112,7 +112,7 @@ jobs:
     steps:
       - name: Send start notification
         id: start
-        uses: your-username/telegram-notify-action@v1
+        uses: asychin/telegram-notify-action@v1
         with:
           telegram_token: ${{ secrets[format('TELEGRAM_BOT_TOKEN_{0}', github.ref_name)] }}
           chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
@@ -129,7 +129,7 @@ jobs:
       
       - name: Send completion notification
         if: always()
-        uses: your-username/telegram-notify-action@v1
+        uses: asychin/telegram-notify-action@v1
         with:
           telegram_token: ${{ secrets[format('TELEGRAM_BOT_TOKEN_{0}', github.ref_name)] }}
           chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
