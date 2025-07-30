@@ -1,0 +1,24 @@
+name: Basic Notification Example
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
+        uses: your-username/telegram-notify-action@v1
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          message: |
+            📦 <b>New Push to Repository</b>
+            
+            <b>Repository:</b> ${{ github.repository }}
+            <b>Branch:</b> <code>${{ github.ref_name }}</code>
+            <b>Commit:</b> <code>${{ github.sha }}</code>
+            <b>Author:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
+            
+            <a href="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}">View Commit</a>

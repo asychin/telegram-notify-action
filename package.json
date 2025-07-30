@@ -1,0 +1,26 @@
+{
+  "name": "telegram-notify-action",
+  "version": "1.0.0",
+  "description": "GitHub Action for sending and editing Telegram notifications",
+  "main": "telegram-notify.js",
+  "scripts": {
+    "test": "node telegram-notify.js"
+  },
+  "keywords": [
+    "github-action",
+    "telegram",
+    "notifications",
+    "bot",
+    "ci-cd",
+    "deployment"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/telegram-notify-action.git"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  }
+}

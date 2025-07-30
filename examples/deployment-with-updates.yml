@@ -1,0 +1,63 @@
+name: Deployment with Live Updates
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send start notification
+        id: start
+        uses: your-username/telegram-notify-action@v1
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          message: |
+            🚀 <b>Deployment Started</b>
+            
+            <b>Status:</b> Starting...
+            <b>Progress:</b> ▱▱▱▱▱▱▱▱▱▱ 0%
+            
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Progress</a>
+      
+      - name: Build application
+        run: |
+          echo "Building application..."
+          sleep 10
+      
+      - name: Update progress - Build complete
+        uses: your-username/telegram-notify-action@v1
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}  
+          message_id: ${{ steps.start.outputs.message_id }}
+          message: |
+            🚀 <b>Deployment in Progress</b>
+            
+            <b>Status:</b> Building completed ✅
+            <b>Progress:</b> ▰▰▰▰▰▱▱▱▱▱ 50%
+            
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Progress</a>
+      
+      - name: Deploy to server
+        run: |
+          echo "Deploying to server..."
+          sleep 10
+      
+      - name: Final notification
+        uses: your-username/telegram-notify-action@v1
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          message_id: ${{ steps.start.outputs.message_id }}
+          message: |
+            ✅ <b>Deployment Completed Successfully!</b>
+            
+            <b>Status:</b> All steps completed ✅
+            <b>Progress:</b> ▰▰▰▰▰▰▰▰▰▰ 100%
+            <b>Duration:</b> ~20 seconds
+            
+            🎉 Application is now live!
+            
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Details</a>

@@ -1,0 +1,67 @@
+name: 'Telegram Notify'
+description: 'Send or update Telegram notifications with support for message threads'
+author: 'Custom Action'
+
+inputs:
+  telegram_token:
+    description: 'Telegram Bot Token'
+    required: true
+  chat_id:
+    description: 'Telegram Chat ID'
+    required: true
+  message:
+    description: 'Message to send'
+    required: true
+  message_thread_id:
+    description: 'Message thread ID (for topics/forums)'
+    required: false
+  message_id:
+    description: 'Message ID to edit (if provided, will edit existing message)'
+    required: false
+  parse_mode:
+    description: 'Parse mode (HTML, Markdown, MarkdownV2)'
+    required: false
+    default: 'HTML'
+  disable_web_page_preview:
+    description: 'Disable web page preview'
+    required: false
+    default: 'true'
+  disable_notification:
+    description: 'Send message silently'
+    required: false
+    default: 'false'
+
+outputs:
+  message_id:
+    description: 'ID of the sent/edited message'
+    value: ${{ steps.telegram.outputs.message_id }}
+  success:
+    description: 'Whether the operation was successful'
+    value: ${{ steps.telegram.outputs.success }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Send/Update Telegram Message
+      id: telegram
+      shell: bash
+      run: |
+        node "${{ github.action_path }}/telegram-notify.js"
+      env:
+        TELEGRAM_TOKEN: ${{ inputs.telegram_token }}
+        CHAT_ID: ${{ inputs.chat_id }}
+        MESSAGE: ${{ inputs.message }}
+        MESSAGE_THREAD_ID: ${{ inputs.message_thread_id }}
+        MESSAGE_ID: ${{ inputs.message_id }}
+        PARSE_MODE: ${{ inputs.parse_mode }}
+        DISABLE_WEB_PAGE_PREVIEW: ${{ inputs.disable_web_page_preview }}
+        DISABLE_NOTIFICATION: ${{ inputs.disable_notification }}
+
+branding:
+  icon: 'send'
+  color: 'blue'
