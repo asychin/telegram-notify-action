@@ -1,0 +1,25 @@
+name: Russian Language Example
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Russian notification
+        uses: asychin/telegram-notify-action@v1
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          language: ru
+          message: |
+            📦 <b>Новый коммит в репозиторий</b>
+
+            <b>Репозиторий:</b> ${{ github.repository }}
+            <b>Ветка:</b> <code>${{ github.ref_name }}</code>
+            <b>Коммит:</b> <code>${{ github.sha }}</code>
+            <b>Автор:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
+
+            <a href="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}">Посмотреть коммит</a>

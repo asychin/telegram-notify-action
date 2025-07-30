@@ -30,6 +30,10 @@ inputs:
     description: "Send message silently"
     required: false
     default: "false"
+  language:
+    description: "Language for log messages (en, ru)"
+    required: false
+    default: "en"
 
 outputs:
   message_id:
@@ -61,6 +65,7 @@ runs:
         PARSE_MODE: ${{ inputs.parse_mode }}
         DISABLE_WEB_PAGE_PREVIEW: ${{ inputs.disable_web_page_preview }}
         DISABLE_NOTIFICATION: ${{ inputs.disable_notification }}
+        LANGUAGE: ${{ inputs.language }}
 
 branding:
   icon: "send"
