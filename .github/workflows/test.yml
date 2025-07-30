@@ -1,4 +1,4 @@
-name: Test Action
+name: Test and Validate Action
 
 on:
   push:
@@ -6,23 +6,361 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      test_scenario:
+        description: 'Test scenario to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - basic
+          - templates
+          - files
+          - error-handling
 
 jobs:
-  test:
+  lint:
+    name: Lint and Code Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Test action
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Check for security vulnerabilities
+        run: npm audit --audit-level high
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm run test:coverage
+      
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '20'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == '' || github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        test-case:
+          - name: "Basic Message"
+            template: ""
+            message: "🧪 Basic test message from GitHub Actions"
+            file_path: ""
+          - name: "Success Template"
+            template: "success"
+            message: "Integration test completed successfully!"
+            file_path: ""
+          - name: "Error Template"
+            template: "error"
+            message: "Simulated error for testing"
+            file_path: ""
+          - name: "Deploy Template"
+            template: "deploy"
+            message: ""
+            file_path: ""
+          - name: "With Inline Keyboard"
+            template: ""
+            message: "Test with inline keyboard"
+            file_path: ""
+            keyboard: '[{"text": "✅ Success", "callback_data": "success"}, {"text": "❌ Failed", "callback_data": "failed"}]'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create test file for file upload tests
+        if: matrix.test-case.name == 'File Upload'
+        run: |
+          echo "Test file content for GitHub Actions" > test-file.txt
+          echo "Repository: ${{ github.repository }}" >> test-file.txt
+          echo "Commit: ${{ github.sha }}" >> test-file.txt
+      
+      - name: Test ${{ matrix.test-case.name }}
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: ${{ matrix.test-case.message }}
+          template: ${{ matrix.test-case.template }}
+          file_path: ${{ matrix.test-case.file_path }}
+          inline_keyboard: ${{ matrix.test-case.keyboard || '' }}
+          template_vars: |
+            {
+              "deployStatus": "successful",
+              "testStatus": "passed",
+              "coverage": "95%",
+              "version": "v2.0.0",
+              "tag": "${{ github.ref_name }}",
+              "releaseNotes": "Enhanced with new features"
+            }
+          language: en
+          max_retries: 2
+          retry_delay: 1
+
+  conditional-tests:
+    name: Conditional Sending Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'error-handling' || github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        condition:
+          - name: "Send on Success Only"
+            send_on_success: "true"
+            send_on_failure: "false"
+            simulate_failure: "false"
+          - name: "Send on Failure Only"
+            send_on_success: "false"
+            send_on_failure: "true"
+            simulate_failure: "true"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Simulate job failure
+        if: matrix.condition.simulate_failure == 'true'
+        run: |
+          echo "Simulating failure for testing conditional sending"
+          exit 1
+        continue-on-error: true
+        id: simulate-fail
+      
+      - name: Test conditional sending - ${{ matrix.condition.name }}
+        uses: ./
+        if: always()
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           message: |
-            🧪 <b>Action Test</b>
+            🧪 **Conditional Test: ${{ matrix.condition.name }}**
             
+            Job Status: ${{ job.status }}
+            Step Status: ${{ steps.simulate-fail.outcome }}
+            Should send: ${{ (matrix.condition.send_on_success == 'true' && job.status == 'success') || (matrix.condition.send_on_failure == 'true' && steps.simulate-fail.outcome == 'failure') }}
+          send_on_success: ${{ matrix.condition.send_on_success }}
+          send_on_failure: ${{ matrix.condition.send_on_failure }}
+          template: "info"
+
+  file-upload-tests:
+    name: File Upload Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'files' || github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        file-type:
+          - type: "document"
+            extension: "txt"
+            content: "Test document content\nGenerated by GitHub Actions\nRepository: ${{ github.repository }}"
+          - type: "photo"
+            extension: "png"
+            # We'll create a simple 1x1 PNG for testing
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create test document
+        if: matrix.file-type.type == 'document'
+        run: |
+          echo "${{ matrix.file-type.content }}" > test-file.${{ matrix.file-type.extension }}
+          echo "Build Date: $(date)" >> test-file.${{ matrix.file-type.extension }}
+          echo "Commit SHA: ${{ github.sha }}" >> test-file.${{ matrix.file-type.extension }}
+      
+      - name: Create test image
+        if: matrix.file-type.type == 'photo'
+        run: |
+          # Create a simple 1x1 PNG file for testing
+          echo -e '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\xdac\xf8\x0f\x00\x00\x01\x00\x01\x00\x00\x00\x00IEND\xaeB`\x82' > test-file.png
+      
+      - name: Test file upload - ${{ matrix.file-type.type }}
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: test-file.${{ matrix.file-type.extension }}
+          file_type: ${{ matrix.file-type.type }}
+          caption: |
+            📎 **File Upload Test**
+            
+            Type: ${{ matrix.file-type.type }}
             Repository: ${{ github.repository }}
             Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
+            Workflow: ${{ github.workflow }}
+
+  error-handling-tests:
+    name: Error Handling Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'error-handling' || github.event_name != 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test retry mechanism with invalid token
+        uses: ./
+        continue-on-error: true
+        with:
+          telegram_token: "invalid_token_for_testing"
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: "This should fail and trigger retry logic"
+          max_retries: 2
+          retry_delay: 1
+        id: retry-test
+      
+      - name: Verify retry test failed as expected
+        run: |
+          if [ "${{ steps.retry-test.outcome }}" != "failure" ]; then
+            echo "Error: Retry test should have failed but didn't"
+            exit 1
+          fi
+          echo "✅ Retry test failed as expected"
+
+  template-tests:
+    name: Template Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'templates' || github.event_name != 'workflow_dispatch'
+    strategy:
+      matrix:
+        template: [success, error, warning, info, deploy, test, release]
+        language: [en, ru]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test ${{ matrix.template }} template in ${{ matrix.language }}
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ matrix.template }}
+          language: ${{ matrix.language }}
+          message: "Custom message for ${{ matrix.template }} template"
+          template_vars: |
+            {
+              "deployStatus": "successful",
+              "testStatus": "passed",
+              "coverage": "95%",
+              "version": "v2.0.0",
+              "tag": "${{ github.ref_name }}",
+              "releaseNotes": "Template test for ${{ matrix.template }}"
+            }
+
+  security-tests:
+    name: Security Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run security audit
+        run: npm audit --audit-level moderate
+      
+      - name: Check for hardcoded secrets
+        run: |
+          if grep -r "bot[0-9]\+:" . --exclude-dir=node_modules --exclude-dir=.git; then
+            echo "❌ Found potential hardcoded bot tokens"
+            exit 1
+          fi
+          echo "✅ No hardcoded secrets found"
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test action performance
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: "test"
+          message: "Performance test - measuring execution time"
+          template_vars: |
+            {
+              "testStatus": "performance",
+              "coverage": "timing"
+            }
+        id: perf-test
+      
+      - name: Check execution time
+        run: |
+          echo "Performance test completed"
+          echo "Message ID: ${{ steps.perf-test.outputs.message_id }}"
+          echo "Retry count: ${{ steps.perf-test.outputs.retry_count }}"
+
+  final-notification:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [integration-tests, conditional-tests, file-upload-tests, error-handling-tests, template-tests, security-tests, performance-tests]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Send test summary
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ needs.integration-tests.result == 'success' && needs.conditional-tests.result == 'success' && needs.file-upload-tests.result == 'success' && needs.template-tests.result == 'success' && 'success' || 'error' }}
+          message: |
+            **Test Suite Completed**
             
-            This is a test of the Telegram Notify Action!
+            📊 **Results:**
+            • Integration Tests: ${{ needs.integration-tests.result }}
+            • Conditional Tests: ${{ needs.conditional-tests.result }}  
+            • File Upload Tests: ${{ needs.file-upload-tests.result }}
+            • Error Handling: ${{ needs.error-handling-tests.result }}
+            • Template Tests: ${{ needs.template-tests.result }}
+            • Security Tests: ${{ needs.security-tests.result }}
+            • Performance Tests: ${{ needs.performance-tests.result }}
+          template_vars: |
+            {
+              "customMessage": "All tests completed for commit ${{ github.sha }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+              {"text": "📝 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}
+            ]

@@ -1,5 +1,5 @@
 name: "Telegram Notify Action - Noty4U"
-description: "Send or update Telegram notifications with support for message threads"
+description: "Send or update Telegram notifications with support for message threads, files, templates, and advanced features"
 author: "Sychin Andrey"
 
 inputs:
@@ -11,7 +11,7 @@ inputs:
     required: true
   message:
     description: "Message to send"
-    required: true
+    required: false
   message_thread_id:
     description: "Message thread ID (for topics/forums)"
     required: false
@@ -34,6 +34,64 @@ inputs:
     description: "Language for log messages (en, ru)"
     required: false
     default: "en"
+  # New enhanced parameters
+  reply_to_message_id:
+    description: "ID of the message to reply to"
+    required: false
+  protect_content:
+    description: "Protect content from forwarding and saving"
+    required: false
+    default: "false"
+  allow_sending_without_reply:
+    description: "Pass True if the message should be sent even if the specified replied-to message is not found"
+    required: false
+    default: "true"
+  message_effect_id:
+    description: "Unique identifier of the message effect to be added to the message"
+    required: false
+  business_connection_id:
+    description: "Unique identifier of the business connection"
+    required: false
+  # File support
+  file_path:
+    description: "Path to file to send (photo, document, video, etc.)"
+    required: false
+  file_type:
+    description: "Type of file to send (photo, document, video, audio, animation, voice, video_note, sticker)"
+    required: false
+    default: "document"
+  caption:
+    description: "Caption for the file (when file_path is provided)"
+    required: false
+  # Template support
+  template:
+    description: "Predefined template (success, error, warning, info, deploy, test, release)"
+    required: false
+  template_vars:
+    description: "JSON object with variables for template substitution"
+    required: false
+  # Inline keyboard support
+  inline_keyboard:
+    description: "JSON array of inline keyboard buttons"
+    required: false
+  # Retry configuration
+  max_retries:
+    description: "Maximum number of retry attempts"
+    required: false
+    default: "3"
+  retry_delay:
+    description: "Initial delay between retries in seconds"
+    required: false
+    default: "1"
+  # Conditional sending
+  send_on_failure:
+    description: "Send notification only on workflow failure"
+    required: false
+    default: "false"
+  send_on_success:
+    description: "Send notification only on workflow success"
+    required: false
+    default: "false"
 
 outputs:
   message_id:
@@ -42,6 +100,12 @@ outputs:
   success:
     description: "Whether the operation was successful"
     value: ${{ steps.telegram.outputs.success }}
+  file_id:
+    description: "ID of the uploaded file (if file was sent)"
+    value: ${{ steps.telegram.outputs.file_id }}
+  retry_count:
+    description: "Number of retry attempts made"
+    value: ${{ steps.telegram.outputs.retry_count }}
 
 runs:
   using: "composite"
@@ -57,6 +121,7 @@ runs:
       run: |
         node "${{ github.action_path }}/telegram-notify.js"
       env:
+        # Existing environment variables
         TELEGRAM_TOKEN: ${{ inputs.telegram_token }}
         CHAT_ID: ${{ inputs.chat_id }}
         MESSAGE: ${{ inputs.message }}
@@ -66,6 +131,33 @@ runs:
         DISABLE_WEB_PAGE_PREVIEW: ${{ inputs.disable_web_page_preview }}
         DISABLE_NOTIFICATION: ${{ inputs.disable_notification }}
         LANGUAGE: ${{ inputs.language }}
+        # New environment variables
+        REPLY_TO_MESSAGE_ID: ${{ inputs.reply_to_message_id }}
+        PROTECT_CONTENT: ${{ inputs.protect_content }}
+        ALLOW_SENDING_WITHOUT_REPLY: ${{ inputs.allow_sending_without_reply }}
+        MESSAGE_EFFECT_ID: ${{ inputs.message_effect_id }}
+        BUSINESS_CONNECTION_ID: ${{ inputs.business_connection_id }}
+        FILE_PATH: ${{ inputs.file_path }}
+        FILE_TYPE: ${{ inputs.file_type }}
+        CAPTION: ${{ inputs.caption }}
+        TEMPLATE: ${{ inputs.template }}
+        TEMPLATE_VARS: ${{ inputs.template_vars }}
+        INLINE_KEYBOARD: ${{ inputs.inline_keyboard }}
+        MAX_RETRIES: ${{ inputs.max_retries }}
+        RETRY_DELAY: ${{ inputs.retry_delay }}
+        SEND_ON_FAILURE: ${{ inputs.send_on_failure }}
+        SEND_ON_SUCCESS: ${{ inputs.send_on_success }}
+        # GitHub context variables
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_WORKFLOW: ${{ github.workflow }}
+        GITHUB_JOB: ${{ github.job }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        JOB_STATUS: ${{ job.status }}
 
 branding:
   icon: "send"

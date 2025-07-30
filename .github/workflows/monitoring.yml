@@ -1,0 +1,392 @@
+name: Repository Monitoring
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled]
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, closed, merged, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  discussion:
+    types: [created, answered]
+  schedule:
+    # Daily health check at 9:00 UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: 'Type of check to perform'
+        required: false
+        default: 'health'
+        type: choice
+        options:
+          - health
+          - stats
+          - security
+
+jobs:
+  issue-notifications:
+    name: Issue Notifications
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' || github.event_name == 'issue_comment'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Determine notification type
+        id: notification-type
+        run: |
+          case "${{ github.event.action }}" in
+            "opened")
+              echo "template=warning" >> $GITHUB_OUTPUT
+              echo "emoji=🐛" >> $GITHUB_OUTPUT
+              echo "action_text=opened" >> $GITHUB_OUTPUT
+              ;;
+            "closed")
+              echo "template=success" >> $GITHUB_OUTPUT
+              echo "emoji=✅" >> $GITHUB_OUTPUT
+              echo "action_text=closed" >> $GITHUB_OUTPUT
+              ;;
+            "reopened")
+              echo "template=warning" >> $GITHUB_OUTPUT
+              echo "emoji=🔄" >> $GITHUB_OUTPUT
+              echo "action_text=reopened" >> $GITHUB_OUTPUT
+              ;;
+            "labeled")
+              echo "template=info" >> $GITHUB_OUTPUT
+              echo "emoji=🏷️" >> $GITHUB_OUTPUT
+              echo "action_text=labeled" >> $GITHUB_OUTPUT
+              ;;
+            "created")
+              echo "template=info" >> $GITHUB_OUTPUT
+              echo "emoji=💬" >> $GITHUB_OUTPUT
+              echo "action_text=commented on" >> $GITHUB_OUTPUT
+              ;;
+          esac
+      
+      - name: Send issue notification
+        if: github.event_name == 'issues'
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ steps.notification-type.outputs.template }}
+          message: |
+            ${{ steps.notification-type.outputs.emoji }} **Issue ${{ steps.notification-type.outputs.action_text }}**
+            
+            **#${{ github.event.issue.number }}** - ${{ github.event.issue.title }}
+            
+            👤 **Author:** ${{ github.event.issue.user.login }}
+            🏷️ **Labels:** ${{ join(github.event.issue.labels.*.name, ', ') || 'None' }}
+            
+            ${{ github.event.issue.body && format('**Description:**\n{0}', github.event.issue.body) || '' }}
+          template_vars: |
+            {
+              "issueNumber": "${{ github.event.issue.number }}",
+              "issueTitle": "${{ github.event.issue.title }}",
+              "author": "${{ github.event.issue.user.login }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "💬 Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+            ]
+      
+      - name: Send comment notification
+        if: github.event_name == 'issue_comment'
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          message: |
+            💬 **New Comment on Issue**
+            
+            **#${{ github.event.issue.number }}** - ${{ github.event.issue.title }}
+            
+            👤 **Commenter:** ${{ github.event.comment.user.login }}
+            
+            **Comment:**
+            ${{ github.event.comment.body }}
+          inline_keyboard: |
+            [
+              {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
+              {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+            ]
+
+  pr-notifications:
+    name: Pull Request Notifications
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Determine PR notification type
+        id: pr-notification-type
+        run: |
+          case "${{ github.event.action }}" in
+            "opened")
+              echo "template=info" >> $GITHUB_OUTPUT
+              echo "emoji=🔄" >> $GITHUB_OUTPUT
+              echo "action_text=opened" >> $GITHUB_OUTPUT
+              ;;
+            "closed")
+              if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+                echo "template=success" >> $GITHUB_OUTPUT
+                echo "emoji=🎉" >> $GITHUB_OUTPUT
+                echo "action_text=merged" >> $GITHUB_OUTPUT
+              else
+                echo "template=warning" >> $GITHUB_OUTPUT
+                echo "emoji=❌" >> $GITHUB_OUTPUT
+                echo "action_text=closed" >> $GITHUB_OUTPUT
+              fi
+              ;;
+            "ready_for_review")
+              echo "template=info" >> $GITHUB_OUTPUT
+              echo "emoji=👀" >> $GITHUB_OUTPUT
+              echo "action_text=marked ready for review" >> $GITHUB_OUTPUT
+              ;;
+            "submitted")
+              echo "template=info" >> $GITHUB_OUTPUT
+              echo "emoji=📝" >> $GITHUB_OUTPUT
+              echo "action_text=reviewed" >> $GITHUB_OUTPUT
+              ;;
+          esac
+      
+      - name: Send PR notification
+        if: github.event_name == 'pull_request'
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ steps.pr-notification-type.outputs.template }}
+          message: |
+            ${{ steps.pr-notification-type.outputs.emoji }} **Pull Request ${{ steps.pr-notification-type.outputs.action_text }}**
+            
+            **#${{ github.event.pull_request.number }}** - ${{ github.event.pull_request.title }}
+            
+            👤 **Author:** ${{ github.event.pull_request.user.login }}
+            🌿 **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            📊 **Changes:** +${{ github.event.pull_request.additions }} -${{ github.event.pull_request.deletions }}
+            
+            ${{ github.event.pull_request.body && format('**Description:**\n{0}', github.event.pull_request.body) || '' }}
+          template_vars: |
+            {
+              "prNumber": "${{ github.event.pull_request.number }}",
+              "prTitle": "${{ github.event.pull_request.title }}",
+              "author": "${{ github.event.pull_request.user.login }}",
+              "additions": "${{ github.event.pull_request.additions }}",
+              "deletions": "${{ github.event.pull_request.deletions }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
+              {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"},
+              {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
+            ]
+      
+      - name: Send review notification
+        if: github.event_name == 'pull_request_review'
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          message: |
+            📝 **Pull Request Review**
+            
+            **#${{ github.event.pull_request.number }}** - ${{ github.event.pull_request.title }}
+            
+            👤 **Reviewer:** ${{ github.event.review.user.login }}
+            📊 **State:** ${{ github.event.review.state }}
+            
+            ${{ github.event.review.body && format('**Review Comment:**\n{0}', github.event.review.body) || '' }}
+          inline_keyboard: |
+            [
+              {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
+              {"text": "📝 View PR", "url": "${{ github.event.pull_request.html_url }}"}
+            ]
+
+  discussion-notifications:
+    name: Discussion Notifications
+    runs-on: ubuntu-latest
+    if: github.event_name == 'discussion'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Send discussion notification
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          message: |
+            💬 **New Discussion ${{ github.event.action }}**
+            
+            **${{ github.event.discussion.title }}**
+            
+            👤 **Author:** ${{ github.event.discussion.user.login }}
+            🏷️ **Category:** ${{ github.event.discussion.category.name }}
+            
+            ${{ github.event.discussion.body }}
+          inline_keyboard: |
+            [
+              {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
+              {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"}
+            ]
+
+  health-check:
+    name: Repository Health Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.check_type == 'health')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run health checks
+        id: health-check
+        run: |
+          echo "Running repository health checks..."
+          
+          # Check for security vulnerabilities
+          AUDIT_RESULT=$(npm audit --audit-level high --json || echo '{}')
+          VULNERABILITIES=$(echo "$AUDIT_RESULT" | jq -r '.metadata.vulnerabilities.total // 0')
+          
+          # Check test coverage
+          npm run test:coverage > /dev/null 2>&1 || true
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(jq -r '.total.lines.pct' coverage/coverage-summary.json)
+          else
+            COVERAGE="N/A"
+          fi
+          
+          # Check for outdated dependencies
+          OUTDATED=$(npm outdated --json 2>/dev/null | jq -r 'keys | length' || echo "0")
+          
+          # Check repository size
+          REPO_SIZE=$(du -sh . | cut -f1)
+          
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "outdated=$OUTDATED" >> $GITHUB_OUTPUT
+          echo "repo_size=$REPO_SIZE" >> $GITHUB_OUTPUT
+          
+          # Determine health status
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "status=warning" >> $GITHUB_OUTPUT
+            echo "health_emoji=⚠️" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "health_emoji=✅" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send health check notification
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ steps.health-check.outputs.status }}
+          message: |
+            ${{ steps.health-check.outputs.health_emoji }} **Daily Health Check**
+            
+            **Repository:** ${{ github.repository }}
+            **Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            
+            📊 **Metrics:**
+            • Security vulnerabilities: ${{ steps.health-check.outputs.vulnerabilities }}
+            • Test coverage: ${{ steps.health-check.outputs.coverage }}%
+            • Outdated dependencies: ${{ steps.health-check.outputs.outdated }}
+            • Repository size: ${{ steps.health-check.outputs.repo_size }}
+            
+            **Status:** ${{ steps.health-check.outputs.status == 'success' && 'Healthy' || 'Needs Attention' }}
+          template_vars: |
+            {
+              "vulnerabilities": "${{ steps.health-check.outputs.vulnerabilities }}",
+              "coverage": "${{ steps.health-check.outputs.coverage }}",
+              "outdated": "${{ steps.health-check.outputs.outdated }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "📊 View Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
+              {"text": "🔒 Security", "url": "${{ github.server_url }}/${{ github.repository }}/security"},
+              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"}
+            ]
+
+  repository-stats:
+    name: Repository Statistics
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.check_type == 'stats'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for stats
+      
+      - name: Generate repository statistics
+        id: stats
+        run: |
+          # Get commit statistics
+          TOTAL_COMMITS=$(git rev-list --all --count)
+          COMMITS_THIS_MONTH=$(git rev-list --since="1 month ago" --count HEAD)
+          CONTRIBUTORS=$(git log --format='%ae' | sort | uniq | wc -l)
+          
+          # Get file statistics
+          TOTAL_FILES=$(find . -type f -not -path './.git/*' -not -path './node_modules/*' | wc -l)
+          CODE_LINES=$(find . -name "*.js" -not -path './node_modules/*' -not -path './.git/*' | xargs wc -l | tail -1 | awk '{print $1}')
+          
+          # Get latest release
+          LATEST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "No releases")
+          
+          echo "total_commits=$TOTAL_COMMITS" >> $GITHUB_OUTPUT
+          echo "commits_this_month=$COMMITS_THIS_MONTH" >> $GITHUB_OUTPUT
+          echo "contributors=$CONTRIBUTORS" >> $GITHUB_OUTPUT
+          echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
+          echo "code_lines=$CODE_LINES" >> $GITHUB_OUTPUT
+          echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
+      
+      - name: Send statistics report
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          message: |
+            📊 **Repository Statistics Report**
+            
+            **Repository:** ${{ github.repository }}
+            **Generated:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            
+            **Development Activity:**
+            • Total commits: ${{ steps.stats.outputs.total_commits }}
+            • Commits this month: ${{ steps.stats.outputs.commits_this_month }}
+            • Contributors: ${{ steps.stats.outputs.contributors }}
+            
+            **Codebase:**
+            • Total files: ${{ steps.stats.outputs.total_files }}
+            • Lines of code: ${{ steps.stats.outputs.code_lines }}
+            • Latest release: ${{ steps.stats.outputs.latest_release }}
+            
+            **Links:**
+            • [Contributors](https://github.com/${{ github.repository }}/graphs/contributors)
+            • [Commit Activity](https://github.com/${{ github.repository }}/graphs/commit-activity)
+            • [Code Frequency](https://github.com/${{ github.repository }}/graphs/code-frequency)
+          template_vars: |
+            {
+              "totalCommits": "${{ steps.stats.outputs.total_commits }}",
+              "monthlyCommits": "${{ steps.stats.outputs.commits_this_month }}",
+              "contributors": "${{ steps.stats.outputs.contributors }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
+              {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
+              {"text": "📊 Statistics", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"}
+            ]

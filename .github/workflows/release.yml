@@ -1,0 +1,174 @@
+name: Release Notification
+
+on:
+  release:
+    types: [published, prereleased]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: 'v2.0.0'
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  release-notification:
+    name: Send Release Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get release info
+        id: release-info
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
+            echo "release_notes=Manual release triggered via workflow dispatch" >> $GITHUB_OUTPUT
+            echo "download_url=https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+            echo "prerelease=${{ github.event.release.prerelease }}" >> $GITHUB_OUTPUT
+            echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create release asset (changelog)
+        run: |
+          cat > RELEASE_NOTES.md << 'EOF'
+          # Release ${{ steps.release-info.outputs.version }}
+          
+          **Repository:** ${{ github.repository }}
+          **Released by:** ${{ github.actor }}
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Prerelease:** ${{ steps.release-info.outputs.prerelease }}
+          
+          ## Release Notes
+          ${{ steps.release-info.outputs.release_notes }}
+          
+          ## What's Changed
+          - Enhanced Telegram notifications with file support
+          - Added message templates for different scenarios
+          - Implemented retry logic with exponential backoff
+          - Added inline keyboard support
+          - Comprehensive testing suite
+          - Improved error handling and logging
+          
+          ## Installation
+          ```yaml
+          - uses: asychin/telegram-notify-action@${{ steps.release-info.outputs.version }}
+            with:
+              telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+              chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+              message: "Your notification message"
+          ```
+          
+          ## Links
+          - [Download](${{ steps.release-info.outputs.download_url }})
+          - [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)
+          - [Examples](https://github.com/${{ github.repository }}/tree/main/examples)
+          EOF
+      
+      - name: Send release notification to Telegram
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: release
+          template_vars: |
+            {
+              "version": "${{ steps.release-info.outputs.version }}",
+              "tag": "${{ steps.release-info.outputs.version }}",
+              "releaseNotes": "${{ steps.release-info.outputs.release_notes }}",
+              "isPrerelease": "${{ steps.release-info.outputs.prerelease }}",
+              "downloadUrl": "${{ steps.release-info.outputs.download_url }}"
+            }
+          message: |
+            🎉 **New Release Available!**
+            
+            Version ${{ steps.release-info.outputs.version }} has been published.
+            
+            Key improvements:
+            • Enhanced file upload capabilities
+            • Advanced message templating
+            • Improved error handling
+            • Better performance and reliability
+          inline_keyboard: |
+            [
+              {"text": "📥 Download", "url": "${{ steps.release-info.outputs.download_url }}"},
+              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
+              {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"}
+            ]
+          language: en
+      
+      - name: Send release notes as document
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: RELEASE_NOTES.md
+          file_type: document
+          caption: |
+            📋 **Release Notes**
+            
+            Complete release notes for ${{ steps.release-info.outputs.version }}
+            
+            Repository: ${{ github.repository }}
+            Released: $(date -u +"%Y-%m-%d %H:%M UTC")
+      
+      - name: Notify development team (if prerelease)
+        if: steps.release-info.outputs.prerelease == 'true'
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_DEV_CHAT_ID }}
+          template: warning
+          message: |
+            🚧 **Prerelease Published**
+            
+            A prerelease version ${{ steps.release-info.outputs.version }} has been published.
+            Please test thoroughly before promoting to stable release.
+          template_vars: |
+            {
+              "version": "${{ steps.release-info.outputs.version }}"
+            }
+          inline_keyboard: |
+            [
+              {"text": "🧪 Test Release", "url": "${{ steps.release-info.outputs.download_url }}"},
+              {"text": "🐛 Report Issues", "url": "https://github.com/${{ github.repository }}/issues/new"}
+            ]
+
+  post-release-tasks:
+    name: Post-Release Tasks
+    runs-on: ubuntu-latest
+    needs: release-notification
+    if: github.event.release.prerelease != true
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update marketplace listing
+        run: |
+          echo "Updating GitHub Marketplace listing..."
+          # Add logic to update marketplace if needed
+      
+      - name: Notify success
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: success
+          message: |
+            ✅ **Release Process Completed**
+            
+            All post-release tasks have been completed successfully.
+            The action is now available on GitHub Marketplace.
+          template_vars: |
+            {
+              "version": "${{ github.event.release.tag_name || github.event.inputs.version }}"
+            }

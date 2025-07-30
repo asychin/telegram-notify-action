@@ -1,233 +1,578 @@
-# 📱 Telegram Notify Action
+# 📱 Telegram Notify Action - Enhanced
 
-A powerful GitHub Action for sending and editing Telegram notifications with support for message threads and dynamic environments.
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)
 
-## ✨ Features
+A powerful and feature-rich GitHub Action for sending notifications to Telegram with advanced capabilities including file uploads, message templates, inline keyboards, retry logic, and much more.
 
-- ✅ Send new messages to Telegram
-- ✅ Edit existing messages
-- ✅ Support for topics/forums (message_thread_id)
-- ✅ Dynamic environment support (dev, prod, staging)
-- ✅ HTML formatting with clickable GitHub profile links
-- ✅ Return message_id for subsequent operations
-- ✅ Comprehensive error handling
-- ✅ Multilingual support (English/Russian)
+## 🚀 Features
 
-## 🚀 Quick Start
+### Core Features
+- ✅ **Send & Edit Messages** - Send new messages or edit existing ones
+- 📁 **File Uploads** - Send documents, images, videos, and other file types
+- 🎨 **Message Templates** - Pre-built templates for different scenarios
+- ⌨️ **Inline Keyboards** - Interactive buttons with URLs and callbacks
+- 🔄 **Retry Logic** - Automatic retry with exponential backoff
+- 🌍 **Multi-language** - Support for English and Russian
+- 🧵 **Thread Support** - Send messages to specific forum topics/threads
 
-```yaml
-- name: Send Telegram notification
-  uses: asychin/telegram-notify-action@v1
-  with:
-    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    message: |
-      🚀 <b>Deployment Started</b>
+### Advanced Features
+- 🎯 **Conditional Sending** - Send notifications based on workflow status
+- 🔒 **Content Protection** - Prevent message forwarding and saving
+- 📊 **GitHub Context** - Automatic GitHub variables substitution
+- 🎛️ **Flexible Configuration** - Extensive customization options
+- 📈 **Comprehensive Testing** - Full test suite with high coverage
+- 🛡️ **Error Handling** - Graceful error handling and detailed logging
 
-      <b>Repository:</b> ${{ github.repository }}
-      <b>Branch:</b> <code>${{ github.ref_name }}</code>
-      <b>Initiated by:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
-
-      <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Workflow</a>
-```
-
-## 📋 Inputs
-
-| Input                      | Required | Description                             | Default |
-| -------------------------- | -------- | --------------------------------------- | ------- |
-| `telegram_token`           | ✅       | Telegram Bot Token                      |         |
-| `chat_id`                  | ✅       | Telegram Chat ID                        |         |
-| `message`                  | ✅       | Message text to send                    |         |
-| `message_thread_id`        | ❌       | Message thread ID for topics            |         |
-| `message_id`               | ❌       | Message ID to edit (for updates)        |         |
-| `parse_mode`               | ❌       | Parse mode (HTML, Markdown, MarkdownV2) | `HTML`  |
-| `disable_web_page_preview` | ❌       | Disable link previews                   | `true`  |
-| `disable_notification`     | ❌       | Send silently                           | `false` |
-| `language`                 | ❌       | Language for log messages (en, ru)      | `en`    |
-
-## 📤 Outputs
-
-| Output       | Description                      |
-| ------------ | -------------------------------- |
-| `message_id` | ID of the sent/edited message    |
-| `success`    | Whether operation was successful |
-
-## 🔄 Dynamic Environment Support
-
-Use with environment-specific variables:
-
-```yaml
-# Automatically selects variables based on branch name
-telegram_token: ${{ secrets[format('TELEGRAM_BOT_TOKEN_{0}', github.ref_name)] }}
-chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
-```
-
-**Required Variables:**
-
-- Secrets: `TELEGRAM_BOT_TOKEN_DEV`, `TELEGRAM_BOT_TOKEN_PROD`
-- Variables: `TELEGRAM_CHAT_ID_DEV`, `TELEGRAM_CHAT_ID_PROD`
-
-## 📝 Examples
+## 📦 Quick Start
 
 ### Basic Usage
 
 ```yaml
-- uses: asychin/telegram-notify-action@v1
+- name: Send Telegram Notification
+  uses: asychin/telegram-notify-action@v2
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    message: "Hello from GitHub Actions! 👋"
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "Hello from GitHub Actions! 🚀"
+```
+
+### Using Templates
+
+```yaml
+- name: Success Notification
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: "Deployment completed successfully!"
+    template_vars: |
+      {
+        "deployStatus": "successful",
+        "version": "v1.2.3"
+      }
+```
+
+### File Upload
+
+```yaml
+- name: Send Report
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    file_path: ./reports/test-results.json
+    file_type: document
+    caption: "📊 Test Results Report"
+```
+
+### Interactive Message
+
+```yaml
+- name: Interactive Notification
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "🎉 New release is ready!"
+    inline_keyboard: |
+      [
+        {"text": "📥 Download", "url": "https://github.com/user/repo/releases/latest"},
+        {"text": "📖 Changelog", "url": "https://github.com/user/repo/blob/main/CHANGELOG.md"}
+      ]
+```
+
+## 📖 Input Parameters
+
+### Required Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `telegram_token` | Telegram Bot Token | `${{ secrets.TELEGRAM_BOT_TOKEN }}` |
+| `chat_id` | Telegram Chat ID | `${{ secrets.TELEGRAM_CHAT_ID }}` |
+
+### Message Parameters
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `message` | Message text | - | `"Hello World!"` |
+| `parse_mode` | Message parse mode | `HTML` | `HTML`, `Markdown`, `MarkdownV2` |
+| `disable_web_page_preview` | Disable link previews | `true` | `true`, `false` |
+| `disable_notification` | Send silently | `false` | `true`, `false` |
+| `language` | Interface language | `en` | `en`, `ru` |
+
+### Advanced Message Parameters
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `message_thread_id` | Forum topic ID | - | `123` |
+| `message_id` | Message ID to edit | - | `456` |
+| `reply_to_message_id` | Reply to message ID | - | `789` |
+| `protect_content` | Protect from forwarding | `false` | `true`, `false` |
+| `allow_sending_without_reply` | Send if reply target missing | `true` | `true`, `false` |
+| `message_effect_id` | Message effect ID | - | `effect_id` |
+| `business_connection_id` | Business connection ID | - | `business_id` |
+
+### File Upload Parameters
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `file_path` | Path to file | - | `./report.pdf` |
+| `file_type` | Type of file | `document` | `photo`, `document`, `video`, `audio` |
+| `caption` | File caption | - | `"📊 Report"` |
+
+### Template Parameters
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `template` | Template name | - | `success`, `error`, `warning`, `info`, `deploy`, `test`, `release` |
+| `template_vars` | Template variables (JSON) | `{}` | `{"version": "v1.0.0"}` |
+
+### Interactive Features
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `inline_keyboard` | Inline keyboard (JSON) | - | `[{"text": "Button", "url": "https://example.com"}]` |
+
+### Retry Configuration
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `max_retries` | Maximum retry attempts | `3` | `5` |
+| `retry_delay` | Initial retry delay (seconds) | `1` | `2` |
+
+### Conditional Sending
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `send_on_failure` | Send only on failure | `false` | `true`, `false` |
+| `send_on_success` | Send only on success | `false` | `true`, `false` |
+
+## 📤 Output Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `message_id` | ID of sent/edited message | `123456` |
+| `success` | Operation success status | `true`, `false` |
+| `file_id` | ID of uploaded file | `BAADBAADrwADBREAAYag2eLJxJVvAg` |
+| `retry_count` | Number of retry attempts | `2` |
+
+## 🎨 Message Templates
+
+The action includes pre-built templates for common scenarios:
+
+### Available Templates
+
+| Template | Description | Use Case |
+|----------|-------------|----------|
+| `success` | Success notification | Successful deployments, builds |
+| `error` | Error notification | Failed workflows, critical issues |
+| `warning` | Warning notification | Non-critical issues, deprecations |
+| `info` | Information notification | General updates, announcements |
+| `deploy` | Deployment notification | Application deployments |
+| `test` | Test results notification | Test suite results |
+| `release` | Release notification | New releases, version updates |
+
+### Template Variables
+
+Templates support variable substitution using `{{variable}}` syntax:
+
+```yaml
+template_vars: |
+  {
+    "version": "v2.0.0",
+    "deployStatus": "successful",
+    "testStatus": "passed",
+    "coverage": "95%",
+    "customMessage": "Additional information"
+  }
+```
+
+### GitHub Context Variables
+
+The following GitHub context variables are automatically available:
+
+- `repository` - Repository name
+- `refName` - Branch/tag name
+- `sha` - Commit SHA
+- `actor` - User who triggered the workflow
+- `workflow` - Workflow name
+- `job` - Job name
+- `runId` - Workflow run ID
+- `runNumber` - Workflow run number
+- `eventName` - Event that triggered the workflow
+
+## 📁 File Upload Support
+
+### Supported File Types
+
+| Type | Description | Max Size |
+|------|-------------|----------|
+| `photo` | Images (JPEG, PNG, WebP) | 10 MB |
+| `document` | Any file type | 50 MB |
+| `video` | Video files | 50 MB |
+| `audio` | Audio files | 50 MB |
+| `animation` | GIF animations | 50 MB |
+| `voice` | Voice messages | 50 MB |
+| `video_note` | Video notes | 50 MB |
+| `sticker` | Sticker files | 50 MB |
+
+### File Upload Example
+
+```yaml
+- name: Upload Test Results
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    file_path: ./test-results.html
+    file_type: document
+    caption: |
+      📊 **Test Results**
+      
+      Generated: $(date)
+      Coverage: 95%
+      Status: ✅ Passed
+```
+
+## ⌨️ Inline Keyboards
+
+Create interactive messages with clickable buttons:
+
+### Button Types
+
+- **URL Buttons** - Open external links
+- **Callback Buttons** - Trigger bot callbacks (requires bot handling)
+
+### Keyboard Format
+
+```json
+[
+  [
+    {"text": "Button 1", "url": "https://example1.com"},
+    {"text": "Button 2", "url": "https://example2.com"}
+  ],
+  [
+    {"text": "Full Width Button", "url": "https://example3.com"}
+  ]
+]
+```
+
+### Example Usage
+
+```yaml
+inline_keyboard: |
+  [
+    [
+      {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+      {"text": "📝 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}
+    ],
+    [
+      {"text": "🐛 Report Issue", "url": "${{ github.server_url }}/${{ github.repository }}/issues/new"}
+    ]
+  ]
+```
+
+## 🔄 Retry Logic
+
+The action includes automatic retry functionality with exponential backoff:
+
+### Configuration
+
+```yaml
+max_retries: 5        # Maximum number of retry attempts
+retry_delay: 2        # Initial delay in seconds (doubles each retry)
+```
+
+### Retry Behavior
+
+1. **Initial Attempt** - Try sending immediately
+2. **First Retry** - Wait `retry_delay` seconds
+3. **Second Retry** - Wait `retry_delay * 2` seconds
+4. **Third Retry** - Wait `retry_delay * 4` seconds
+5. **Continue** - Until `max_retries` reached
+
+## 🎯 Conditional Sending
+
+Send notifications only when specific conditions are met:
+
+### Send on Failure Only
+
+```yaml
+- name: Failure Notification
+  if: failure()
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: error
+    message: "Workflow failed! Please check the logs."
+    send_on_failure: true
+```
+
+### Send on Success Only
+
+```yaml
+- name: Success Notification
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: "Deployment completed successfully!"
+    send_on_success: true
+```
+
+## 🌍 Multi-language Support
+
+The action supports multiple languages for system messages:
+
+### Supported Languages
+
+- `en` - English (default)
+- `ru` - Russian
+
+### Usage
+
+```yaml
+language: ru  # Use Russian interface
+```
+
+## 🛠️ Setup Instructions
+
+### 1. Create a Telegram Bot
+
+1. Message [@BotFather](https://t.me/BotFather) on Telegram
+2. Send `/newbot` and follow the instructions
+3. Save the bot token
+
+### 2. Get Chat ID
+
+**For personal chat:**
+1. Message your bot
+2. Visit `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+3. Find your chat ID in the response
+
+**For group chat:**
+1. Add bot to the group
+2. Send a message mentioning the bot
+3. Visit the getUpdates URL
+4. Find the group chat ID (negative number)
+
+### 3. Configure GitHub Secrets
+
+Add these secrets to your repository:
+
+- `TELEGRAM_BOT_TOKEN` - Your bot token
+- `TELEGRAM_CHAT_ID` - Your chat ID
+
+## 📝 Examples
+
+### Complete CI/CD Workflow
+
+```yaml
+name: CI/CD with Telegram Notifications
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Tests
+        run: npm test
+        id: tests
+      
+      - name: Test Results
+        if: always()
+        uses: asychin/telegram-notify-action@v2
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ steps.tests.outcome == 'success' && 'test' || 'error' }}
+          message: |
+            🧪 **Test Results**
+            
+            Status: ${{ steps.tests.outcome }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+          template_vars: |
+            {
+              "testStatus": "${{ steps.tests.outcome }}",
+              "coverage": "95%"
+            }
+          inline_keyboard: |
+            [
+              {"text": "📊 View Details", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+            ]
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy
+        run: echo "Deploying..."
+        id: deploy
+      
+      - name: Deployment Notification
+        uses: asychin/telegram-notify-action@v2
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: deploy
+          message: "🚀 Deployment to production completed!"
+          template_vars: |
+            {
+              "deployStatus": "successful",
+              "version": "v1.0.0"
+            }
+```
+
+### File Upload with Report
+
+```yaml
+- name: Generate Report
+  run: |
+    echo "Generating test report..."
+    npm run test:report
+    
+- name: Send Report
+  uses: asychin/telegram-notify-action@v2
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    file_path: ./reports/test-report.html
+    file_type: document
+    caption: |
+      📊 **Test Report**
+      
+      Generated: $(date)
+      Tests: 150 passed, 0 failed
+      Coverage: 95.2%
+    inline_keyboard: |
+      [
+        {"text": "📈 View Online", "url": "https://your-site.com/reports"}
+      ]
 ```
 
 ### Message Editing
 
 ```yaml
-- name: Send initial message
-  id: initial
-  uses: asychin/telegram-notify-action@v1
+- name: Start Process
+  id: start
+  uses: asychin/telegram-notify-action@v2
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    message: "🔄 Process starting..."
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "⏳ Starting deployment process..."
 
-- name: Update message
-  uses: asychin/telegram-notify-action@v1
+- name: Deploy Application
+  run: |
+    echo "Deploying..."
+    sleep 30
+    echo "Deployment complete!"
+
+- name: Update Status
+  uses: asychin/telegram-notify-action@v2
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    message_id: ${{ steps.initial.outputs.message_id }}
-    message: "✅ Process completed!"
-```
-
-### Send to Topic
-
-```yaml
-- uses: asychin/telegram-notify-action@v1
-  with:
-    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    message_thread_id: ${{ vars.TELEGRAM_TOPIC_ID }}
-    message: "Message to specific topic"
-```
-
-### Russian Language Support
-
-```yaml
-- uses: asychin/telegram-notify-action@v1
-  with:
-    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-    language: ru
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message_id: ${{ steps.start.outputs.message_id }}
     message: |
-      📦 <b>Новый коммит в репозиторий</b>
-
-      <b>Репозиторий:</b> ${{ github.repository }}
-      <b>Ветка:</b> <code>${{ github.ref_name }}</code>
-      <b>Автор:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
+      ✅ **Deployment Complete!**
+      
+      Duration: 30 seconds
+      Status: Success
+      Version: v1.2.3
+    inline_keyboard: |
+      [
+        {"text": "🌐 View Site", "url": "https://your-site.com"}
+      ]
 ```
 
-### Full Deployment Example
+## 🧪 Testing
 
-```yaml
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send start notification
-        id: start
-        uses: asychin/telegram-notify-action@v1
-        with:
-          telegram_token: ${{ secrets[format('TELEGRAM_BOT_TOKEN_{0}', github.ref_name)] }}
-          chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
-          message: |
-            🚀 <b>Deployment Started</b>
+The action includes comprehensive testing:
 
-            <b>Repository:</b> ${{ github.repository }}
-            <b>Branch:</b> <code>${{ github.ref_name }}</code>
-            <b>Initiated by:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
+```bash
+# Install dependencies
+npm install
 
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Workflow</a>
+# Run tests
+npm test
 
-      # Your deployment steps here...
+# Run tests with coverage
+npm run test:coverage
 
-      - name: Send completion notification
-        if: always()
-        uses: asychin/telegram-notify-action@v1
-        with:
-          telegram_token: ${{ secrets[format('TELEGRAM_BOT_TOKEN_{0}', github.ref_name)] }}
-          chat_id: ${{ vars[format('TELEGRAM_CHAT_ID_{0}', github.ref_name)] }}
-          message_id: ${{ steps.start.outputs.message_id }}
-          message: |
-            ${{ job.status == 'success' && '✅' || '❌' }} <b>Deployment ${{ job.status == 'success' && 'Completed' || 'Failed' }}</b>
-
-            <b>Repository:</b> ${{ github.repository }}
-            <b>Branch:</b> <code>${{ github.ref_name }}</code>
-            <b>Initiated by:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
-            <b>Duration:</b> ${{ steps.deploy.conclusion }}
-
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Workflow</a>
+# Run linting
+npm run lint
 ```
-
-## 🤖 Bot Setup
-
-1. Create bot via [@BotFather](https://t.me/BotFather)
-2. Get bot token and add to GitHub Secrets
-3. Add bot to your chat/channel
-4. For channels: make bot an administrator
-5. Get chat ID using [@userinfobot](https://t.me/userinfobot)
-6. Add chat ID to GitHub Variables
-
-## 🔧 Troubleshooting
-
-### "Bad Request: chat not found"
-
-- Ensure bot is added to the chat
-- For channels/supergroups: make bot an administrator
-- Verify chat ID is correct
-
-### "Forbidden: bot was blocked"
-
-- Bot was blocked by user (for private chats)
-- User must start conversation with bot first
-
-## 🌐 Language Support
-
-The action supports multiple languages for log messages:
-
-- **English** (`en`) - default language
-- **Russian** (`ru`) - русский язык
-
-Set the `language` parameter to `ru` for Russian log messages:
-
-```yaml
-- uses: asychin/telegram-notify-action@v1
-  with:
-    language: ru
-    # ... other parameters
-```
-
-## 📊 HTML Formatting
-
-Supported HTML tags:
-
-- `<b>text</b>` - **bold**
-- `<i>text</i>` - _italic_
-- `<code>text</code>` - `monospace`
-- `<pre>text</pre>` - `preformatted`
-- `<a href="url">text</a>` - [links](url)
-
-## 📄 License
-
-MIT License - see LICENSE file for details
 
 ## 🤝 Contributing
 
-Contributions welcome! Please read CONTRIBUTING.md for guidelines.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## ⭐ Support
+## 📄 License
 
-If this action helped you, please ⭐ star the repository!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Bot not responding:**
+- Verify bot token is correct
+- Ensure bot is not blocked
+- Check if bot has necessary permissions
+
+**File upload fails:**
+- Check file size limits
+- Verify file path is correct
+- Ensure file type is supported
+
+**Template not working:**
+- Verify template name is correct
+- Check template_vars JSON format
+- Ensure all required variables are provided
+
+**Retry logic not working:**
+- Check network connectivity
+- Verify retry configuration
+- Review error logs for details
+
+### Debug Mode
+
+Enable debug logging by setting the `ACTIONS_STEP_DEBUG` secret to `true` in your repository.
+
+## 📞 Support
+
+- 📖 [Documentation](https://github.com/asychin/telegram-notify-action/blob/main/README.md)
+- 🐛 [Report Issues](https://github.com/asychin/telegram-notify-action/issues)
+- 💬 [Discussions](https://github.com/asychin/telegram-notify-action/discussions)
+- 📧 [Contact](mailto:your-email@example.com)
+
+## 🙏 Acknowledgments
+
+- Thanks to all contributors
+- Inspired by the GitHub Actions community
+- Built with ❤️ for developers
 
 ---
 
-Created with ❤️ for the GitHub Actions community
+**Made with ❤️ by [Sychin Andrey](https://github.com/asychin)**

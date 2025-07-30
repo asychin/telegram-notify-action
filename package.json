@@ -1,10 +1,15 @@
 {
   "name": "telegram-notify-action",
-  "version": "1.0.0",
-  "description": "GitHub Action for sending and editing Telegram notifications",
+  "version": "2.0.0",
+  "description": "Enhanced GitHub Action for sending and editing Telegram notifications with file support, templates, and advanced features",
   "main": "telegram-notify.js",
   "scripts": {
-    "test": "node telegram-notify.js"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint telegram-notify.js",
+    "lint:fix": "eslint telegram-notify.js --fix",
+    "validate": "node telegram-notify.js --validate"
   },
   "keywords": [
     "github-action",
@@ -12,7 +17,11 @@
     "notifications",
     "bot",
     "ci-cd",
-    "deployment"
+    "deployment",
+    "files",
+    "templates",
+    "inline-keyboards",
+    "retry-logic"
   ],
   "repository": {
     "type": "git",
@@ -22,5 +31,47 @@
   "license": "MIT",
   "engines": {
     "node": ">=16"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.57.0",
+    "formdata-polyfill": "^4.0.10",
+    "node-fetch": "^3.3.2",
+    "@types/node": "^20.10.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "telegram-notify.js"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/?(*.)+(spec|test).js"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2022": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "prefer-const": "error",
+      "no-var": "error"
+    }
   }
 }
