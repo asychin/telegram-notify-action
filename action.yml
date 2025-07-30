@@ -1,4 +1,4 @@
-name: "Telegram Notify"
+name: "Telegram Notify Action"
 description: "Send or update Telegram notifications with support for message threads"
 author: "Sychin Andrey"
 
