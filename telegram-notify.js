@@ -1321,6 +1321,7 @@ Released by: {{actor}}
 // Export for testing
 if (typeof module !== "undefined" && module.exports) {
   module.exports = TelegramNotify;
+  module.exports.TelegramNotify = TelegramNotify;
 }
 
 // Execute the action only when run directly (not when imported)
