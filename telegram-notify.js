@@ -67,7 +67,8 @@ class TelegramNotify {
     // Retry configuration
     this.maxRetries = parseInt(process.env.MAX_RETRIES) || 5;
     this.retryDelay = parseInt(process.env.RETRY_DELAY) || 1;
-    this.maxRateLimitRetries = parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
+    this.maxRateLimitRetries =
+      parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
 
     // Conditional sending
     this.sendOnFailure = process.env.SEND_ON_FAILURE === "true";
@@ -626,7 +627,7 @@ Released by: {{actor}}
           const retryAfter = retryAfterMatch
             ? parseInt(retryAfterMatch[1])
             : 30;
-          
+
           // Rate limiting gets separate retry attempts
           if (rateLimitRetries < this.maxRateLimitRetries) {
             rateLimitRetries++;
@@ -634,7 +635,7 @@ Released by: {{actor}}
               `Rate limited (${rateLimitRetries}/${this.maxRateLimitRetries}). Waiting ${retryAfter} seconds before retry...`
             );
             await this.sleep(retryAfter * 1000);
-            
+
             // Don't increment attempt counter for rate limiting
             attempt--;
             continue;
