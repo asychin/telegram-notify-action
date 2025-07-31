@@ -481,6 +481,17 @@ Released by: {{actor}}
       } catch (error) {
         lastError = error;
         
+        // Handle rate limiting with longer delay
+        if (error.message.includes("Too Many Requests")) {
+          const retryAfterMatch = error.message.match(/retry after (\d+)/);
+          const retryAfter = retryAfterMatch ? parseInt(retryAfterMatch[1]) : 30;
+          if (attempt < this.maxRetries) {
+            this.warning(`Rate limited. Waiting ${retryAfter} seconds before retry...`);
+            await this.sleep(retryAfter * 1000);
+            continue;
+          }
+        }
+        
         if (attempt < this.maxRetries) {
           const delay = this.retryDelay * Math.pow(2, attempt) * 1000; // Exponential backoff
           this.warning(`${this.messages.retryAttempt} ${attempt + 1}/${this.maxRetries + 1} after ${delay}ms`);
@@ -490,6 +501,26 @@ Released by: {{actor}}
     }
 
     this.error(`${this.messages.maxRetriesReached}. ${this.messages.requestFailed} ${lastError.message}`);
+  }
+
+  /**
+   * Prepare inline keyboard for Telegram API
+   */
+  prepareInlineKeyboard() {
+    if (!this.inlineKeyboard) return null;
+    
+    let keyboard = this.inlineKeyboard;
+    if (Array.isArray(keyboard) && keyboard.length > 0) {
+      // If first element is not an array, wrap each button in an array
+      if (!Array.isArray(keyboard[0])) {
+        keyboard = keyboard.map(button => [button]);
+      }
+      return { inline_keyboard: keyboard };
+    }
+    return null;
+  }
+
+  /**
   }
 
   /**
@@ -523,9 +554,11 @@ Released by: {{actor}}
       payload.business_connection_id = this.businessConnectionId;
     }
     if (this.inlineKeyboard) {
-      payload.reply_markup = {
-        inline_keyboard: this.inlineKeyboard
-      };
+      let keyboard = Array.isArray(this.inlineKeyboard) ? this.inlineKeyboard : [this.inlineKeyboard];
+      if (keyboard.length > 0 && !Array.isArray(keyboard[0])) {
+        keyboard = keyboard.map(button => [button]);
+      }
+      payload.reply_markup = { inline_keyboard: keyboard };
     }
 
     return payload;
@@ -614,11 +647,12 @@ Released by: {{actor}}
       parse_mode: this.parseMode,
       disable_web_page_preview: this.disableWebPagePreview
     };
-
     if (this.inlineKeyboard) {
-      payload.reply_markup = {
-        inline_keyboard: this.inlineKeyboard
-      };
+      let keyboard = Array.isArray(this.inlineKeyboard) ? this.inlineKeyboard : [this.inlineKeyboard];
+      if (keyboard.length > 0 && !Array.isArray(keyboard[0])) {
+        keyboard = keyboard.map(button => [button]);
+      }
+      payload.reply_markup = { inline_keyboard: keyboard };
     }
 
     this.info(`${this.messages.editingMessage} ${this.messageId}`);
