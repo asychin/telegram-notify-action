@@ -31,7 +31,7 @@ inputs:
     required: false
     default: "false"
   language:
-    description: "Language for log messages (en, ru)"
+    description: "Language for log messages (en, ru, zh)"
     required: false
     default: "en"
   # New enhanced parameters

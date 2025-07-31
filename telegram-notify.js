@@ -155,6 +155,27 @@ class TelegramNotify {
         fileNotFound: "Файл не найден:",
         invalidFileType: "Недопустимый тип файла:",
       },
+      zh: {
+        tokenRequired: "需要 TELEGRAM_TOKEN",
+        chatIdRequired: "需要 CHAT_ID",
+        messageOrFileRequired: "需要 MESSAGE、FILE_PATH 或 TEMPLATE",
+        sendingMessage: "正在发送新的 Telegram 消息...",
+        sendingFile: "正在发送文件到 Telegram...",
+        sendingToThread: "向主题发送消息:",
+        editingMessage: "正在编辑消息，ID:",
+        messageSent: "消息发送成功！消息 ID:",
+        messageEdited: "消息编辑成功！消息 ID:",
+        fileSent: "文件发送成功！文件 ID:",
+        failed: "发送/编辑 Telegram 消息失败:",
+        telegramApiError: "Telegram API 错误:",
+        requestFailed: "请求失败:",
+        retryAttempt: "重试尝试",
+        maxRetriesReached: "已达到最大重试次数",
+        conditionalSkip: "由于条件发送规则跳过通知",
+        templateNotFound: "模板未找到:",
+        fileNotFound: "文件未找到:",
+        invalidFileType: "无效的文件类型:",
+      },
     };
 
     return messages[this.language] || messages.en;
@@ -184,6 +205,15 @@ Workflow: {{workflow}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
+        zh: `✅ <b>成功</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+提交: {{sha}}
+执行者: {{actor}}
+工作流: {{workflow}}
+
+{{customMessage}}`,
       },
       error: {
         en: `❌ <b>Error</b>
@@ -206,6 +236,16 @@ Workflow: {{workflow}}
 Статус задачи: {{jobStatus}}
 
 {{customMessage}}`,
+        zh: `❌ <b>错误</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+提交: {{sha}}
+执行者: {{actor}}
+工作流: {{workflow}}
+任务状态: {{jobStatus}}
+
+{{customMessage}}`,
       },
       warning: {
         en: `⚠️ <b>Warning</b>
@@ -222,6 +262,13 @@ Workflow: {{workflow}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
+        zh: `⚠️ <b>警告</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+工作流: {{workflow}}
+
+{{customMessage}}`,
       },
       info: {
         en: `ℹ️ <b>Information</b>
@@ -236,6 +283,13 @@ Actor: {{actor}}
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Автор: {{actor}}
+
+{{customMessage}}`,
+        zh: `ℹ️ <b>信息</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+执行者: {{actor}}
 
 {{customMessage}}`,
       },
@@ -262,6 +316,17 @@ Status: {{deployStatus}}
 Статус: {{deployStatus}}
 
 {{customMessage}}`,
+        zh: `🚀 <b>部署</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+提交: {{sha}}
+运行: #{{runNumber}}
+
+部署者: {{actor}}
+状态: {{deployStatus}}
+
+{{customMessage}}`,
       },
       test: {
         en: `🧪 <b>Test Results</b>
@@ -286,6 +351,17 @@ Coverage: {{coverage}}
 Покрытие: {{coverage}}
 
 {{customMessage}}`,
+        zh: `🧪 <b>测试结果</b>
+
+仓库: {{repository}}
+分支: {{refName}}
+提交: {{sha}}
+运行: #{{runNumber}}
+
+测试状态: {{testStatus}}
+覆盖率: {{coverage}}
+
+{{customMessage}}`,
       },
       release: {
         en: `🎉 <b>New Release</b>
@@ -304,6 +380,16 @@ Released by: {{actor}}
 Версия: {{version}}
 Тег: {{tag}}
 Выпустил: {{actor}}
+
+{{releaseNotes}}
+
+{{customMessage}}`,
+        zh: `🎉 <b>新版本发布</b>
+
+仓库: {{repository}}
+版本: {{version}}
+标签: {{tag}}
+发布者: {{actor}}
 
 {{releaseNotes}}
 
