@@ -782,7 +782,7 @@ Released by: {{actor}}
     const allVars = {
       ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
       ...this.getEventContext(), // Automatic event-specific variables
-      customMessage: this.message || "",
+      customMessage: this.message || "", // Always include customMessage, even if empty
       ...this.templateVars, // User-defined variables (highest priority)
     };
 
@@ -805,7 +805,7 @@ Released by: {{actor}}
     const processedText = templateText.replace(
       /\{\{(\w+)\}\}/g,
       (match, key) => {
-        return allVars[key] || match;
+        return Object.prototype.hasOwnProperty.call(allVars, key) ? allVars[key] : match;
       }
     );
 
