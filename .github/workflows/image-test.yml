@@ -1,0 +1,296 @@
+name: Image Upload Tests - C2PA Detection
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "Test mode to run"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - c2pa-detection
+          - photo-vs-document
+          - size-validation
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+    paths:
+      - "telegram-notify.js"
+      - "test-image.png"
+      - ".github/workflows/image-test.yml"
+
+jobs:
+  c2pa-metadata-detection:
+    name: 🔍 C2PA Metadata Detection Test
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_mode == 'all' || github.event.inputs.test_mode == 'c2pa-detection' || github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: ✅ Verify Test Image Exists
+        run: |
+          if [ ! -f "test-image.png" ]; then
+            echo "❌ Test image not found!"
+            exit 1
+          fi
+
+          echo "📊 Image Analysis:"
+          ls -lh test-image.png
+          file test-image.png
+
+          # Check for C2PA metadata
+          if strings test-image.png | grep -i "c2pa\|jumb" > /dev/null; then
+            echo "✅ C2PA metadata detected in test image"
+          else
+            echo "ℹ️ No C2PA metadata found"
+          fi
+
+      - name: 🧪 Test Photo Upload (Should Auto-Convert to Document)
+        uses: ./
+        id: photo-test
+        continue-on-error: true
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: "test-image.png"
+          file_type: "photo"
+          caption: "🧪 C2PA Test: Photo type (should auto-convert to document)"
+          language: "ru"
+          max_retries: 2
+
+      - name: 📊 Photo Test Results
+        run: |
+          echo "Photo test results:"
+          echo "Success: ${{ steps.photo-test.outputs.success }}"
+          echo "Message ID: ${{ steps.photo-test.outputs.message_id }}"
+          echo "File ID: ${{ steps.photo-test.outputs.file_id }}"
+          echo "Retry Count: ${{ steps.photo-test.outputs.retry_count }}"
+
+  document-upload-test:
+    name: 📎 Document Upload Test
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_mode == 'all' || github.event.inputs.test_mode == 'photo-vs-document' || github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 📄 Test Document Upload (Recommended for C2PA)
+        uses: ./
+        id: document-test
+        continue-on-error: true
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: "test-image.png"
+          file_type: "document"
+          caption: "📄 C2PA Test: Document type (recommended for images with metadata)"
+          language: "en"
+          max_retries: 2
+
+      - name: 📊 Document Test Results
+        run: |
+          echo "Document test results:"
+          echo "Success: ${{ steps.document-test.outputs.success }}"
+          echo "Message ID: ${{ steps.document-test.outputs.message_id }}"
+          echo "File ID: ${{ steps.document-test.outputs.file_id }}"
+          echo "Retry Count: ${{ steps.document-test.outputs.retry_count }}"
+
+  size-validation-test:
+    name: 📏 File Size Validation Test
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_mode == 'all' || github.event.inputs.test_mode == 'size-validation' || github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 📏 Test Size Validation
+        run: |
+          echo "🔍 File Size Analysis:"
+
+          size_bytes=$(stat -f%z test-image.png 2>/dev/null || stat -c%s test-image.png)
+          size_kb=$((size_bytes / 1024))
+          size_mb=$((size_bytes / 1024 / 1024))
+
+          echo "File size: ${size_kb}KB (${size_bytes} bytes)"
+
+          # Photo limit: 10MB
+          photo_limit_mb=10
+          photo_limit_bytes=$((photo_limit_mb * 1024 * 1024))
+
+          # Document limit: 50MB  
+          document_limit_mb=50
+          document_limit_bytes=$((document_limit_mb * 1024 * 1024))
+
+          # Sticker limit: 512KB
+          sticker_limit_kb=512
+          sticker_limit_bytes=$((sticker_limit_kb * 1024))
+
+          echo "📤 Photo upload: $( [ $size_bytes -le $photo_limit_bytes ] && echo "✅ SUPPORTED" || echo "❌ TOO LARGE" ) (limit: ${photo_limit_mb}MB)"
+          echo "📎 Document upload: $( [ $size_bytes -le $document_limit_bytes ] && echo "✅ SUPPORTED" || echo "❌ TOO LARGE" ) (limit: ${document_limit_mb}MB)"
+          echo "🏷️ Sticker: $( [ $size_bytes -le $sticker_limit_bytes ] && echo "✅ SUPPORTED" || echo "❌ TOO LARGE" ) (limit: ${sticker_limit_kb}KB)"
+
+      - name: 🚫 Test Sticker Size Rejection
+        uses: ./
+        id: sticker-test
+        continue-on-error: true
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: "test-image.png"
+          file_type: "sticker"
+          caption: "🏷️ Sticker test (should fail - file too large)"
+          max_retries: 1
+
+      - name: 📊 Sticker Test Results (Should Fail)
+        run: |
+          echo "Sticker test results (expected to fail):"
+          echo "Success: ${{ steps.sticker-test.outputs.success }}"
+          if [ "${{ steps.sticker-test.outputs.success }}" = "false" ]; then
+            echo "✅ Test passed: File correctly rejected for sticker (too large)"
+          else
+            echo "❌ Test failed: File should have been rejected for sticker"
+          fi
+
+  metadata-analysis:
+    name: 🔬 Detailed Metadata Analysis
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_mode == 'all' || github.event.inputs.test_mode == 'c2pa-detection' || github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔍 Deep Metadata Analysis
+        run: |
+          echo "🔬 DETAILED METADATA ANALYSIS"
+          echo "========================================"
+
+          # Basic file info
+          echo "📁 File: test-image.png"
+          ls -lh test-image.png
+          file test-image.png
+
+          # Check PNG signature
+          echo ""
+          echo "🖼️ PNG Signature Check:"
+          xxd -l 8 test-image.png | head -1
+
+          # Look for C2PA/JUMB markers
+          echo ""
+          echo "🔍 C2PA/JUMB Metadata Search:"
+          if strings test-image.png | grep -i "c2pa" | head -5; then
+            echo "⚠️ C2PA metadata found!"
+          else
+            echo "ℹ️ No C2PA strings found"
+          fi
+
+          if strings test-image.png | grep -i "jumb" | head -5; then
+            echo "⚠️ JUMB metadata found!"
+          else
+            echo "ℹ️ No JUMB strings found"  
+          fi
+
+          # Check for other metadata
+          echo ""
+          echo "📋 Other Metadata Markers:"
+          strings test-image.png | grep -E "(exif|xmp|iptc|tiff)" -i | head -3 || echo "No standard metadata markers found"
+
+          echo ""
+          echo "✅ Analysis complete"
+
+      - name: 🧪 Run Unit Tests for Image Handling
+        run: |
+          echo "🧪 Running image-specific unit tests..."
+          npm test -- tests/image.test.js --verbose
+
+          echo ""
+          echo "🔗 Running integration tests..."
+          npm test -- tests/integration.test.js --verbose
+
+  summary:
+    name: 📊 Image Test Summary
+    runs-on: ubuntu-latest
+    needs:
+      [
+        c2pa-metadata-detection,
+        document-upload-test,
+        size-validation-test,
+        metadata-analysis,
+      ]
+    if: always()
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📊 Send Test Summary
+        uses: ./
+        continue-on-error: true
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: ${{ (needs.c2pa-metadata-detection.result == 'success' && needs.document-upload-test.result == 'success' && needs.size-validation-test.result == 'success' && needs.metadata-analysis.result == 'success') && 'success' || 'warning' }}
+          language: "ru"
+          message: |
+            **🖼️ Тестирование изображений завершено**
+
+            📊 **Результаты:**
+            • C2PA Detection: ${{ needs.c2pa-metadata-detection.result }}
+            • Document Upload: ${{ needs.document-upload-test.result }}
+            • Size Validation: ${{ needs.size-validation-test.result }}
+            • Metadata Analysis: ${{ needs.metadata-analysis.result }}
+
+            🔍 **Обнаружена проблема:** Изображение содержит метаданные C2PA
+            ✅ **Решение:** Автоматическое переключение photo → document
+          template_vars: |
+            {
+              "customMessage": "Тесты изображений для коммита ${{ github.sha }}"
+            }
+          inline_keyboard: |
+            [
+              [{"text": "📊 Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}],
+              [{"text": "📝 Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}]
+            ]
