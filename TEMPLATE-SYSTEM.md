@@ -258,9 +258,47 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 | --------------- | ------------------------------ | -------------------- |
 | `customMessage` | Содержимое параметра `message` | Дополнительный текст |
 
+### Автоматические переменные (✨ Новое в v3.0)
+
+**Telegram Notify Action теперь автоматически извлекает переменные из GitHub событий!**
+
+Больше не нужно вручную прописывать:
+
+```yaml
+# ❌ Старый способ (v2.x)
+template_vars: |
+  {
+    "author": "${{ github.event.issue.user.login }}",
+    "issueNumber": "${{ github.event.issue.number }}",
+    "issueTitle": "${{ github.event.issue.title }}"
+  }
+```
+
+Теперь эти переменные доступны автоматически:
+
+```yaml
+# ✅ Новый способ (v3.0)
+message: |
+  **Автор:** {{author}}
+  **Issue:** #{{issueNumber}} - {{issueTitle}}
+
+# Переменные доступны сразу!
+```
+
+**Доступные автоматические переменные по событиям:**
+
+| Событие        | Автоматические переменные                                                               |
+| -------------- | --------------------------------------------------------------------------------------- |
+| `issues`       | `author`, `issueNumber`, `issueTitle`, `issueState`, `labels`, `assignees`, `createdAt` |
+| `pull_request` | `author`, `prNumber`, `prTitle`, `baseBranch`, `headBranch`, `isDraft`, `labels`        |
+| `push`         | `pusher`, `commitCount`, `lastCommitMessage`, `lastCommitAuthor`                        |
+| `release`      | `releaseAuthor`, `releaseName`, `releaseTag`, `isPrerelease`                            |
+
+Подробная документация: [AUTO-CONTEXT-VARIABLES.md](docs/AUTO-CONTEXT-VARIABLES.md)
+
 ### Пользовательские переменные
 
-Передаются через параметр `template_vars` в формате JSON:
+Передаются через параметр `template_vars` в формате JSON для кастомных значений:
 
 ```yaml
 template_vars: |
@@ -268,9 +306,7 @@ template_vars: |
     "version": "v2.1.0",
     "environment": "production",
     "deployStatus": "successful",
-    "testStatus": "passed",
-    "coverage": "95%",
-    "duration": "3m 45s"
+    "customAuthor": "Вася Пупкин"  # Переопределяет автоматическое значение
   }
 ```
 

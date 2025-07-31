@@ -77,22 +77,16 @@ jobs:
           message: |
             **🎯 Детали Issue:**
 
-            **📊 Статус:** ${{ steps.notification-type.outputs.action_text }}
-            **👤 Автор:** `${{ github.event.issue.user.login }}`
-            **🏷️ Метки:** ${{ join(github.event.issue.labels.*.name, ', ') || '❌ Нет меток' }}
-            **📅 Создан:** ${{ github.event.issue.created_at }}
+            **📊 Статус:** {{action}}
+            **👤 Автор:** `{{author}}`
+            **🏷️ Метки:** {{labels}}
+            **📅 Создан:** {{createdAt}}
 
-            ${{ github.event.issue.body && '**📄 Есть описание** ✅' || '**📄 Без описания** ❌' }}
+            **📝 Номер Issue:** #{{issueNumber}}
           template_vars: |
             {
-              "issueNumber": "${{ github.event.issue.number }}",
-              "issueTitle": "${{ github.event.issue.title }}",
-              "author": "${{ github.event.issue.user.login }}",
               "action": "${{ steps.notification-type.outputs.action_text }}",
-              "emoji": "${{ steps.notification-type.outputs.emoji }}",
-              "labels": "${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}",
-              "status": "${{ github.event.issue.state }}",
-              "createdAt": "${{ github.event.issue.created_at }}"
+              "emoji": "${{ steps.notification-type.outputs.emoji }}"
             }
           inline_keyboard: |
             [

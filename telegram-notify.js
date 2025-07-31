@@ -109,6 +109,266 @@ class TelegramNotify {
   }
 
   /**
+   * Get automatic event context variables from GitHub event
+   * This provides common variables for each event type without manual configuration
+   */
+  getEventContext() {
+    const eventContext = {};
+
+    try {
+      // Get GitHub event data from GITHUB_EVENT_PATH
+      const eventPath = process.env.GITHUB_EVENT_PATH;
+      if (!eventPath) return eventContext;
+
+      const fs = require("fs");
+      let eventData = {};
+
+      try {
+        const eventContent = fs.readFileSync(eventPath, "utf8");
+        eventData = JSON.parse(eventContent);
+      } catch (error) {
+        this.warning(`Failed to read GitHub event data: ${error.message}`);
+        return eventContext;
+      }
+
+      const eventName = this.githubContext.eventName;
+
+      // Helper function for safe property access
+      const safeGet = (obj, path) => {
+        try {
+          return path.split(".").reduce((o, p) => o && o[p], obj);
+        } catch {
+          return undefined;
+        }
+      };
+
+      // Common variables for all events
+      if (eventData.sender) {
+        eventContext.triggerUser = safeGet(eventData, "sender.login");
+        eventContext.triggerUserId = safeGet(eventData, "sender.id");
+      }
+
+      // Event-specific automatic variables
+      switch (eventName) {
+        case "issues":
+          if (eventData.issue) {
+            eventContext.author = safeGet(eventData, "issue.user.login");
+            eventContext.issueNumber = safeGet(eventData, "issue.number");
+            eventContext.issueTitle = safeGet(eventData, "issue.title");
+            eventContext.issueState = safeGet(eventData, "issue.state");
+            eventContext.issueBody = safeGet(eventData, "issue.body");
+            eventContext.createdAt = safeGet(eventData, "issue.created_at");
+            eventContext.updatedAt = safeGet(eventData, "issue.updated_at");
+
+            // Labels as comma-separated string
+            const labels = safeGet(eventData, "issue.labels");
+            eventContext.labels = Array.isArray(labels)
+              ? labels.map((label) => label.name).join(", ")
+              : "";
+
+            // Assignees as comma-separated string
+            const assignees = safeGet(eventData, "issue.assignees");
+            eventContext.assignees = Array.isArray(assignees)
+              ? assignees.map((assignee) => assignee.login).join(", ")
+              : "";
+          }
+          break;
+
+        case "issue_comment":
+          if (eventData.issue) {
+            eventContext.author = safeGet(eventData, "issue.user.login");
+            eventContext.issueNumber = safeGet(eventData, "issue.number");
+            eventContext.issueTitle = safeGet(eventData, "issue.title");
+            eventContext.issueState = safeGet(eventData, "issue.state");
+          }
+          if (eventData.comment) {
+            eventContext.commentAuthor = safeGet(
+              eventData,
+              "comment.user.login"
+            );
+            eventContext.commentBody = safeGet(eventData, "comment.body");
+            eventContext.commentId = safeGet(eventData, "comment.id");
+            eventContext.commentCreatedAt = safeGet(
+              eventData,
+              "comment.created_at"
+            );
+          }
+          break;
+
+        case "pull_request":
+          if (eventData.pull_request) {
+            eventContext.author = safeGet(eventData, "pull_request.user.login");
+            eventContext.prNumber = safeGet(eventData, "pull_request.number");
+            eventContext.prTitle = safeGet(eventData, "pull_request.title");
+            eventContext.prState = safeGet(eventData, "pull_request.state");
+            eventContext.prBody = safeGet(eventData, "pull_request.body");
+            eventContext.baseBranch = safeGet(
+              eventData,
+              "pull_request.base.ref"
+            );
+            eventContext.headBranch = safeGet(
+              eventData,
+              "pull_request.head.ref"
+            );
+            eventContext.prCreatedAt = safeGet(
+              eventData,
+              "pull_request.created_at"
+            );
+            eventContext.prUpdatedAt = safeGet(
+              eventData,
+              "pull_request.updated_at"
+            );
+            eventContext.isDraft = safeGet(eventData, "pull_request.draft");
+            eventContext.mergeable = safeGet(
+              eventData,
+              "pull_request.mergeable"
+            );
+
+            // Labels and assignees
+            const labels = safeGet(eventData, "pull_request.labels");
+            eventContext.labels = Array.isArray(labels)
+              ? labels.map((label) => label.name).join(", ")
+              : "";
+
+            const assignees = safeGet(eventData, "pull_request.assignees");
+            eventContext.assignees = Array.isArray(assignees)
+              ? assignees.map((assignee) => assignee.login).join(", ")
+              : "";
+          }
+          break;
+
+        case "pull_request_review":
+          if (eventData.pull_request) {
+            eventContext.author = safeGet(eventData, "pull_request.user.login");
+            eventContext.prNumber = safeGet(eventData, "pull_request.number");
+            eventContext.prTitle = safeGet(eventData, "pull_request.title");
+          }
+          if (eventData.review) {
+            eventContext.reviewAuthor = safeGet(eventData, "review.user.login");
+            eventContext.reviewState = safeGet(eventData, "review.state");
+            eventContext.reviewBody = safeGet(eventData, "review.body");
+            eventContext.reviewId = safeGet(eventData, "review.id");
+          }
+          break;
+
+        case "release":
+          if (eventData.release) {
+            eventContext.releaseAuthor = safeGet(
+              eventData,
+              "release.author.login"
+            );
+            eventContext.releaseName = safeGet(eventData, "release.name");
+            eventContext.releaseTag = safeGet(eventData, "release.tag_name");
+            eventContext.releaseBody = safeGet(eventData, "release.body");
+            eventContext.isPrerelease = safeGet(
+              eventData,
+              "release.prerelease"
+            );
+            eventContext.isDraft = safeGet(eventData, "release.draft");
+            eventContext.releaseCreatedAt = safeGet(
+              eventData,
+              "release.created_at"
+            );
+          }
+          break;
+
+        case "push":
+          eventContext.pusher = safeGet(eventData, "pusher.name");
+          eventContext.pusherId = safeGet(eventData, "pusher.id");
+          eventContext.commitCount = safeGet(eventData, "commits.length") || 0;
+
+          // Get last commit info
+          const commits = safeGet(eventData, "commits");
+          if (Array.isArray(commits) && commits.length > 0) {
+            const lastCommit = commits[commits.length - 1];
+            eventContext.lastCommitMessage = safeGet(lastCommit, "message");
+            eventContext.lastCommitAuthor = safeGet(lastCommit, "author.name");
+            eventContext.lastCommitId = safeGet(lastCommit, "id");
+          }
+          break;
+
+        case "workflow_run":
+          if (eventData.workflow_run) {
+            eventContext.workflowName = safeGet(eventData, "workflow_run.name");
+            eventContext.workflowStatus = safeGet(
+              eventData,
+              "workflow_run.status"
+            );
+            eventContext.workflowConclusion = safeGet(
+              eventData,
+              "workflow_run.conclusion"
+            );
+            eventContext.workflowId = safeGet(eventData, "workflow_run.id");
+            eventContext.workflowRunNumber = safeGet(
+              eventData,
+              "workflow_run.run_number"
+            );
+            eventContext.workflowActor = safeGet(
+              eventData,
+              "workflow_run.actor.login"
+            );
+          }
+          break;
+
+        case "deployment":
+          if (eventData.deployment) {
+            eventContext.deploymentId = safeGet(eventData, "deployment.id");
+            eventContext.deploymentEnvironment = safeGet(
+              eventData,
+              "deployment.environment"
+            );
+            eventContext.deploymentRef = safeGet(eventData, "deployment.ref");
+            eventContext.deploymentSha = safeGet(eventData, "deployment.sha");
+            eventContext.deploymentCreator = safeGet(
+              eventData,
+              "deployment.creator.login"
+            );
+          }
+          break;
+
+        case "deployment_status":
+          if (eventData.deployment_status) {
+            eventContext.deploymentState = safeGet(
+              eventData,
+              "deployment_status.state"
+            );
+            eventContext.deploymentDescription = safeGet(
+              eventData,
+              "deployment_status.description"
+            );
+            eventContext.deploymentEnvironmentUrl = safeGet(
+              eventData,
+              "deployment_status.environment_url"
+            );
+          }
+          if (eventData.deployment) {
+            eventContext.deploymentEnvironment = safeGet(
+              eventData,
+              "deployment.environment"
+            );
+          }
+          break;
+
+        default:
+          // For unknown events, try to extract common patterns
+          if (eventData.action) {
+            eventContext.eventAction = eventData.action;
+          }
+          break;
+      }
+
+      // Add event action for all events (if available)
+      if (eventData.action) {
+        eventContext.action = eventData.action;
+      }
+    } catch (error) {
+      this.warning(`Error extracting event context: ${error.message}`);
+    }
+
+    return eventContext;
+  }
+
+  /**
    * Get localized messages
    */
   getLocalizedMessages() {
@@ -484,10 +744,26 @@ Released by: {{actor}}
 
     // Merge GitHub context with template variables
     const allVars = {
-      ...this.githubContext,
+      ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
+      ...this.getEventContext(), // Automatic event-specific variables
       customMessage: this.message || "",
-      ...this.templateVars,
+      ...this.templateVars, // User-defined variables (highest priority)
     };
+
+    // Debug: log available variables in debug mode
+    if (process.env.ACTIONS_STEP_DEBUG === "true") {
+      this.info(
+        `Available template variables: ${Object.keys(allVars).join(", ")}`
+      );
+
+      // Show automatic event variables separately for clarity
+      const eventVars = this.getEventContext();
+      if (Object.keys(eventVars).length > 0) {
+        this.info(
+          `Automatic event variables: ${Object.keys(eventVars).join(", ")}`
+        );
+      }
+    }
 
     // Replace template variables
     const processedText = templateText.replace(
@@ -1009,7 +1285,7 @@ Released by: {{actor}}
 
 // Export for testing
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { TelegramNotify };
+  module.exports = TelegramNotify;
 }
 
 // Execute the action only when run directly (not when imported)
