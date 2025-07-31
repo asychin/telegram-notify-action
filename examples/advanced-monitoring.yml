@@ -1,19 +1,37 @@
-name: Repository Monitoring
+# 🎯 Advanced Repository Monitoring with Templates
+#
+# This example demonstrates advanced usage of telegram-notify-action with:
+# • Dynamic template selection based on events
+# • Rich template variables and custom messages
+# • Multilingual support (Russian templates)
+# • HTML formatting with inline keyboards
+# • Comprehensive repository monitoring
+
+name: Advanced Repository Monitoring
 
 on:
+  # 📝 Issues and comments monitoring
   issues:
     types: [opened, closed, reopened, labeled]
   issue_comment:
     types: [created]
+
+  # 🔄 Pull requests monitoring
   pull_request:
     types: [opened, closed, ready_for_review]
   pull_request_review:
     types: [submitted]
+
+  # 💬 Discussions monitoring
   discussion:
     types: [created, answered]
+
+  # ⏰ Scheduled health checks
   schedule:
     # Daily health check at 9:00 UTC
     - cron: "0 9 * * *"
+
+  # 🚀 Manual trigger with options
   workflow_dispatch:
     inputs:
       check_type:
@@ -27,6 +45,7 @@ on:
           - security
 
 jobs:
+  # 📝 ISSUE NOTIFICATIONS JOB
   issue-notifications:
     name: Issue Notifications
     runs-on: ubuntu-latest
@@ -34,6 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 🎯 Dynamic template selection based on issue action
       - name: Determine notification type
         id: notification-type
         run: |
@@ -65,15 +85,20 @@ jobs:
               ;;
           esac
 
+      # 📤 Send issue notification using dynamic template
       - name: Send issue notification
         if: github.event_name == 'issues'
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # 🎨 Dynamic template selection: success, warning, info
           template: ${{ steps.notification-type.outputs.template }}
+          # 🌍 Russian language templates
           language: ru
+          # 📝 HTML formatting support
           parse_mode: "HTML"
+          # 💬 Custom message combined with template
           message: |
             <b>🎯 Детали Issue:</b>
 
@@ -82,6 +107,7 @@ jobs:
             <b>Метки:</b> ${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}
 
             ${{ github.event.issue.body && format('<b>Описание:</b>\n<pre>{0}</pre>', github.event.issue.body) || '' }}
+          # 🔧 Rich template variables
           template_vars: |
             {
               "issueNumber": "${{ github.event.issue.number }}",
@@ -93,18 +119,21 @@ jobs:
               "status": "${{ github.event.issue.state }}",
               "createdAt": "${{ github.event.issue.created_at }}"
             }
+          # ⌨️ Interactive inline keyboard
           inline_keyboard: |
             [
               {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
               {"text": "💬 Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
             ]
 
+      # 💬 Send comment notification with info template
       - name: Send comment notification
         if: github.event_name == 'issue_comment'
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # 📘 Static template selection
           template: info
           parse_mode: "Markdown"
           message: |
@@ -122,6 +151,7 @@ jobs:
               {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
             ]
 
+  # 🔄 PULL REQUEST NOTIFICATIONS JOB
   pr-notifications:
     name: Pull Request Notifications
     runs-on: ubuntu-latest
@@ -129,6 +159,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 🎯 Smart PR template selection
       - name: Determine PR notification type
         id: pr-notification-type
         run: |
@@ -161,15 +192,18 @@ jobs:
               ;;
           esac
 
+      # 🚀 Send PR notification using deploy template (treating PR as code deployment)
       - name: Send PR notification
         if: github.event_name == 'pull_request'
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: deploy # Используем шаблон deploy для PR как развертывания кода
+          # 🚀 Using deploy template for PR (creative template usage)
+          template: deploy
           language: ru
           parse_mode: "HTML"
+          # 📊 Rich PR statistics
           message: |
             <b>📈 Статистика изменений:</b>
 
@@ -179,6 +213,7 @@ jobs:
             <b>Статус проверок:</b> ${{ github.event.pull_request.mergeable_state || 'в процессе' }}
 
             ${{ github.event.pull_request.body && format('<b>Описание:</b>\n<i>{0}</i>', github.event.pull_request.body) || '' }}
+          # 🔧 Extended PR template variables
           template_vars: |
             {
               "prNumber": "${{ github.event.pull_request.number }}",
@@ -193,6 +228,7 @@ jobs:
               "headBranch": "${{ github.event.pull_request.head.ref }}",
               "baseBranch": "${{ github.event.pull_request.base.ref }}"
             }
+          # ⌨️ PR action buttons
           inline_keyboard: |
             [
               {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
@@ -200,9 +236,10 @@ jobs:
               {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
             ]
 
+      # 📝 Send review notification
       - name: Send review notification
         if: github.event_name == 'pull_request_review'
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -223,6 +260,7 @@ jobs:
               {"text": "📝 View PR", "url": "${{ github.event.pull_request.html_url }}"}
             ]
 
+  # 💬 DISCUSSION NOTIFICATIONS JOB
   discussion-notifications:
     name: Discussion Notifications
     runs-on: ubuntu-latest
@@ -230,8 +268,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 💬 Send discussion notification with info template
       - name: Send discussion notification
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -252,6 +291,7 @@ jobs:
               {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"}
             ]
 
+  # 🏥 HEALTH CHECK JOB
   health-check:
     name: Repository Health Check
     runs-on: ubuntu-latest
@@ -268,6 +308,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 🔍 Comprehensive health checks
       - name: Run health checks
         id: health-check
         run: |
@@ -309,14 +350,17 @@ jobs:
             echo "health_emoji=✅" >> $GITHUB_OUTPUT
           fi
 
+      # 🧪 Send health check using test template (creative template usage)
       - name: Send health check notification
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: test # Используем шаблон test для health check
+          # 🧪 Using test template for health check (creative usage)
+          template: test
           language: ru
           parse_mode: "HTML"
+          # 🏥 Detailed health report
           message: |
             <b>🏥 Детальный отчет здоровья:</b>
 
@@ -327,6 +371,7 @@ jobs:
             <b>📋 Рекомендации:</b>
             ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Обновить зависимости с уязвимостями' || '• ✅ Безопасность в порядке' }}
             ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Обновить {0} устаревших пакетов', steps.health-check.outputs.outdated) || '• ✅ Все пакеты актуальны' }}
+          # 🔬 Health check template variables
           template_vars: |
             {
               "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ Все проверки пройдены' || '⚠️ Есть проблемы' }}",
@@ -338,6 +383,7 @@ jobs:
               "checkDate": "${{ steps.health-check.outputs.current_date }}",
               "totalIssues": "${{ steps.health-check.outputs.vulnerabilities }}+${{ steps.health-check.outputs.outdated }}"
             }
+          # 🔗 Useful repository links
           inline_keyboard: |
             [
               {"text": "📊 View Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
@@ -345,6 +391,7 @@ jobs:
               {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"}
             ]
 
+  # 📊 REPOSITORY STATISTICS JOB
   repository-stats:
     name: Repository Statistics
     runs-on: ubuntu-latest
@@ -354,6 +401,7 @@ jobs:
         with:
           fetch-depth: 0 # Fetch full history for stats
 
+      # 📈 Generate comprehensive repository statistics
       - name: Generate repository statistics
         id: stats
         run: |
@@ -380,8 +428,9 @@ jobs:
           echo "code_lines=$CODE_LINES" >> $GITHUB_OUTPUT
           echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
 
+      # 📊 Send statistics using info template
       - name: Send statistics report
-        uses: ./
+        uses: your-username/telegram-notify-action@v2 # Replace with your action
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -407,15 +456,40 @@ jobs:
             • [Contributors](https://github.com/${{ github.repository }}/graphs/contributors)
             • [Commit Activity](https://github.com/${{ github.repository }}/graphs/commit-activity)
             • [Code Frequency](https://github.com/${{ github.repository }}/graphs/code-frequency)
+          # 📊 Statistics template variables
           template_vars: |
             {
               "totalCommits": "${{ steps.stats.outputs.total_commits }}",
               "monthlyCommits": "${{ steps.stats.outputs.commits_this_month }}",
               "contributors": "${{ steps.stats.outputs.contributors }}"
             }
+          # 📈 Statistics links
           inline_keyboard: |
             [
               {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
               {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
               {"text": "📊 Statistics", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"}
             ]
+
+# 🎨 TEMPLATES USED IN THIS EXAMPLE:
+#
+# • success ✅ - For successful operations (issue closed, PR merged)
+# • error ❌ - For failed operations (not used here, but available)
+# • warning ⚠️ - For issues that need attention (new issues, security alerts)
+# • info ℹ️ - For general information (comments, discussions, stats)
+# • deploy 🚀 - For deployments (creatively used for PRs)
+# • test 🧪 - For test results (creatively used for health checks)
+# • release 🎉 - For new releases (not used here, but available)
+#
+# 🌍 LANGUAGE SUPPORT:
+# All templates support: en (English), ru (Russian), zh (Chinese)
+#
+# 🔧 TEMPLATE VARIABLES:
+# Each template automatically gets GitHub context variables:
+# {{repository}}, {{actor}}, {{refName}}, {{sha}}, {{workflow}}, etc.
+# Plus any custom variables you pass via template_vars
+#
+# 💡 CREATIVE TEMPLATE USAGE:
+# • Using 'deploy' template for Pull Requests (treating code changes as deployment)
+# • Using 'test' template for Health Checks (treating health as test results)
+# • This shows templates are flexible and can be used creatively!
