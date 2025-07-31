@@ -40,28 +40,18 @@ jobs:
           case "${{ github.event.action }}" in
             "opened")
               echo "template=warning" >> $GITHUB_OUTPUT
-              echo "emoji=🐛" >> $GITHUB_OUTPUT
-              echo "action_text=opened" >> $GITHUB_OUTPUT
               ;;
             "closed")
               echo "template=success" >> $GITHUB_OUTPUT
-              echo "emoji=✅" >> $GITHUB_OUTPUT
-              echo "action_text=closed" >> $GITHUB_OUTPUT
               ;;
             "reopened")
               echo "template=warning" >> $GITHUB_OUTPUT
-              echo "emoji=🔄" >> $GITHUB_OUTPUT
-              echo "action_text=reopened" >> $GITHUB_OUTPUT
               ;;
             "labeled")
               echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=🏷️" >> $GITHUB_OUTPUT
-              echo "action_text=labeled" >> $GITHUB_OUTPUT
               ;;
             "created")
               echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=💬" >> $GITHUB_OUTPUT
-              echo "action_text=commented on" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -72,27 +62,33 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.notification-type.outputs.template }}
-          language: ru
-          parse_mode: "Markdown"
           message: |
-            **🎯 Детали Issue:**
-
-            **📊 Статус:** {{action}}
-            **👤 Автор:** `{{author}}`
-            **🏷️ Метки:** {{labels}}
-            **📅 Создан:** {{createdAt}}
-
-            **📝 Номер Issue:** #{{issueNumber}}
-          template_vars: |
-            {
-              "action": "${{ steps.notification-type.outputs.action_text }}",
-              "emoji": "${{ steps.notification-type.outputs.emoji }}"
-            }
+            🐛 **Issue {{action}}**
+            
+            **Заголовок:** {{issueTitle}}
+            **Номер:** #{{issueNumber}}
+            **Автор:** {{issueAuthor}}
+            **Состояние:** {{issueState}}
+            **Метки:** {{labels}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка:** {{issueUrl}}
+            
+            📊 **Контекст GitHub:**
+            - Workflow: {{workflow}}
+            - Запуск: #{{runNumber}}
+            - Актор: {{actor}}
+            - Событие: {{eventName}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+            
+            📝 **Описание:**
+            {{issueBody}}
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "💬 Добавить комментарий", "url": "${{ github.event.issue.html_url }}#issuecomment-new"},
-              {"text": "✏️ Редактировать", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "👀 Посмотреть", "url": "{{issueUrl}}"},
+              {"text": "💬 Комментировать", "url": "{{issueUrl}}#issuecomment-new"},
+              {"text": "✏️ Редактировать", "url": "{{issueUrl}}"}
             ]
 
       - name: Send comment notification
@@ -102,22 +98,28 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
             💬 **Новый комментарий к Issue**
-
-            **🔢 #${{ github.event.issue.number }}** - 📝 ${{ github.event.issue.title }}
-
-            **👤 Комментатор:** ${{ github.event.comment.user.login }}
-            **🕐 Время:** ${{ github.event.comment.created_at }}
-
-            **💭 Комментарий:**
-            ${{ github.event.comment.body }}
+            
+            **Issue:** #{{issueNumber}} - {{issueTitle}}
+            **Автор комментария:** {{commentAuthor}}
+            **Время:** {{commentCreatedAt}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            
+            📊 **Контекст:**
+            - Workflow: {{workflow}}
+            - Runner: {{runnerName}} ({{runnerOs}})
+            - Актор: {{actor}}
+            
+            💭 **Комментарий:**
+            {{commentBody}}
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть комментарий", "url": "${{ github.event.comment.html_url }}"},
-              {"text": "📝 Ответить", "url": "${{ github.event.issue.html_url }}#issuecomment-new"},
-              {"text": "🔗 Перейти к Issue", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "👀 Посмотреть", "url": "{{commentUrl}}"},
+              {"text": "📝 Ответить", "url": "{{issueUrl}}#issuecomment-new"},
+              {"text": "🔗 К Issue", "url": "{{issueUrl}}"}
             ]
 
   pr-notifications:
@@ -133,29 +135,19 @@ jobs:
           case "${{ github.event.action }}" in
             "opened")
               echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=🔄" >> $GITHUB_OUTPUT
-              echo "action_text=opened" >> $GITHUB_OUTPUT
               ;;
             "closed")
               if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
                 echo "template=success" >> $GITHUB_OUTPUT
-                echo "emoji=🎉" >> $GITHUB_OUTPUT
-                echo "action_text=merged" >> $GITHUB_OUTPUT
               else
                 echo "template=warning" >> $GITHUB_OUTPUT
-                echo "emoji=❌" >> $GITHUB_OUTPUT
-                echo "action_text=closed" >> $GITHUB_OUTPUT
               fi
               ;;
             "ready_for_review")
               echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=👀" >> $GITHUB_OUTPUT
-              echo "action_text=marked ready for review" >> $GITHUB_OUTPUT
               ;;
             "submitted")
               echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=📝" >> $GITHUB_OUTPUT
-              echo "action_text=reviewed" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -165,41 +157,41 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: deploy # Используем шаблон deploy для PR как развертывания кода
-          language: ru
-          parse_mode: "Markdown"
+          template: ${{ steps.pr-notification-type.outputs.template }}
           message: |
-            **📈 Статистика изменений:**
-
-            **🌿 Ветка:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
-            **📁 Файлов изменено:** ${{ github.event.pull_request.changed_files }}
-            **📝 Коммитов:** ${{ github.event.pull_request.commits }}
-            **📊 Изменения:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
-            **👤 Автор:** ${{ github.event.pull_request.user.login }}
-            **📅 Создан:** ${{ github.event.pull_request.created_at }}
-
-            **📝 Краткое описание:**
-            *${{ github.event.pull_request.title }}*
-          template_vars: |
-            {
-              "prNumber": "${{ github.event.pull_request.number }}",
-              "prTitle": "${{ github.event.pull_request.title }}",
-              "author": "${{ github.event.pull_request.user.login }}",
-              "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
-              "version": "PR#${{ github.event.pull_request.number }}",
-              "additions": "${{ github.event.pull_request.additions }}",
-              "deletions": "${{ github.event.pull_request.deletions }}",
-              "changedFiles": "${{ github.event.pull_request.changed_files }}",
-              "commits": "${{ github.event.pull_request.commits }}",
-              "headBranch": "${{ github.event.pull_request.head.ref }}",
-              "baseBranch": "${{ github.event.pull_request.base.ref }}"
-            }
+            🔄 **Pull Request {{prAction}}**
+            
+            **Заголовок:** {{prTitle}}
+            **Номер:** #{{prNumber}}
+            **Автор:** {{prAuthor}}
+            **Состояние:** {{prState}}
+            
+            🔀 **Ветки:**
+            - Из: {{prHeadRef}} ({{prHeadSha}})
+            - В: {{prBaseRef}}
+            
+            📊 **Статистика:**
+            - Коммиты: {{prCommits}}
+            - Изменения: +{{prAdditions}} -{{prDeletions}}
+            - Файлов: {{prChangedFiles}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка:** {{prUrl}}
+            
+            📋 **Контекст GitHub:**
+            - Workflow: {{workflow}}
+            - Запуск: #{{runNumber}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Актор: {{actor}}
+            
+            📝 **Описание:**
+            {{prBody}}
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "📝 Сделать ревью", "url": "${{ github.event.pull_request.html_url }}/files"},
-              {"text": "✅ Одобрить", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
-              {"text": "🔄 Слить", "url": "${{ github.event.pull_request.html_url }}"}
+              {"text": "👀 Посмотреть", "url": "{{prUrl}}"},
+              {"text": "📝 Ревью", "url": "{{prUrl}}/files"},
+              {"text": "✅ Одобрить", "url": "{{prUrl}}/files#submit-review"}
             ]
 
       - name: Send review notification
@@ -209,22 +201,29 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
             📝 **Обзор Pull Request**
-
-            **🔢 #${{ github.event.pull_request.number }}** - 📑 ${{ github.event.pull_request.title }}
-
-            **👤 Ревьюер:** ${{ github.event.review.user.login }}
-            **📊 Статус:** ${{ github.event.review.state == 'approved' && '✅ Одобрено' || github.event.review.state == 'changes_requested' && '❌ Требуются изменения' || '💬 Комментарий' }}
-            **🕐 Время:** ${{ github.event.review.submitted_at }}
-
-            ${{ github.event.review.body && format('**💭 Комментарий к обзору:**\n{0}', github.event.review.body) || '' }}
+            
+            **PR:** #{{prNumber}} - {{prTitle}}
+            **Ревьюер:** {{reviewAuthor}}
+            **Состояние:** {{reviewState}}
+            **ID ревью:** {{reviewId}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            
+            📊 **Контекст:**
+            - Workflow: {{workflow}}
+            - Runner: {{runnerName}} ({{runnerOs}})
+            - Актор: {{actor}}
+            
+            💭 **Комментарий ревью:**
+            {{reviewBody}}
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть ревью", "url": "${{ github.event.review.html_url }}"},
-              {"text": "📝 Перейти к PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "💬 Ответить на ревью", "url": "${{ github.event.pull_request.html_url }}#discussion_r"}
+              {"text": "👀 Посмотреть ревью", "url": "{{reviewUrl}}"},
+              {"text": "📝 К PR", "url": "{{prUrl}}"},
+              {"text": "💬 Ответить", "url": "{{prUrl}}#discussion_r"}
             ]
 
   discussion-notifications:
@@ -240,24 +239,32 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
-            💬 **Новое обсуждение ${{ github.event.action == 'created' && 'создано' || github.event.action == 'answered' && 'отвечено' || github.event.action }}**
-
-            **📢 ${{ github.event.discussion.title }}**
-
-            **👤 Автор:** ${{ github.event.discussion.user.login }}
-            **🏷️ Категория:** ${{ github.event.discussion.category.name }}
-            **📅 Создано:** ${{ github.event.discussion.created_at }}
-            **💬 Ответов:** ${{ github.event.discussion.answer_chosen_at && '✅ Есть выбранный ответ' || '❓ Ждет ответа' }}
-
-            **📝 Содержание:**
-            ${{ github.event.discussion.body }}
+            💬 **Обсуждение {{action}}**
+            
+            **Заголовок:** {{discussionTitle}}
+            **Автор:** {{discussionAuthor}}
+            **Категория:** {{discussionCategory}}
+            **ID:** {{discussionId}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка:** {{discussionUrl}}
+            
+            📊 **Контекст GitHub:**
+            - Workflow: {{workflow}}
+            - Запуск: #{{runNumber}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Актор: {{actor}}
+            - Время: {{triggeredAt}}
+            
+            📝 **Содержание:**
+            {{discussionBody}}
           inline_keyboard: |
             [
-              {"text": "💬 Присоединиться к обсуждению", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "👍 Поставить реакцию", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "✍️ Ответить", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
+              {"text": "💬 Присоединиться", "url": "{{discussionUrl}}"},
+              {"text": "👍 Реакция", "url": "{{discussionUrl}}"},
+              {"text": "✍️ Ответить", "url": "{{discussionUrl}}#discussioncomment-new"}
             ]
 
   health-check:
@@ -280,10 +287,6 @@ jobs:
         id: health-check
         run: |
           echo "Running repository health checks..."
-
-          # Generate current timestamp
-          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
 
           # Check for security vulnerabilities
           AUDIT_RESULT=$(npm audit --audit-level high --json || echo '{}')
@@ -311,10 +314,8 @@ jobs:
           # Determine health status
           if [ "$VULNERABILITIES" -gt 0 ]; then
             echo "status=warning" >> $GITHUB_OUTPUT
-            echo "health_emoji=⚠️" >> $GITHUB_OUTPUT
           else
             echo "status=success" >> $GITHUB_OUTPUT
-            echo "health_emoji=✅" >> $GITHUB_OUTPUT
           fi
 
       - name: Send health check notification
@@ -322,40 +323,44 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: test # Используем шаблон test для health check
-          language: ru
-          parse_mode: "Markdown"
+          template: ${{ steps.health-check.outputs.status }}
           message: |
-            **🏥 Детальный отчет здоровья репозитория:**
-
-            **📅 Дата проверки:** ${{ steps.health-check.outputs.current_date }}
-            **💾 Размер репозитория:** `${{ steps.health-check.outputs.repo_size }}`
-            **🎯 Общий статус:** ${{ steps.health-check.outputs.status == 'success' && '✅ Отличное здоровье' || '⚠️ Требует внимания' }}
-            **📊 Покрытие тестами:** ${{ steps.health-check.outputs.coverage }}%
-            **🔒 Уязвимости:** ${{ steps.health-check.outputs.vulnerabilities == '0' && '✅ Не найдено' || format('⚠️ {0} найдено', steps.health-check.outputs.vulnerabilities) }}
-            **📦 Устаревшие пакеты:** ${{ steps.health-check.outputs.outdated == '0' && '✅ Все актуальны' || format('📦 {0} требуют обновления', steps.health-check.outputs.outdated) }}
-
-            **📋 Рекомендации:**
-            ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Обновить зависимости с уязвимостями' || '• ✅ Безопасность в порядке' }}
-            ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Обновить {0} устаревших пакетов', steps.health-check.outputs.outdated) || '• ✅ Все пакеты актуальны' }}
-            • 📈 Поддерживать покрытие тестами выше 80%
-          template_vars: |
-            {
-              "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ Все проверки пройдены' || '⚠️ Есть проблемы' }}",
-              "coverage": "${{ steps.health-check.outputs.coverage }}%",
-              "vulnerabilities": "${{ steps.health-check.outputs.vulnerabilities }}",
-              "outdatedPackages": "${{ steps.health-check.outputs.outdated }}",
-              "repoSize": "${{ steps.health-check.outputs.repo_size }}",
-              "healthScore": "${{ steps.health-check.outputs.vulnerabilities == '0' && steps.health-check.outputs.outdated < '5' && '95%' || '70%' }}",
-              "checkDate": "${{ steps.health-check.outputs.current_date }}",
-              "totalIssues": "${{ steps.health-check.outputs.vulnerabilities }}+${{ steps.health-check.outputs.outdated }}"
-            }
+            🏥 **Проверка здоровья репозитория**
+            
+            **Результат:** ${{ steps.health-check.outputs.status == 'success' && '✅ Отличное здоровье' || '⚠️ Требует внимания' }}
+            **Размер:** ${{ steps.health-check.outputs.repo_size }}
+            **Покрытие тестами:** ${{ steps.health-check.outputs.coverage }}%
+            **Уязвимости:** ${{ steps.health-check.outputs.vulnerabilities }}
+            **Устаревшие пакеты:** ${{ steps.health-check.outputs.outdated }}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🆔 **ID репозитория:** {{repositoryId}}
+            
+            📊 **Контекст GitHub:**
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
+            - Запуск: #{{runNumber}} (ID: {{runId}})
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Время: {{triggeredAt}}
+            
+            🌐 **Окружение:**
+            - Actions Environment: {{actionsEnvironment}}
+            - Workspace: {{workspace}}
+            - Tool Cache: {{runnerToolCache}}
+            - Temp: {{runnerTemp}}
+            
+            🔗 **GitHub URLs:**
+            - Сервер: {{serverUrl}}
+            - API: {{apiUrl}}
+            - GraphQL: {{graphqlUrl}}
           inline_keyboard: |
             [
-              {"text": "📊 Действия", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔒 Безопасность", "url": "${{ github.server_url }}/${{ github.repository }}/security"},
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "🔧 Настройки", "url": "${{ github.server_url }}/${{ github.repository }}/settings"}
+              {"text": "📊 Действия", "url": "{{serverUrl}}/{{repository}}/actions"},
+              {"text": "🔒 Безопасность", "url": "{{serverUrl}}/{{repository}}/security"},
+              {"text": "📈 Аналитика", "url": "{{serverUrl}}/{{repository}}/pulse"},
+              {"text": "🔧 Настройки", "url": "{{serverUrl}}/{{repository}}/settings"}
             ]
 
   repository-stats:
@@ -370,10 +375,6 @@ jobs:
       - name: Generate repository statistics
         id: stats
         run: |
-          # Generate current timestamp
-          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
-
           # Get commit statistics
           TOTAL_COMMITS=$(git rev-list --all --count)
           COMMITS_THIS_MONTH=$(git rev-list --since="1 month ago" --count HEAD)
@@ -399,37 +400,36 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
-            📊 **Отчет по статистике репозитория**
-
-            **🏠 Репозиторий:** ${{ github.repository }}
-            **📅 Сгенерирован:** ${{ steps.stats.outputs.current_date }}
-
-            **🚀 Активность разработки:**
-            • 📝 Всего коммитов: **${{ steps.stats.outputs.total_commits }}**
-            • 📈 Коммитов за месяц: **${{ steps.stats.outputs.commits_this_month }}**
-            • 👥 Участников: **${{ steps.stats.outputs.contributors }}**
-
-            **💻 Кодовая база:**
-            • 📁 Всего файлов: **${{ steps.stats.outputs.total_files }}**
-            • 📏 Строк кода: **${{ steps.stats.outputs.code_lines }}**
-            • 🏷️ Последний релиз: **${{ steps.stats.outputs.latest_release }}**
-
-            **🔗 Полезные ссылки:**
-            • 👥 [Участники](https://github.com/${{ github.repository }}/graphs/contributors)
-            • 📈 [Активность коммитов](https://github.com/${{ github.repository }}/graphs/commit-activity)
-            • 📊 [Частота кода](https://github.com/${{ github.repository }}/graphs/code-frequency)
-          template_vars: |
-            {
-              "totalCommits": "${{ steps.stats.outputs.total_commits }}",
-              "monthlyCommits": "${{ steps.stats.outputs.commits_this_month }}",
-              "contributors": "${{ steps.stats.outputs.contributors }}"
-            }
+            📊 **Статистика репозитория**
+            
+            **Всего коммитов:** ${{ steps.stats.outputs.total_commits }}
+            **За месяц:** ${{ steps.stats.outputs.commits_this_month }}
+            **Участников:** ${{ steps.stats.outputs.contributors }}
+            **Файлов:** ${{ steps.stats.outputs.total_files }}
+            **Строк кода:** ${{ steps.stats.outputs.code_lines }}
+            **Последний релиз:** ${{ steps.stats.outputs.latest_release }}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🆔 **ID:** {{repositoryId}}
+            
+            📊 **Контекст GitHub:**
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
+            - Запуск: #{{runNumber}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Время: {{triggeredAt}}
+            
+            🌐 **Окружение:**
+            - Actions Environment: {{actionsEnvironment}}
+            - Workspace: {{workspace}}
+            - Server: {{serverUrl}}
           inline_keyboard: |
             [
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "👥 Участники", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
-              {"text": "📊 Статистика", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
-              {"text": "🏷️ Релизы", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
+              {"text": "📈 Аналитика", "url": "{{serverUrl}}/{{repository}}/pulse"},
+              {"text": "👥 Участники", "url": "{{serverUrl}}/{{repository}}/graphs/contributors"},
+              {"text": "📊 Трафик", "url": "{{serverUrl}}/{{repository}}/graphs/traffic"},
+              {"text": "🏷️ Релизы", "url": "{{serverUrl}}/{{repository}}/releases"}
             ]
