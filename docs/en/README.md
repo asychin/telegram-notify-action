@@ -203,6 +203,116 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 | `template`      | Template name             | -       | `success`, `error`, `warning`, `info`, `deploy`, `test`, `release` |
 | `template_vars` | Template variables (JSON) | `{}`    | `{"version": "v1.0.0"}`                                            |
 
+## 🔄 Auto-Context Variables
+
+The action automatically provides access to GitHub Actions context variables without manual configuration in `template_vars`. All variables are available in `{{variableName}}` format in your messages.
+
+### Repository Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{repository}}` | Full repository name | `owner/repo-name` |
+| `{{repositoryOwner}}` | Repository owner | `owner` |
+| `{{repositoryId}}` | Repository ID | `123456789` |
+| `{{repositoryOwnerId}}` | Repository owner ID | `987654321` |
+
+### Git Context
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{ref}}` | Full branch/tag reference | `refs/heads/main` |
+| `{{refName}}` | Branch or tag name | `main` |
+| `{{refType}}` | Reference type | `branch` |
+| `{{refProtected}}` | Is branch protected | `true` |
+| `{{baseRef}}` | Base branch for PR | `main` |
+| `{{headRef}}` | Source branch for PR | `feature-branch` |
+| `{{sha}}` | Commit SHA | `abc123def456...` |
+
+### Workflow Context
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{workflow}}` | Workflow name | `CI/CD Pipeline` |
+| `{{workflowRef}}` | Workflow reference | `refs/heads/main` |
+| `{{workflowSha}}` | Workflow commit SHA | `abc123def456...` |
+| `{{job}}` | Current job name | `build` |
+| `{{jobStatus}}` | Job status | `success` |
+
+### Run Information
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{runId}}` | Workflow run ID | `1234567890` |
+| `{{runNumber}}` | Run number | `42` |
+| `{{runAttempt}}` | Attempt number | `1` |
+| `{{eventName}}` | Event type | `push` |
+| `{{eventPath}}` | Event file path | `/github/workflow/event.json` |
+
+### User Information
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{actor}}` | User who triggered workflow | `username` |
+| `{{actorId}}` | User ID | `12345` |
+| `{{triggeredBy}}` | User who initiated event | `username` |
+
+### Runner Information
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{runnerName}}` | Runner name | `GitHub Actions 2` |
+| `{{runnerOs}}` | Operating system | `Linux` |
+| `{{runnerArch}}` | Architecture | `X64` |
+| `{{runnerEnvironment}}` | Environment type | `github-hosted` |
+| `{{runnerToolCache}}` | Tool cache path | `/opt/hostedtoolcache` |
+| `{{runnerTemp}}` | Temporary directory | `/tmp` |
+| `{{runnerDebug}}` | Debug mode | `1` |
+
+### GitHub URLs and API
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{serverUrl}}` | GitHub server URL | `https://github.com` |
+| `{{apiUrl}}` | GitHub API URL | `https://api.github.com` |
+| `{{graphqlUrl}}` | GraphQL API URL | `https://api.github.com/graphql` |
+
+### Additional Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{workspace}}` | Working directory | `/github/workspace` |
+| `{{ci}}` | CI environment indicator | `true` |
+| `{{retentionDays}}` | Artifact retention days | `90` |
+| `{{secretSource}}` | Secrets source | `Actions` |
+| `{{actionRef}}` | Action reference | `v1` |
+| `{{actionRepository}}` | Action repository | `owner/action-repo` |
+
+### Usage Example
+
+```yaml
+- name: Send notification with auto-context
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: |
+      🚀 **Deployment Complete**
+      
+      **Repository:** {{repository}}
+      **Branch:** {{refName}}
+      **Commit:** {{sha}}
+      **Actor:** {{actor}}
+      **Runner:** {{runnerName}} on {{runnerOs}}
+      **Status:** {{jobStatus}}
+    inline_keyboard: |
+      [
+        [
+          {"text": "🏠 Repository", "url": "{{serverUrl}}/{{repository}}"},
+          {"text": "🔄 This Run", "url": "{{serverUrl}}/{{repository}}/actions/runs/{{runId}}"}
+        ]
+      ]
+```
+
 ### Interactive Features
 
 | Parameter         | Description            | Default | Example                                              |
