@@ -772,13 +772,26 @@ Released by: {{actor}}
         ...this.templateVars, // User-defined variables (highest priority)
       };
       
+      // Debug: log available variables in debug mode
+      if (process.env.ACTIONS_STEP_DEBUG === "true") {
+        this.info(
+          `Processing regular message with variables: ${Object.keys(allVars).join(", ")}`
+        );
+        this.info(`Original message: ${this.message}`);
+      }
+      
       // Replace variables in regular message
-      const processedMessage = this.message.replace(
+      const processedMessage = (this.message || '').replace(
         /\{\{(\w+)\}\}/g,
         (match, key) => {
           return allVars[key] || match;
         }
       );
+      
+      // Debug: log processed message
+      if (process.env.ACTIONS_STEP_DEBUG === "true") {
+        this.info(`Processed message: ${processedMessage}`);
+      }
       
       return this.cleanHtmlContent(processedMessage);
     }
