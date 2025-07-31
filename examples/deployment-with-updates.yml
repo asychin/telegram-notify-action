@@ -1,63 +1,172 @@
-name: Deployment with Live Updates
+name: Deployment with Updates
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
     steps:
-      - name: Send start notification
-        id: start
-        uses: your-username/telegram-notify-action@v1
+      - name: Pre-deployment notification
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
           message: |
-            🚀 <b>Deployment Started</b>
+            🚀 **Начало деплоя**
             
-            <b>Status:</b> Starting...
-            <b>Progress:</b> ▱▱▱▱▱▱▱▱▱▱ 0%
+            🎯 **Окружение:** {{actionsEnvironment}}
+            📝 **ID окружения:** {{actionsEnvironmentId}}
+            🔗 **URL окружения:** {{actionsEnvironmentUrl}}
             
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Progress</a>
-      
-      - name: Build application
+            📦 **Версия:** {{tagName}}
+            🏷️ **Имя релиза:** {{releaseName}}
+            👤 **Автор релиза:** {{releaseAuthor}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка на релиз:** {{releaseUrl}}
+            
+            🏃 **Runner:** {{runnerName}} на {{runnerOs}}
+            🏗️ **Архитектура:** {{runnerArch}}
+            📁 **Workspace:** {{workspace}}
+
+      - name: Deploy to environment
+        id: deploy
         run: |
-          echo "Building application..."
+          echo "Deploying to ${{ github.event.inputs.environment || 'production' }}..."
+          
+          # Simulate deployment
           sleep 10
-      
-      - name: Update progress - Build complete
-        uses: your-username/telegram-notify-action@v1
+          
+          # Simulate success/failure (for demo)
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "deploy_url=https://example.com" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "deploy_url=https://staging.example.com" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Successful deployment notification
+        if: steps.deploy.outputs.status == 'success'
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}  
-          message_id: ${{ steps.start.outputs.message_id }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: success
           message: |
-            🚀 <b>Deployment in Progress</b>
+            ✅ **Деплой успешно завершен**
             
-            <b>Status:</b> Building completed ✅
-            <b>Progress:</b> ▰▰▰▰▰▱▱▱▱▱ 50%
+            🎯 **Окружение:** {{actionsEnvironment}}
+            🌐 **URL:** ${{ steps.deploy.outputs.deploy_url }}
             
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Progress</a>
-      
-      - name: Deploy to server
-        run: |
-          echo "Deploying to server..."
-          sleep 10
-      
-      - name: Final notification
-        uses: your-username/telegram-notify-action@v1
+            📊 **Информация о запуске:**
+            - ID: {{runId}}
+            - Номер: {{runNumber}}
+            - Попытка: {{runAttempt}}
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Деплоил:** {{actor}}
+            🕒 **Время запуска:** {{triggeredAt}}
+            
+            🖥️ **Система:**
+            - Runner: {{runnerName}}
+            - ОС: {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Tool Cache: {{runnerToolCache}}
+            - Temp: {{runnerTemp}}
+            
+            🌐 **GitHub Environment:**
+            - API: {{apiUrl}}
+            - GraphQL: {{graphqlUrl}}
+            - Server: {{serverUrl}}
+          
+      - name: Failed deployment notification
+        if: failure()
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
-          message_id: ${{ steps.start.outputs.message_id }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: error
           message: |
-            ✅ <b>Deployment Completed Successfully!</b>
+            ❌ **Деплой завершился с ошибкой**
             
-            <b>Status:</b> All steps completed ✅
-            <b>Progress:</b> ▰▰▰▰▰▰▰▰▰▰ 100%
-            <b>Duration:</b> ~20 seconds
+            🎯 **Окружение:** {{actionsEnvironment}}
+            🚫 **Статус задачи:** {{jobStatus}}
             
-            🎉 Application is now live!
+            📊 **Информация о запуске:**
+            - ID: {{runId}}
+            - Номер: {{runNumber}}
+            - Попытка: {{runAttempt}}
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
             
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">📊 View Details</a>
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Инициатор:** {{actor}}
+            🔗 **Ссылка на запуск:** {{serverUrl}}/{{repository}}/actions/runs/{{runId}}
+            
+            🖥️ **Система:**
+            - Runner: {{runnerName}}
+            - ОС: {{runnerOs}}
+            - Рабочая папка: {{workspace}}
+
+  post-deployment:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Post-deployment summary
+        uses: asychin/telegram-notify-action@v3
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          message: |
+            📋 **Отчет о деплое**
+            
+            🎯 **Окружение:** {{actionsEnvironment}}
+            📊 **Результат:** ${{ needs.deploy.result }}
+            
+            🔍 **Детали GitHub:**
+            - Репозиторий: {{repository}}
+            - ID репозитория: {{repositoryId}}
+            - Владелец: {{repositoryOwner}}
+            - ID владельца: {{repositoryOwnerId}}
+            
+            🔗 **Защита ветки:** {{refProtected}}
+            📝 **Тип ссылки:** {{refType}}
+            🌿 **Ветка:** {{refName}}
+            🆔 **SHA:** {{sha}}
+            
+            🏃 **Система выполнения:**
+            - Имя: {{runnerName}}
+            - ОС: {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Tool Cache: {{runnerToolCache}}
+            - Temp Directory: {{runnerTemp}}
+            - Workspace: {{workspace}}
+            
+            🌐 **GitHub Окружение:**
+            - ID: {{actionsEnvironmentId}}
+            - URL: {{actionsEnvironmentUrl}}
+          template_vars: |
+            {
+              "deploymentResult": "${{ needs.deploy.result }}",
+              "finalStatus": "${{ needs.deploy.result == 'success' && '✅ Успешно' || '❌ Неудачно' }}"
+            }

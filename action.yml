@@ -172,6 +172,39 @@ runs:
         GITHUB_RUN_NUMBER: ${{ github.run_number }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         JOB_STATUS: ${{ job.status }}
+        # Additional GitHub context variables
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        GITHUB_REPOSITORY_ID: ${{ github.repository_id }}
+        GITHUB_REPOSITORY_OWNER_ID: ${{ github.repository_owner_id }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_REF_TYPE: ${{ github.ref_type }}
+        GITHUB_REF_PROTECTED: ${{ github.ref_protected }}
+        GITHUB_BASE_REF: ${{ github.base_ref }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        GITHUB_ACTOR_ID: ${{ github.actor_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        GITHUB_SERVER_URL: ${{ github.server_url }}
+        GITHUB_API_URL: ${{ github.api_url }}
+        GITHUB_GRAPHQL_URL: ${{ github.graphql_url }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
+        GITHUB_ACTION_REF: ${{ github.action_ref }}
+        GITHUB_ACTION_REPOSITORY: ${{ github.action_repository }}
+        GITHUB_WORKFLOW_REF: ${{ github.workflow_ref }}
+        GITHUB_WORKFLOW_SHA: ${{ github.workflow_sha }}
+        GITHUB_RETENTION_DAYS: ${{ github.retention_days }}
+        GITHUB_SECRET_SOURCE: ${{ github.secret_source }}
+        # Runner context variables
+        RUNNER_OS: ${{ runner.os }}
+        RUNNER_ARCH: ${{ runner.arch }}
+        RUNNER_NAME: ${{ runner.name }}
+        RUNNER_ENVIRONMENT: ${{ runner.environment }}
+        RUNNER_TEMP: ${{ runner.temp }}
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
+        RUNNER_DEBUG: ${{ runner.debug }}
+        # CI variable
+        CI: true
 
 branding:
   icon: "send"

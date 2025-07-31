@@ -1,24 +1,56 @@
-name: Basic Notification Example
+name: Basic Telegram Notification
 
 on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send notification
-        uses: asychin/telegram-notify-action@v1
+      - name: Send basic notification
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ vars.TELEGRAM_CHAT_ID }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
           message: |
-            📦 <b>New Push to Repository</b>
+            🚀 **Новое событие в репозитории**
+            
+            **Репозиторий:** {{repository}}
+            **Ветка:** {{refName}}
+            **Событие:** {{eventName}}
+            **Автор:** {{actor}}
+            **SHA:** {{sha}}
+            **Workflow:** {{workflow}}
+            **Задача:** {{job}}
+            **Запуск:** #{{runNumber}}
+            
+            🏢 **Владелец:** {{repositoryOwner}}
+            🔗 **URL:** {{serverUrl}}/{{repository}}
 
-            <b>Repository:</b> ${{ github.repository }}
-            <b>Branch:</b> <code>${{ github.ref_name }}</code>
-            <b>Commit:</b> <code>${{ github.sha }}</code>
-            <b>Author:</b> <a href="${{ github.server_url }}/${{ github.actor }}">${{ github.actor }}</a>
-
-            <a href="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}">View Commit</a>
+      - name: Send notification with custom variables
+        uses: asychin/telegram-notify-action@v3
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: success
+          message: |
+            ✅ **Успешное выполнение**
+            
+            **Окружение:** {{actionsEnvironment}}
+            **Runner:** {{runnerName}} ({{runnerOs}})
+            **Архитектура:** {{runnerArch}}
+            **Workspace:** {{workspace}}
+            
+            📊 **Детали запуска:**
+            - ID: {{runId}}
+            - Номер: {{runNumber}}
+            - Попытка: {{runAttempt}}
+            - Тип ссылки: {{refType}}
+          template_vars: |
+            {
+              "custom_message": "Дополнительная информация от пользователя"
+            }
