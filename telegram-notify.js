@@ -198,7 +198,7 @@ class TelegramNotify {
   getMessageTemplates() {
     const templates = {
       success: {
-        en: `✅ <b>Success</b>
+        en: `✅ **Success**
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -207,7 +207,7 @@ Actor: {{actor}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `✅ <b>Успех</b>
+        ru: `✅ **Успех**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -216,7 +216,7 @@ Workflow: {{workflow}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `✅ <b>成功</b>
+        zh: `✅ **成功**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -227,7 +227,7 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       error: {
-        en: `❌ <b>Error</b>
+        en: `❌ **Error**
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -237,7 +237,7 @@ Workflow: {{workflow}}
 Job Status: {{jobStatus}}
 
 {{customMessage}}`,
-        ru: `❌ <b>Ошибка</b>
+        ru: `❌ **Ошибка**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -247,7 +247,7 @@ Workflow: {{workflow}}
 Статус задачи: {{jobStatus}}
 
 {{customMessage}}`,
-        zh: `❌ <b>错误</b>
+        zh: `❌ **错误**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -259,21 +259,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       warning: {
-        en: `⚠️ <b>Warning</b>
+        en: `⚠️ **Warning**
 
 Repository: {{repository}}
 Branch: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `⚠️ <b>Предупреждение</b>
+        ru: `⚠️ **Предупреждение**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `⚠️ <b>警告</b>
+        zh: `⚠️ **警告**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -282,21 +282,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       info: {
-        en: `ℹ️ <b>Information</b>
+        en: `ℹ️ **Information**
 
 Repository: {{repository}}
 Branch: {{refName}}
 Actor: {{actor}}
 
 {{customMessage}}`,
-        ru: `ℹ️ <b>Информация</b>
+        ru: `ℹ️ **Информация**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Автор: {{actor}}
 
 {{customMessage}}`,
-        zh: `ℹ️ <b>信息</b>
+        zh: `ℹ️ **信息**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -305,7 +305,7 @@ Actor: {{actor}}
 {{customMessage}}`,
       },
       deploy: {
-        en: `🚀 <b>Deployment</b>
+        en: `🚀 **Deployment**
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -316,7 +316,7 @@ Deployed by: {{actor}}
 Status: {{deployStatus}}
 
 {{customMessage}}`,
-        ru: `🚀 <b>Развертывание</b>
+        ru: `🚀 **Развертывание**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -327,7 +327,7 @@ Status: {{deployStatus}}
 Статус: {{deployStatus}}
 
 {{customMessage}}`,
-        zh: `🚀 <b>部署</b>
+        zh: `🚀 **部署**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -340,7 +340,7 @@ Status: {{deployStatus}}
 {{customMessage}}`,
       },
       test: {
-        en: `🧪 <b>Test Results</b>
+        en: `🧪 **Test Results**
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -351,7 +351,7 @@ Test Status: {{testStatus}}
 Coverage: {{coverage}}
 
 {{customMessage}}`,
-        ru: `🧪 <b>Результаты тестов</b>
+        ru: `🧪 **Результаты тестов**
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -362,7 +362,7 @@ Coverage: {{coverage}}
 Покрытие: {{coverage}}
 
 {{customMessage}}`,
-        zh: `🧪 <b>测试结果</b>
+        zh: `🧪 **测试结果**
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -375,7 +375,7 @@ Coverage: {{coverage}}
 {{customMessage}}`,
       },
       release: {
-        en: `🎉 <b>New Release</b>
+        en: `🎉 **New Release**
 
 Repository: {{repository}}
 Version: {{version}}
@@ -385,7 +385,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        ru: `🎉 <b>Новый релиз</b>
+        ru: `🎉 **Новый релиз**
 
 Репозиторий: {{repository}}
 Версия: {{version}}
@@ -395,7 +395,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        zh: `🎉 <b>新版本发布</b>
+        zh: `🎉 **新版本发布**
 
 仓库: {{repository}}
 版本: {{version}}
