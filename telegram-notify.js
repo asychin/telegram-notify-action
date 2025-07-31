@@ -627,7 +627,7 @@ Released by: {{actor}}
     const mimeType = mimeTypes[ext] || 'application/octet-stream';
     
     // Special handling for PNG files with metadata (like C2PA)
-    let processedBuffer = fileBuffer;
+    const processedBuffer = fileBuffer;
     if (ext === '.png' && this.fileType === 'photo') {
       // Check if PNG has problematic metadata
       const pngSignature = fileBuffer.slice(0, 8);
