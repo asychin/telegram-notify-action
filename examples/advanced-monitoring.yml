@@ -1,501 +1,186 @@
-# 🎯 Advanced Repository Monitoring with Templates
-#
-# This example demonstrates advanced usage of telegram-notify-action with:
-# • Dynamic template selection based on events
-# • Rich template variables and custom messages
-# • Multilingual support (Russian templates)
-# • HTML formatting with inline keyboards
-# • Comprehensive repository monitoring
-
-name: Advanced Repository Monitoring
+name: Advanced Monitoring with Telegram
 
 on:
-  # 📝 Issues and comments monitoring
-  issues:
-    types: [opened, closed, reopened, labeled]
-  issue_comment:
-    types: [created]
-
-  # 🔄 Pull requests monitoring
-  pull_request:
-    types: [opened, closed, ready_for_review]
-  pull_request_review:
-    types: [submitted]
-
-  # 💬 Discussions monitoring
-  discussion:
-    types: [created, answered]
-
-  # ⏰ Scheduled health checks
+  workflow_run:
+    workflows: ["CI", "Build", "Deploy"]
+    types: [completed, requested]
   schedule:
-    # Daily health check at 9:00 UTC
-    - cron: "0 9 * * *"
-
-  # 🚀 Manual trigger with options
-  workflow_dispatch:
-    inputs:
-      check_type:
-        description: "Type of check to perform"
-        required: false
-        default: "health"
-        type: choice
-        options:
-          - health
-          - stats
-          - security
+    - cron: '0 */6 * * *'  # Every 6 hours
+  issues:
+    types: [opened, closed]
+  pull_request:
+    types: [opened, closed, merged]
+  release:
+    types: [published]
 
 jobs:
-  # 📝 ISSUE NOTIFICATIONS JOB
-  issue-notifications:
-    name: Issue Notifications
+  monitor-workflow:
+    if: github.event_name == 'workflow_run'
     runs-on: ubuntu-latest
-    if: github.event_name == 'issues' || github.event_name == 'issue_comment'
     steps:
-      - uses: actions/checkout@v4
-
-      # 🎯 Dynamic template selection based on issue action
-      - name: Determine notification type
-        id: notification-type
-        run: |
-          case "${{ github.event.action }}" in
-            "opened")
-              echo "template=warning" >> $GITHUB_OUTPUT
-              echo "emoji=🐛" >> $GITHUB_OUTPUT
-              echo "action_text=opened" >> $GITHUB_OUTPUT
-              ;;
-            "closed")
-              echo "template=success" >> $GITHUB_OUTPUT
-              echo "emoji=✅" >> $GITHUB_OUTPUT
-              echo "action_text=closed" >> $GITHUB_OUTPUT
-              ;;
-            "reopened")
-              echo "template=warning" >> $GITHUB_OUTPUT
-              echo "emoji=🔄" >> $GITHUB_OUTPUT
-              echo "action_text=reopened" >> $GITHUB_OUTPUT
-              ;;
-            "labeled")
-              echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=🏷️" >> $GITHUB_OUTPUT
-              echo "action_text=labeled" >> $GITHUB_OUTPUT
-              ;;
-            "created")
-              echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=💬" >> $GITHUB_OUTPUT
-              echo "action_text=commented on" >> $GITHUB_OUTPUT
-              ;;
-          esac
-
-      # 📤 Send issue notification using dynamic template
-      - name: Send issue notification
-        if: github.event_name == 'issues'
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
+      - name: Workflow Success Notification
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # 🎨 Dynamic template selection: success, warning, info
-          template: ${{ steps.notification-type.outputs.template }}
-          # 🌍 Russian language templates
-          language: ru
-          # 📝 HTML formatting support (also supports "Markdown")
-          parse_mode: "HTML"
-          # 💬 Custom message combined with template
+          template: success
           message: |
-            <b>🎯 Детали Issue:</b>
+            ✅ **Workflow успешно завершен**
+            
+            🔄 **Workflow:** {{workflow}}
+            📋 **Задача:** {{job}}
+            🏃 **Runner:** {{runnerName}} на {{runnerOs}}
+            🏗️ **Архитектура:** {{runnerArch}}
+            
+            📊 **Статистика запуска:**
+            - ID запуска: {{runId}}
+            - Номер: {{runNumber}}
+            - Попытка: {{runAttempt}}
+            - Событие: {{eventName}}
+            
+            🏢 **Репозиторий:**
+            - Владелец: {{repositoryOwner}}
+            - ID: {{repositoryId}}
+            - Защищенная ветка: {{refProtected}}
+            
+            🌐 **Окружение:**
+            - GitHub Actions: {{actionsEnvironment}}
+            - ID окружения: {{actionsEnvironmentId}}
+            - Workspace: {{workspace}}
+            - Temp: {{runnerTemp}}
 
-            <b>Статус:</b> ${{ steps.notification-type.outputs.action_text }}
-            <b>Автор:</b> <code>${{ github.event.issue.user.login }}</code>
-            <b>Метки:</b> ${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}
-
-            ${{ github.event.issue.body && format('<b>Описание:</b>\n<pre>{0}</pre>', github.event.issue.body) || '' }}
-          # 🔧 Rich template variables
-          template_vars: |
-            {
-              "issueNumber": "${{ github.event.issue.number }}",
-              "issueTitle": "${{ github.event.issue.title }}",
-              "author": "${{ github.event.issue.user.login }}",
-              "action": "${{ steps.notification-type.outputs.action_text }}",
-              "emoji": "${{ steps.notification-type.outputs.emoji }}",
-              "labels": "${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}",
-              "status": "${{ github.event.issue.state }}",
-              "createdAt": "${{ github.event.issue.created_at }}"
-            }
-          # ⌨️ Interactive inline keyboard
-          inline_keyboard: |
-            [
-              {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "💬 Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
-            ]
-
-      # 💬 Send comment notification with info template
-      - name: Send comment notification
-        if: github.event_name == 'issue_comment'
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
+      - name: Workflow Failure Notification
+        if: github.event.workflow_run.conclusion == 'failure'
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # 📘 Static template selection
-          template: info
-          parse_mode: "Markdown"
+          template: error
           message: |
-            💬 **New Comment on Issue**
+            ❌ **Workflow завершился с ошибкой**
+            
+            🔄 **Workflow:** {{workflow}}
+            📋 **Задача:** {{job}}
+            🚫 **Статус:** {{jobStatus}}
+            
+            🔍 **Детали ошибки:**
+            - Запуск: #{{runNumber}} (ID: {{runId}})
+            - Попытка: {{runAttempt}}
+            - SHA: {{sha}}
+            - Ветка: {{refName}}
+            
+            👤 **Инициатор:** {{actor}}
+            🏢 **Репозиторий:** {{repository}}
+            🔗 **Ссылка:** {{serverUrl}}/{{repository}}/actions/runs/{{runId}}
 
-            **#${{ github.event.issue.number }}** - ${{ github.event.issue.title }}
-
-            👤 **Commenter:** ${{ github.event.comment.user.login }}
-
-            **Comment:**
-            ${{ github.event.comment.body }}
-          inline_keyboard: |
-            [
-              {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
-              {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
-            ]
-
-  # 🔄 PULL REQUEST NOTIFICATIONS JOB
-  pr-notifications:
-    name: Pull Request Notifications
+  monitor-issues:
+    if: github.event_name == 'issues'
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
     steps:
-      - uses: actions/checkout@v4
-
-      # 🎯 Smart PR template selection
-      - name: Determine PR notification type
-        id: pr-notification-type
-        run: |
-          case "${{ github.event.action }}" in
-            "opened")
-              echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=🔄" >> $GITHUB_OUTPUT
-              echo "action_text=opened" >> $GITHUB_OUTPUT
-              ;;
-            "closed")
-              if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
-                echo "template=success" >> $GITHUB_OUTPUT
-                echo "emoji=🎉" >> $GITHUB_OUTPUT
-                echo "action_text=merged" >> $GITHUB_OUTPUT
-              else
-                echo "template=warning" >> $GITHUB_OUTPUT
-                echo "emoji=❌" >> $GITHUB_OUTPUT
-                echo "action_text=closed" >> $GITHUB_OUTPUT
-              fi
-              ;;
-            "ready_for_review")
-              echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=👀" >> $GITHUB_OUTPUT
-              echo "action_text=marked ready for review" >> $GITHUB_OUTPUT
-              ;;
-            "submitted")
-              echo "template=info" >> $GITHUB_OUTPUT
-              echo "emoji=📝" >> $GITHUB_OUTPUT
-              echo "action_text=reviewed" >> $GITHUB_OUTPUT
-              ;;
-          esac
-
-      # 🚀 Send PR notification using deploy template (treating PR as code deployment)
-      - name: Send PR notification
-        if: github.event_name == 'pull_request'
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
+      - name: New Issue Notification
+        if: github.event.action == 'opened'
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # 🚀 Using deploy template for PR (creative template usage)
-          template: deploy
-          language: ru
-          parse_mode: "HTML"
-          # 📊 Rich PR statistics
+          template: warning
           message: |
-            <b>📈 Статистика изменений:</b>
+            🐛 **Новый Issue**
+            
+            **Автор:** {{issueAuthor}}
+            **Заголовок:** {{issueTitle}}
+            **Номер:** #{{issueNumber}}
+            **Состояние:** {{issueState}}
+            **Метки:** {{labels}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка:** {{issueUrl}}
+            
+            📝 **Описание:**
+            {{issueBody}}
 
-            <b>Ветка:</b> <code>${{ github.event.pull_request.head.ref }}</code> → <code>${{ github.event.pull_request.base.ref }}</code>
-            <b>Файлов изменено:</b> ${{ github.event.pull_request.changed_files }}
-            <b>Коммитов:</b> ${{ github.event.pull_request.commits }}
-            <b>Статус проверок:</b> ${{ github.event.pull_request.mergeable_state || 'в процессе' }}
+      - name: Issue Closed Notification
+        if: github.event.action == 'closed'
+        uses: asychin/telegram-notify-action@v3
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: success
+          message: |
+            ✅ **Issue закрыт**
+            
+            **Заголовок:** {{issueTitle}}
+            **Номер:** #{{issueNumber}}
+            **Закрыл:** {{actor}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            🔗 **Ссылка:** {{issueUrl}}
 
-            ${{ github.event.pull_request.body && format('<b>Описание:</b>\n<i>{0}</i>', github.event.pull_request.body) || '' }}
-          # 🔧 Extended PR template variables
-          template_vars: |
-            {
-              "prNumber": "${{ github.event.pull_request.number }}",
-              "prTitle": "${{ github.event.pull_request.title }}",
-              "author": "${{ github.event.pull_request.user.login }}",
-              "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
-              "version": "PR#${{ github.event.pull_request.number }}",
-              "additions": "${{ github.event.pull_request.additions }}",
-              "deletions": "${{ github.event.pull_request.deletions }}",
-              "changedFiles": "${{ github.event.pull_request.changed_files }}",
-              "commits": "${{ github.event.pull_request.commits }}",
-              "headBranch": "${{ github.event.pull_request.head.ref }}",
-              "baseBranch": "${{ github.event.pull_request.base.ref }}"
-            }
-          # ⌨️ PR action buttons
-          inline_keyboard: |
-            [
-              {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"},
-              {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
-            ]
-
-      # 📝 Send review notification
-      - name: Send review notification
-        if: github.event_name == 'pull_request_review'
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
+  monitor-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Request Notification
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
-            📝 **Pull Request Review**
+            🔄 **Pull Request {{prAction}}**
+            
+            **Заголовок:** {{prTitle}}
+            **Номер:** #{{prNumber}}
+            **Автор:** {{prAuthor}}
+            **Состояние:** {{prState}}
+            
+            🔀 **Ветки:**
+            - Из: {{prHeadRef}} ({{prHeadSha}})
+            - В: {{prBaseRef}}
+            
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            🔗 **Ссылка:** {{prUrl}}
+            
+            📊 **Статистика:**
+            - Коммиты: {{prCommits}}
+            - Изменения: +{{prAdditions}} -{{prDeletions}}
+            - Файлов: {{prChangedFiles}}
 
-            **#${{ github.event.pull_request.number }}** - ${{ github.event.pull_request.title }}
-
-            👤 **Reviewer:** ${{ github.event.review.user.login }}
-            📊 **State:** ${{ github.event.review.state }}
-
-            ${{ github.event.review.body && format('**Review Comment:**\n{0}', github.event.review.body) || '' }}
-          inline_keyboard: |
-            [
-              {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
-              {"text": "📝 View PR", "url": "${{ github.event.pull_request.html_url }}"}
-            ]
-
-  # 💬 DISCUSSION NOTIFICATIONS JOB
-  discussion-notifications:
-    name: Discussion Notifications
+  scheduled-health-check:
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
-    if: github.event_name == 'discussion'
     steps:
-      - uses: actions/checkout@v4
-
-      # 💬 Send discussion notification with info template
-      - name: Send discussion notification
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
+      - name: Health Check Report
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
-          parse_mode: "Markdown"
           message: |
-            💬 **New Discussion ${{ github.event.action }}**
-
-            **${{ github.event.discussion.title }}**
-
-            👤 **Author:** ${{ github.event.discussion.user.login }}
-            🏷️ **Category:** ${{ github.event.discussion.category.name }}
-
-            ${{ github.event.discussion.body }}
-          inline_keyboard: |
-            [
-              {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"}
-            ]
-
-  # 🏥 HEALTH CHECK JOB
-  health-check:
-    name: Repository Health Check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.check_type == 'health')
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      # 🔍 Comprehensive health checks
-      - name: Run health checks
-        id: health-check
-        run: |
-          echo "Running repository health checks..."
-
-          # Generate current timestamp
-          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
-
-          # Check for security vulnerabilities
-          AUDIT_RESULT=$(npm audit --audit-level high --json || echo '{}')
-          VULNERABILITIES=$(echo "$AUDIT_RESULT" | jq -r '.metadata.vulnerabilities.total // 0')
-
-          # Check test coverage
-          npm run test:coverage > /dev/null 2>&1 || true
-          if [ -f coverage/coverage-summary.json ]; then
-            COVERAGE=$(jq -r '.total.lines.pct' coverage/coverage-summary.json)
-          else
-            COVERAGE="N/A"
-          fi
-
-          # Check for outdated dependencies
-          OUTDATED=$(npm outdated --json 2>/dev/null | jq -r 'keys | length' || echo "0")
-
-          # Check repository size
-          REPO_SIZE=$(du -sh . | cut -f1)
-
-          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
-          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
-          echo "outdated=$OUTDATED" >> $GITHUB_OUTPUT
-          echo "repo_size=$REPO_SIZE" >> $GITHUB_OUTPUT
-
-          # Determine health status
-          if [ "$VULNERABILITIES" -gt 0 ]; then
-            echo "status=warning" >> $GITHUB_OUTPUT
-            echo "health_emoji=⚠️" >> $GITHUB_OUTPUT
-          else
-            echo "status=success" >> $GITHUB_OUTPUT
-            echo "health_emoji=✅" >> $GITHUB_OUTPUT
-          fi
-
-      # 🧪 Send health check using test template (creative template usage)
-      - name: Send health check notification
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # 🧪 Using test template for health check (creative usage)
-          template: test
-          language: ru
-          parse_mode: "HTML"
-          # 🏥 Detailed health report
-          message: |
-            <b>🏥 Детальный отчет здоровья:</b>
-
-            <b>Дата проверки:</b> ${{ steps.health-check.outputs.current_date }}
-            <b>Размер репозитория:</b> <code>${{ steps.health-check.outputs.repo_size }}</code>
-            <b>Общий статус:</b> ${{ steps.health-check.outputs.status == 'success' && '✅ Здоров' || '⚠️ Требует внимания' }}
-
-            <b>📋 Рекомендации:</b>
-            ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Обновить зависимости с уязвимостями' || '• ✅ Безопасность в порядке' }}
-            ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Обновить {0} устаревших пакетов', steps.health-check.outputs.outdated) || '• ✅ Все пакеты актуальны' }}
-          # 🔬 Health check template variables
-          template_vars: |
-            {
-              "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ Все проверки пройдены' || '⚠️ Есть проблемы' }}",
-              "coverage": "${{ steps.health-check.outputs.coverage }}%",
-              "vulnerabilities": "${{ steps.health-check.outputs.vulnerabilities }}",
-              "outdatedPackages": "${{ steps.health-check.outputs.outdated }}",
-              "repoSize": "${{ steps.health-check.outputs.repo_size }}",
-              "healthScore": "${{ steps.health-check.outputs.vulnerabilities == '0' && steps.health-check.outputs.outdated < '5' && '95%' || '70%' }}",
-              "checkDate": "${{ steps.health-check.outputs.current_date }}",
-              "totalIssues": "${{ steps.health-check.outputs.vulnerabilities }}+${{ steps.health-check.outputs.outdated }}"
-            }
-          # 🔗 Useful repository links
-          inline_keyboard: |
-            [
-              {"text": "📊 View Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔒 Security", "url": "${{ github.server_url }}/${{ github.repository }}/security"},
-              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"}
-            ]
-
-  # 📊 REPOSITORY STATISTICS JOB
-  repository-stats:
-    name: Repository Statistics
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.check_type == 'stats'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history for stats
-
-      # 📈 Generate comprehensive repository statistics
-      - name: Generate repository statistics
-        id: stats
-        run: |
-          # Generate current timestamp
-          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
-
-          # Get commit statistics
-          TOTAL_COMMITS=$(git rev-list --all --count)
-          COMMITS_THIS_MONTH=$(git rev-list --since="1 month ago" --count HEAD)
-          CONTRIBUTORS=$(git log --format='%ae' | sort | uniq | wc -l)
-
-          # Get file statistics
-          TOTAL_FILES=$(find . -type f -not -path './.git/*' -not -path './node_modules/*' | wc -l)
-          CODE_LINES=$(find . -name "*.js" -not -path './node_modules/*' -not -path './.git/*' | xargs wc -l | tail -1 | awk '{print $1}')
-
-          # Get latest release
-          LATEST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "No releases")
-
-          echo "total_commits=$TOTAL_COMMITS" >> $GITHUB_OUTPUT
-          echo "commits_this_month=$COMMITS_THIS_MONTH" >> $GITHUB_OUTPUT
-          echo "contributors=$CONTRIBUTORS" >> $GITHUB_OUTPUT
-          echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
-          echo "code_lines=$CODE_LINES" >> $GITHUB_OUTPUT
-          echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
-
-      # 📊 Send statistics using info template
-      - name: Send statistics report
-        uses: your-username/telegram-notify-action@v2 # Replace with your action
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: info
-          parse_mode: "Markdown"
-          message: |
-            📊 **Repository Statistics Report**
-
-            **Repository:** ${{ github.repository }}
-            **Generated:** ${{ steps.stats.outputs.current_date }}
-
-            **Development Activity:**
-            • Total commits: ${{ steps.stats.outputs.total_commits }}
-            • Commits this month: ${{ steps.stats.outputs.commits_this_month }}
-            • Contributors: ${{ steps.stats.outputs.contributors }}
-
-            **Codebase:**
-            • Total files: ${{ steps.stats.outputs.total_files }}
-            • Lines of code: ${{ steps.stats.outputs.code_lines }}
-            • Latest release: ${{ steps.stats.outputs.latest_release }}
-
-            **Links:**
-            • [Contributors](https://github.com/${{ github.repository }}/graphs/contributors)
-            • [Commit Activity](https://github.com/${{ github.repository }}/graphs/commit-activity)
-            • [Code Frequency](https://github.com/${{ github.repository }}/graphs/code-frequency)
-          # 📊 Statistics template variables
-          template_vars: |
-            {
-              "totalCommits": "${{ steps.stats.outputs.total_commits }}",
-              "monthlyCommits": "${{ steps.stats.outputs.commits_this_month }}",
-              "contributors": "${{ steps.stats.outputs.contributors }}"
-            }
-          # 📈 Statistics links
-          inline_keyboard: |
-            [
-              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
-              {"text": "📊 Statistics", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"}
-            ]
-
-# 🎨 TEMPLATES USED IN THIS EXAMPLE:
-#
-# • success ✅ - For successful operations (issue closed, PR merged)
-# • error ❌ - For failed operations (not used here, but available)
-# • warning ⚠️ - For issues that need attention (new issues, security alerts)
-# • info ℹ️ - For general information (comments, discussions, stats)
-# • deploy 🚀 - For deployments (creatively used for PRs)
-# • test 🧪 - For test results (creatively used for health checks)
-# • release 🎉 - For new releases (not used here, but available)
-#
-# 🌍 LANGUAGE SUPPORT:
-# All templates support: en (English), ru (Russian), zh (Chinese)
-#
-# 🎨 FORMATTING MODES:
-# Templates automatically adapt to your parse_mode setting:
-# • parse_mode: "HTML" → Uses <b>bold</b>, <i>italic</i>, <code>code</code>
-# • parse_mode: "Markdown" → Uses **bold**, *italic*, `code`
-# Templates are format-aware and work seamlessly with both modes!
-#
-# 🔧 TEMPLATE VARIABLES:
-# Each template automatically gets GitHub context variables:
-# {{repository}}, {{actor}}, {{refName}}, {{sha}}, {{workflow}}, etc.
-# Plus any custom variables you pass via template_vars
-#
-# 💡 CREATIVE TEMPLATE USAGE:
-# • Using 'deploy' template for Pull Requests (treating code changes as deployment)
-# • Using 'test' template for Health Checks (treating health as test results)
-# • This shows templates are flexible and can be used creatively!
+            🏥 **Периодическая проверка здоровья**
+            
+            🕒 **Время проверки:** {{triggeredAt}}
+            🏢 **Репозиторий:** {{repository}}
+            👤 **Владелец:** {{repositoryOwner}}
+            
+            🌐 **Окружение GitHub Actions:**
+            - Среда: {{actionsEnvironment}}
+            - ID среды: {{actionsEnvironmentId}}
+            - URL: {{actionsEnvironmentUrl}}
+            
+            🏃 **Runner информация:**
+            - Имя: {{runnerName}}
+            - ОС: {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Рабочая папка: {{workspace}}
+            - Временная папка: {{runnerTemp}}
+            
+            🔗 **Ссылки:**
+            - Сервер: {{serverUrl}}
+            - API: {{apiUrl}}
+            - GraphQL: {{graphqlUrl}}
+            
+            ✅ Все системы работают нормально!
