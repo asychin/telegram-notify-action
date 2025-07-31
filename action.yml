@@ -8,7 +8,7 @@ inputs:
     required: true
   chat_id:
     description: "Telegram Chat ID"
-    required: true
+    required: false
   message:
     description: "Message to send"
     required: false
