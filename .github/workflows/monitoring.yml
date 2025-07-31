@@ -72,6 +72,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.notification-type.outputs.template }}
+          parse_mode: "Markdown"
           message: |
             ${{ steps.notification-type.outputs.emoji }} **Issue ${{ steps.notification-type.outputs.action_text }}**
 
@@ -100,6 +101,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
+          parse_mode: "Markdown"
           message: |
             💬 **New Comment on Issue**
 
@@ -161,6 +163,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.pr-notification-type.outputs.template }}
+          parse_mode: "Markdown"
           message: |
             ${{ steps.pr-notification-type.outputs.emoji }} **Pull Request ${{ steps.pr-notification-type.outputs.action_text }}**
 
@@ -193,6 +196,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
+          parse_mode: "Markdown"
           message: |
             📝 **Pull Request Review**
 
@@ -221,6 +225,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
+          parse_mode: "Markdown"
           message: |
             💬 **New Discussion ${{ github.event.action }}**
 
@@ -299,6 +304,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.health-check.outputs.status }}
+          parse_mode: "Markdown"
           message: |
             ${{ steps.health-check.outputs.health_emoji }} **Daily Health Check**
 
@@ -366,6 +372,7 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
+          parse_mode: "Markdown"
           message: |
             📊 **Repository Statistics Report**
 
