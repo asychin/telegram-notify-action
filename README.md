@@ -148,6 +148,8 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 👉 **[examples/advanced-monitoring.yml](examples/advanced-monitoring.yml)**
 
+> **🎨 Latest Update:** Switched to Markdown formatting for better readability and mobile experience!
+
 ## ⚙️ Configuration / 配置 / Конфигурация
 
 ### Required Parameters / 必需参数 / Обязательные параметры
