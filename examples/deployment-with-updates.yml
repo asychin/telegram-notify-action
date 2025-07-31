@@ -165,8 +165,4 @@ jobs:
             🌐 **GitHub Окружение:**
             - ID: {{actionsEnvironmentId}}
             - URL: {{actionsEnvironmentUrl}}
-          template_vars: |
-            {
-              "deploymentResult": "${{ needs.deploy.result }}",
-              "finalStatus": "${{ needs.deploy.result == 'success' && '✅ Успешно' || '❌ Неудачно' }}"
-            }
+

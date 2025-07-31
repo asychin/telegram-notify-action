@@ -50,7 +50,4 @@ jobs:
             - Номер: {{runNumber}}
             - Попытка: {{runAttempt}}
             - Тип ссылки: {{refType}}
-          template_vars: |
-            {
-              "custom_message": "Дополнительная информация от пользователя"
-            }
+

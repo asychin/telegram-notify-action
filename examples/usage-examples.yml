@@ -1,495 +1,346 @@
-# Telegram Notify Action - Usage Examples
-# This file contains comprehensive examples of using the enhanced Telegram Notify Action
+# 🎯 Comprehensive Usage Examples for Telegram Notify Action
+#
+# This file demonstrates various use cases and configurations
+# for the telegram-notify-action with AUTO-CONTEXT VARIABLES
 
-name: Usage Examples
+name: Telegram Notify Usage Examples
 
 on:
   workflow_dispatch:
     inputs:
       example_type:
-        description: 'Type of example to run'
+        description: "Choose example to run"
         required: true
+        default: "basic"
         type: choice
         options:
           - basic
           - templates
           - files
-          - advanced
-          - all
+          - keyboards
+          - conditions
 
 jobs:
-  # 1. Basic Usage Examples
+  # 📝 BASIC MESSAGING EXAMPLES
   basic-examples:
-    name: Basic Usage Examples
+    name: Basic Examples
     runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'basic' || github.event.inputs.example_type == 'all'
+    if: github.event.inputs.example_type == 'basic'
     steps:
       - uses: actions/checkout@v4
-      
-      # Simple text message
-      - name: Simple Message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "Hello from GitHub Actions! 👋"
-      
-      # Message with HTML formatting
-      - name: HTML Formatted Message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: |
-            <b>Bold Text</b>
-            <i>Italic Text</i>
-            <code>Code Text</code>
-            <pre>Preformatted Text</pre>
-            <a href="https://github.com">Link</a>
-          parse_mode: HTML
-      
-      # Message with Markdown formatting
-      - name: Markdown Formatted Message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: |
-            **Bold Text**
-            *Italic Text*
-            `Code Text`
-            ```
-            Preformatted Code Block
-            ```
-            [Link](https://github.com)
-          parse_mode: Markdown
-      
-      # Silent notification
-      - name: Silent Message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "This is a silent notification 🔇"
-          disable_notification: true
-      
-      # Message to thread/topic
-      - name: Message to Thread
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "Message posted to specific thread 🧵"
-          message_thread_id: "123"  # Replace with actual thread ID
 
-  # 2. Template Examples
+      - name: Simple text message
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: |
+            📢 **Простое сообщение**
+            
+            Автоматические переменные:
+            - Репозиторий: {{repository}}
+            - Владелец: {{repositoryOwner}}
+            - Workflow: {{workflow}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+
+      - name: HTML formatted message
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse_mode: "HTML"
+          message: |
+            <b>🎨 HTML форматирование</b>
+            
+            <b>Репозиторий:</b> <code>{{repository}}</code>
+            <b>Актор:</b> <i>{{actor}}</i>
+            <b>SHA:</b> <code>{{sha}}</code>
+            <b>Runner:</b> {{runnerName}} ({{runnerOs}})
+
+      - name: Markdown formatted message
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse_mode: "Markdown"
+          message: |
+            **📋 Markdown форматирование**
+            
+            **Workflow:** `{{workflow}}`
+            **Запуск:** #{{runNumber}}
+            **Ветка:** `{{refName}}`
+            **Время:** {{triggeredAt}}
+
+  # 🎨 TEMPLATE EXAMPLES
   template-examples:
     name: Template Examples
     runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'templates' || github.event.inputs.example_type == 'all'
+    if: github.event.inputs.example_type == 'templates'
     strategy:
       matrix:
         template: [success, error, warning, info, deploy, test, release]
     steps:
       - uses: actions/checkout@v4
-      
-      - name: ${{ matrix.template }} Template Example
+
+      - name: ${{ matrix.template }} template example
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ matrix.template }}
-          message: "Custom message for ${{ matrix.template }} template"
-          template_vars: |
-            {
-              "deployStatus": "successful",
-              "testStatus": "passed",
-              "coverage": "95%",
-              "version": "v2.0.0",
-              "tag": "v2.0.0",
-              "releaseNotes": "Example release notes for template demonstration"
-            }
-          language: en
+          message: |
+            🎨 **Шаблон: ${{ matrix.template }}**
+            
+            Автоматические переменные в действии:
+            - Репозиторий: {{repository}}
+            - Владелец: {{repositoryOwner}}
+            - ID репозитория: {{repositoryId}}
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
+            - Запуск: #{{runNumber}} (ID: {{runId}})
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Актор: {{actor}}
+            - Событие: {{eventName}}
+            - Время: {{triggeredAt}}
 
-  # 3. File Upload Examples
+  # 📎 FILE UPLOAD EXAMPLES
   file-examples:
     name: File Upload Examples
     runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'files' || github.event.inputs.example_type == 'all'
+    if: github.event.inputs.example_type == 'files'
     steps:
       - uses: actions/checkout@v4
-      
-      # Create test files
-      - name: Create Test Files
+
+      - name: Create sample files
         run: |
-          # Create a text document
-          cat > test-document.txt << 'EOF'
-          This is a test document created by GitHub Actions.
+          echo "Sample document content" > sample.txt
+          echo "Repository: {{repository}}" >> sample.txt
+          echo "Workflow: {{workflow}}" >> sample.txt
+          echo "Runner: {{runnerName}}" >> sample.txt
           
-          Repository: ${{ github.repository }}
-          Workflow: ${{ github.workflow }}
-          Run ID: ${{ github.run_id }}
-          Timestamp: $(date)
-          
-          This demonstrates file upload capabilities of the Telegram Notify Action.
-          EOF
-          
-          # Create a JSON report
-          cat > report.json << 'EOF'
+          # Create a simple JSON file
+          cat > data.json << EOF
           {
-            "repository": "${{ github.repository }}",
-            "workflow": "${{ github.workflow }}",
-            "run_id": "${{ github.run_id }}",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "status": "success",
-            "metrics": {
-              "files_processed": 42,
-              "duration": "2m 30s",
-              "memory_usage": "128MB"
-            }
+            "repository": "{{repository}}",
+            "workflow": "{{workflow}}",
+            "runNumber": "{{runNumber}}",
+            "actor": "{{actor}}"
           }
           EOF
-          
-          # Create a simple CSV
-          cat > data.csv << 'EOF'
-          Name,Value,Status
-          Test 1,100,Success
-          Test 2,95,Success
-          Test 3,87,Warning
-          Test 4,45,Error
-          EOF
-          
-          # Create a simple PNG (1x1 pixel)
-          echo -e '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\xdac\xf8\x0f\x00\x00\x01\x00\x01\x00\x00\x00\x00IEND\xaeB`\x82' > test-image.png
-      
-      # Send document
-      - name: Send Document
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          file_path: test-document.txt
-          file_type: document
-          caption: |
-            📄 **Test Document**
-            
-            Generated by GitHub Actions workflow
-            Repository: ${{ github.repository }}
-      
-      # Send JSON report
-      - name: Send JSON Report
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          file_path: report.json
-          file_type: document
-          caption: |
-            📊 **Workflow Report**
-            
-            JSON report containing workflow metrics and status
-      
-      # Send CSV data
-      - name: Send CSV Data
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          file_path: data.csv
-          file_type: document
-          caption: |
-            📈 **Test Results Data**
-            
-            CSV file containing test results and metrics
-      
-      # Send image
-      - name: Send Image
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          file_path: test-image.png
-          file_type: photo
-          caption: |
-            🖼️ **Test Image**
-            
-            Sample image uploaded via GitHub Actions
 
-  # 4. Advanced Features Examples
-  advanced-examples:
-    name: Advanced Features Examples
+      - name: Send document
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: "sample.txt"
+          file_type: "document"
+          caption: |
+            📄 **Документ загружен**
+            
+            Контекст:
+            - Репозиторий: {{repository}}
+            - Workflow: {{workflow}}
+            - Runner: {{runnerName}} на {{runnerOs}}
+            - Время: {{triggeredAt}}
+
+      - name: Send JSON data
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_path: "data.json"
+          file_type: "document"
+          caption: |
+            📊 **JSON данные**
+            
+            Автоматические переменные GitHub:
+            - ID репозитория: {{repositoryId}}
+            - Владелец: {{repositoryOwner}}
+            - SHA: {{sha}}
+            - Ветка: {{refName}} ({{refType}})
+
+  # ⌨️ KEYBOARD EXAMPLES
+  keyboard-examples:
+    name: Inline Keyboard Examples
     runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'advanced' || github.event.inputs.example_type == 'all'
+    if: github.event.inputs.example_type == 'keyboards'
     steps:
       - uses: actions/checkout@v4
-      
-      # Message with inline keyboard
-      - name: Message with Inline Keyboard
+
+      - name: Simple inline keyboard
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           message: |
-            🎮 **Interactive Message**
+            ⌨️ **Простая клавиатура**
             
-            This message includes interactive buttons below.
-            Click on any button to navigate to different sections.
+            Репозиторий: {{repository}}
+            Workflow: {{workflow}}
+            Runner: {{runnerName}}
           inline_keyboard: |
             [
-              {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
-              {"text": "📝 View Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
-            ],
-            [
-              {"text": "🐛 Report Issue", "url": "${{ github.server_url }}/${{ github.repository }}/issues/new"},
-              {"text": "💬 Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              {"text": "🏠 Репозиторий", "url": "{{serverUrl}}/{{repository}}"},
+              {"text": "🔄 Workflow", "url": "{{serverUrl}}/{{repository}}/actions/runs/{{runId}}"}
             ]
-      
-      # Message with retry configuration
-      - name: Message with Custom Retry Settings
+
+      - name: Multi-row keyboard
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "This message uses custom retry settings for better reliability 🔄"
-          max_retries: 5
-          retry_delay: 2
-      
-      # Message with all advanced options
-      - name: Message with All Advanced Options
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: "info"
           message: |
-            🚀 **Advanced Configuration Example**
+            🎛️ **Многорядная клавиатура**
             
-            This message demonstrates all advanced options:
-            • Protected content (cannot be forwarded)
-            • Custom parse mode
-            • Web page preview disabled
-            • Reply to specific message
-            • Custom template variables
-          parse_mode: HTML
-          disable_web_page_preview: true
-          protect_content: true
-          reply_to_message_id: "123"  # Replace with actual message ID
-          allow_sending_without_reply: true
-          template_vars: |
-            {
-              "customVar1": "Custom Value 1",
-              "customVar2": "Custom Value 2",
-              "timestamp": "${{ github.event.head_commit.timestamp }}"
-            }
-      
-      # Conditional sending example (success only)
-      - name: Success-Only Notification
+            GitHub контекст:
+            - Сервер: {{serverUrl}}
+            - API: {{apiUrl}}
+            - GraphQL: {{graphqlUrl}}
+          inline_keyboard: |
+            [
+              [
+                {"text": "📊 Actions", "url": "{{serverUrl}}/{{repository}}/actions"},
+                {"text": "📈 Insights", "url": "{{serverUrl}}/{{repository}}/pulse"}
+              ],
+              [
+                {"text": "🔒 Security", "url": "{{serverUrl}}/{{repository}}/security"},
+                {"text": "⚙️ Settings", "url": "{{serverUrl}}/{{repository}}/settings"}
+              ],
+              [
+                {"text": "📝 Issues", "url": "{{serverUrl}}/{{repository}}/issues"},
+                {"text": "🔀 Pull Requests", "url": "{{serverUrl}}/{{repository}}/pulls"}
+              ]
+            ]
+
+  # 🔀 CONDITIONAL EXAMPLES
+  conditional-examples:
+    name: Conditional Sending Examples
+    runs-on: ubuntu-latest
+    if: github.event.inputs.example_type == 'conditions'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Success only notification
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "This message is only sent when the workflow succeeds ✅"
           send_on_success: true
           send_on_failure: false
-      
-      # Message editing example
-      - name: Send Initial Message
-        id: initial-message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "⏳ Processing... Please wait."
-      
-      - name: Simulate Processing
-        run: sleep 5
-      
-      - name: Update Message
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message_id: ${{ steps.initial-message.outputs.message_id }}
+          template: "success"
           message: |
-            ✅ **Processing Complete!**
+            ✅ **Только при успехе**
             
-            The task has been completed successfully.
-            Duration: 5 seconds
-          inline_keyboard: |
-            [
-              {"text": "📊 View Results", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-            ]
+            Это сообщение отправляется только при успешном выполнении.
+            
+            Контекст:
+            - Репозиторий: {{repository}}
+            - Статус задачи: {{jobStatus}}
+            - Runner: {{runnerName}}
 
-  # 5. Multi-language Examples
-  multilingual-examples:
-    name: Multi-language Examples
+      - name: Always send notification
+        uses: ./
+        if: always()
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: "info"
+          message: |
+            📢 **Всегда отправляется**
+            
+            Это сообщение отправляется независимо от результата.
+            
+            GitHub Actions контекст:
+            - Workflow: {{workflow}}
+            - Задача: {{job}}
+            - Запуск: #{{runNumber}}
+            - Актор: {{actor}}
+            - Окружение: {{actionsEnvironment}}
+            - Workspace: {{workspace}}
+            - Tool Cache: {{runnerToolCache}}
+
+  # 📊 COMPREHENSIVE EXAMPLE
+  comprehensive-example:
+    name: Comprehensive Example
     runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'all'
-    strategy:
-      matrix:
-        language: [en, ru]
+    if: always()
+    needs: [basic-examples, template-examples, file-examples, keyboard-examples, conditional-examples]
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Multi-language Template (${{ matrix.language }})
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: success
-          language: ${{ matrix.language }}
-          message: |
-            ${{ matrix.language == 'en' && 'Multi-language support demonstration' || 'Демонстрация многоязычной поддержки' }}
-          template_vars: |
-            {
-              "customMessage": "${{ matrix.language == 'en' && 'This message is in English' || 'Это сообщение на русском языке' }}"
-            }
 
-  # 6. Error Handling Examples
-  error-handling-examples:
-    name: Error Handling Examples
-    runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'all'
-    steps:
-      - uses: actions/checkout@v4
-      
-      # Demonstrate graceful error handling
-      - name: Test with Invalid Token (Expected to Fail)
-        uses: ./
-        continue-on-error: true
-        with:
-          telegram_token: "invalid_token_for_testing"
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "This should fail gracefully"
-          max_retries: 1
-          retry_delay: 1
-        id: error-test
-      
-      - name: Report Error Test Results
+      - name: Final comprehensive notification
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: ${{ steps.error-test.outcome == 'failure' && 'success' || 'error' }}
+          template: "release"
+          language: "ru"
           message: |
-            🧪 **Error Handling Test Results**
+            🎉 **Комплексный пример завершен**
             
-            Expected outcome: Failure
-            Actual outcome: ${{ steps.error-test.outcome }}
+            📊 **Полный контекст GitHub Actions:**
             
-            ${{ steps.error-test.outcome == 'failure' && '✅ Error handling works correctly!' || '❌ Error handling failed!' }}
-
-  # 7. Integration Examples
-  integration-examples:
-    name: Integration Examples
-    runs-on: ubuntu-latest
-    if: github.event.inputs.example_type == 'all'
-    steps:
-      - uses: actions/checkout@v4
-      
-      # Example: Notify about test results
-      - name: Run Mock Tests
-        id: tests
-        run: |
-          echo "Running mock tests..."
-          # Simulate test results
-          echo "passed=85" >> $GITHUB_OUTPUT
-          echo "failed=3" >> $GITHUB_OUTPUT
-          echo "skipped=2" >> $GITHUB_OUTPUT
-          echo "coverage=92.5" >> $GITHUB_OUTPUT
-      
-      - name: Send Test Results
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: ${{ steps.tests.outputs.failed == '0' && 'success' || 'warning' }}
-          message: |
-            📊 **Test Results Summary**
+            🏢 **Репозиторий:**
+            - Название: {{repository}}
+            - Владелец: {{repositoryOwner}}
+            - ID: {{repositoryId}}
+            - ID владельца: {{repositoryOwnerId}}
             
-            • Passed: ${{ steps.tests.outputs.passed }}
-            • Failed: ${{ steps.tests.outputs.failed }}
-            • Skipped: ${{ steps.tests.outputs.skipped }}
-            • Coverage: ${{ steps.tests.outputs.coverage }}%
-          template_vars: |
-            {
-              "testStatus": "${{ steps.tests.outputs.failed == '0' && 'All tests passed' || 'Some tests failed' }}",
-              "coverage": "${{ steps.tests.outputs.coverage }}"
-            }
+            🌿 **Git контекст:**
+            - Ссылка: {{ref}}
+            - Имя ветки: {{refName}}
+            - Тип: {{refType}}
+            - Защищена: {{refProtected}}
+            - SHA: {{sha}}
+            
+            🔄 **Workflow контекст:**
+            - Название: {{workflow}}
+            - Ссылка: {{workflowRef}}
+            - SHA: {{workflowSha}}
+            - Задача: {{job}}
+            - Статус: {{jobStatus}}
+            
+            🏃 **Запуск:**
+            - ID: {{runId}}
+            - Номер: {{runNumber}}
+            - Попытка: {{runAttempt}}
+            - Событие: {{eventName}}
+            - Актор: {{actor}}
+            - ID актора: {{actorId}}
+            - Время: {{triggeredAt}}
+            
+            🖥️ **Runner:**
+            - Имя: {{runnerName}}
+            - ОС: {{runnerOs}}
+            - Архитектура: {{runnerArch}}
+            - Workspace: {{workspace}}
+            - Tool Cache: {{runnerToolCache}}
+            - Temp: {{runnerTemp}}
+            
+            🌐 **Окружение:**
+            - GitHub Actions: {{actionsEnvironment}}
+            - ID окружения: {{actionsEnvironmentId}}
+            - URL окружения: {{actionsEnvironmentUrl}}
+            
+            🔗 **URLs:**
+            - Сервер: {{serverUrl}}
+            - API: {{apiUrl}}
+            - GraphQL: {{graphqlUrl}}
           inline_keyboard: |
             [
-              {"text": "📊 View Details", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
-              {"text": "📈 Coverage Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-            ]
-      
-      # Example: Deployment notification
-      - name: Mock Deployment
-        id: deploy
-        run: |
-          echo "Simulating deployment..."
-          echo "environment=production" >> $GITHUB_OUTPUT
-          echo "version=v2.0.0" >> $GITHUB_OUTPUT
-          echo "url=https://example.com" >> $GITHUB_OUTPUT
-      
-      - name: Send Deployment Notification
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: deploy
-          message: |
-            🚀 **Deployment Successful**
-            
-            Version ${{ steps.deploy.outputs.version }} has been deployed to ${{ steps.deploy.outputs.environment }}.
-          template_vars: |
-            {
-              "deployStatus": "successful",
-              "version": "${{ steps.deploy.outputs.version }}",
-              "environment": "${{ steps.deploy.outputs.environment }}"
-            }
-          inline_keyboard: |
-            [
-              {"text": "🌐 View Site", "url": "${{ steps.deploy.outputs.url }}"},
-              {"text": "📊 Monitoring", "url": "https://monitoring.example.com"},
-              {"text": "📝 Logs", "url": "https://logs.example.com"}
-            ]
-
-  # 8. Summary
-  summary:
-    name: Examples Summary
-    runs-on: ubuntu-latest
-    needs: [basic-examples, template-examples, file-examples, advanced-examples, multilingual-examples, error-handling-examples, integration-examples]
-    if: always() && github.event.inputs.example_type == 'all'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Send Summary
-        uses: ./
-        with:
-          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: success
-          message: |
-            🎉 **Usage Examples Completed**
-            
-            All usage examples have been executed successfully!
-            
-            **Examples Covered:**
-            • Basic messaging and formatting
-            • Template usage with variables
-            • File uploads (documents, images)
-            • Advanced features (keyboards, retry logic)
-            • Multi-language support
-            • Error handling
-            • Integration scenarios
-            
-            Check your Telegram chat to see all the examples in action!
-          template_vars: |
-            {
-              "customMessage": "You can use these examples as a reference for implementing the Telegram Notify Action in your own workflows."
-            }
-          inline_keyboard: |
-            [
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
-              {"text": "💾 Download Action", "url": "https://github.com/${{ github.repository }}"},
-              {"text": "🐛 Report Issues", "url": "https://github.com/${{ github.repository }}/issues"}
+              [
+                {"text": "🏠 Репозиторий", "url": "{{serverUrl}}/{{repository}}"},
+                {"text": "🔄 Этот запуск", "url": "{{serverUrl}}/{{repository}}/actions/runs/{{runId}}"}
+              ],
+              [
+                {"text": "📊 Все Actions", "url": "{{serverUrl}}/{{repository}}/actions"},
+                {"text": "📈 Аналитика", "url": "{{serverUrl}}/{{repository}}/pulse"}
+              ],
+              [
+                {"text": "🔒 Безопасность", "url": "{{serverUrl}}/{{repository}}/security"},
+                {"text": "⚙️ Настройки", "url": "{{serverUrl}}/{{repository}}/settings"}
+              ]
             ]
