@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/github/license/asychin/telegram-notify-action)](LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/asychin/telegram-notify-action/test.yml)](https://github.com/asychin/telegram-notify-action/actions)
 
-**Enhanced GitHub Action for sending Telegram notifications with advanced features**
+## Enhanced GitHub Action for sending Telegram notifications with advanced features
 
 ![Telegram Bot](test-image.png)
 
@@ -51,7 +51,7 @@ Choose your preferred language:
 ## 📚 Additional Resources
 
 - **[Template System](TEMPLATE-SYSTEM.md)** - Learn about message templates and variables
-- **[Auto Context Variables](docs/AUTO-CONTEXT-VARIABLES.md)** - Automatic variable extraction
+- **[Auto Context Variables](docs/en/README.md#-auto-context-variables)** - Automatic variable extraction
 - **[Examples](examples/)** - Ready-to-use workflow examples
 - **[Changelog](CHANGELOG.md)** - Version history and updates
 

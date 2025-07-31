@@ -3,7 +3,7 @@
 <!-- Language Navigation -->
 <div align="center">
 
-### 🌐 Language / 语言 / Язык
+## 🌐 Language / 语言 / Язык
 
 | [🇺🇸 **English**](TEMPLATE-SYSTEM.md) | [🇨🇳 中文](../zh/TEMPLATE-SYSTEM.md) | [🇷🇺 Русский](../ru/TEMPLATE-SYSTEM.md) |
 | :----------------------------------: | :---------------------------------: | :------------------------------------: |
