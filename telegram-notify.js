@@ -764,7 +764,24 @@ Released by: {{actor}}
    * Process message template
    */
   processTemplate() {
-    if (!this.template) return this.cleanHtmlContent(this.message);
+    if (!this.template) {
+      // Process regular message with auto-context variables
+      const allVars = {
+        ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
+        ...this.getEventContext(), // Automatic event-specific variables
+        ...this.templateVars, // User-defined variables (highest priority)
+      };
+      
+      // Replace variables in regular message
+      const processedMessage = this.message.replace(
+        /\{\{(\w+)\}\}/g,
+        (match, key) => {
+          return allVars[key] || match;
+        }
+      );
+      
+      return this.cleanHtmlContent(processedMessage);
+    }
 
     const templates = this.getMessageTemplates();
     const templateData = templates[this.template];
@@ -975,12 +992,40 @@ Released by: {{actor}}
   prepareInlineKeyboard() {
     if (!this.inlineKeyboard) return null;
 
+    // Prepare variables for replacement
+    const allVars = {
+      ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
+      ...this.getEventContext(), // Automatic event-specific variables
+      ...this.templateVars, // User-defined variables (highest priority)
+    };
+
     let keyboard = this.inlineKeyboard;
     if (Array.isArray(keyboard) && keyboard.length > 0) {
       // If first element is not an array, wrap each button in an array
       if (!Array.isArray(keyboard[0])) {
         keyboard = keyboard.map((button) => [button]);
       }
+      
+      // Replace variables in keyboard buttons
+      keyboard = keyboard.map(row => 
+        row.map(button => {
+          const processedButton = { ...button };
+          if (processedButton.text) {
+            processedButton.text = processedButton.text.replace(
+              /\{\{(\w+)\}\}/g,
+              (match, key) => allVars[key] || match
+            );
+          }
+          if (processedButton.url) {
+            processedButton.url = processedButton.url.replace(
+              /\{\{(\w+)\}\}/g,
+              (match, key) => allVars[key] || match
+            );
+          }
+          return processedButton;
+        })
+      );
+      
       return { inline_keyboard: keyboard };
     }
     return null;
