@@ -488,9 +488,13 @@ Released by: {{actor}}
           if (attempt < this.maxRetries) {
             this.warning(`Rate limited. Waiting ${retryAfter} seconds before retry...`);
             await this.sleep(retryAfter * 1000);
-            continue;
           }
-        } else if (attempt < this.maxRetries) {
+          // Skip normal retry logic for rate limiting
+          continue;
+        }
+        
+        // Normal retry logic (only if not rate limited)
+        if (attempt < this.maxRetries) {
           const delay = this.retryDelay * Math.pow(2, attempt) * 1000; // Exponential backoff
           this.warning(`${this.messages.retryAttempt} ${attempt + 1}/${this.maxRetries + 1} after ${delay}ms`);
           await this.sleep(delay);
