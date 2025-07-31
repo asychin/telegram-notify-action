@@ -579,9 +579,77 @@ Released by: {{actor}}
     const formData = new FormData();
     const fileBuffer = fs.readFileSync(this.filePath);
     const fileName = path.basename(this.filePath);
+    const stats = fs.statSync(this.filePath);
+    const fileSize = stats.size;
     
-    // Create a Blob from the buffer
-    const blob = new Blob([fileBuffer]);
+    // Check file size limits
+    const maxSizes = {
+      photo: 10 * 1024 * 1024, // 10MB for photos
+      document: 50 * 1024 * 1024, // 50MB for documents
+      video: 50 * 1024 * 1024, // 50MB for videos
+      audio: 50 * 1024 * 1024, // 50MB for audio
+      animation: 50 * 1024 * 1024, // 50MB for animations
+      voice: 50 * 1024 * 1024, // 50MB for voice
+      video_note: 50 * 1024 * 1024, // 50MB for video notes
+      sticker: 512 * 1024 // 512KB for stickers
+    };
+    
+    const maxSize = maxSizes[this.fileType] || 50 * 1024 * 1024;
+    if (fileSize > maxSize) {
+      throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(2)}MB. Max allowed: ${(maxSize / 1024 / 1024).toFixed(2)}MB for ${this.fileType}`);
+    }
+    
+    this.info(`File info: ${fileName} (${(fileSize / 1024).toFixed(2)}KB, type: ${this.fileType})`);
+    
+    // Detect MIME type based on file extension
+    const mimeTypes = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.bmp': 'image/bmp',
+      '.tiff': 'image/tiff',
+      '.mp4': 'video/mp4',
+      '.avi': 'video/avi',
+      '.mov': 'video/quicktime',
+      '.webm': 'video/webm',
+      '.mp3': 'audio/mpeg',
+      '.wav': 'audio/wav',
+      '.ogg': 'audio/ogg',
+      '.pdf': 'application/pdf',
+      '.txt': 'text/plain',
+      '.doc': 'application/msword',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    };
+    
+    const ext = path.extname(fileName).toLowerCase();
+    const mimeType = mimeTypes[ext] || 'application/octet-stream';
+    
+    // Special handling for PNG files with metadata (like C2PA)
+    let processedBuffer = fileBuffer;
+    if (ext === '.png' && this.fileType === 'photo') {
+      // Check if PNG has problematic metadata
+      const pngSignature = fileBuffer.slice(0, 8);
+      const expectedSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+      
+      if (pngSignature.equals(expectedSignature)) {
+        // Look for C2PA or other problematic chunks
+        const bufferStr = fileBuffer.toString('binary');
+        if (bufferStr.includes('c2pa') || bufferStr.includes('C2PA') || bufferStr.includes('jumb')) {
+          this.warning('PNG contains C2PA metadata which may cause processing issues. Consider using document type instead of photo.');
+          
+          // Try sending as document instead of photo if it's a photo
+          if (this.fileType === 'photo') {
+            this.warning('Switching from photo to document type for better compatibility...');
+            this.fileType = 'document';
+          }
+        }
+      }
+    }
+    
+    // Create a Blob from the buffer with proper MIME type
+    const blob = new Blob([processedBuffer], { type: mimeType });
     formData.append(this.fileType, blob, fileName);
 
     // Add other parameters
