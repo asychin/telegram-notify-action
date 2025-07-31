@@ -10,8 +10,8 @@ try {
   fetch = globalThis.fetch;
 } catch {
   // Fallback for older Node.js versions
-  const { FormData: FormDataPolyfill } = require('formdata-polyfill/esm');
-  const fetchPolyfill = require('node-fetch');
+  const { FormData: FormDataPolyfill } = require("formdata-polyfill/esm");
+  const fetchPolyfill = require("node-fetch");
   FormData = FormDataPolyfill;
   fetch = fetchPolyfill;
 }
@@ -36,20 +36,25 @@ class TelegramNotify {
     this.messageThreadId = process.env.MESSAGE_THREAD_ID;
     this.messageId = process.env.MESSAGE_ID;
     this.parseMode = process.env.PARSE_MODE || "HTML";
-    this.disableWebPagePreview = process.env.DISABLE_WEB_PAGE_PREVIEW === "true";
+    this.disableWebPagePreview =
+      process.env.DISABLE_WEB_PAGE_PREVIEW === "true";
     this.disableNotification = process.env.DISABLE_NOTIFICATION === "true";
     this.language = process.env.LANGUAGE || "en";
 
     // Enhanced parameters
     this.replyToMessageId = process.env.REPLY_TO_MESSAGE_ID;
     this.protectContent = process.env.PROTECT_CONTENT === "true";
-    this.allowSendingWithoutReply = process.env.ALLOW_SENDING_WITHOUT_REPLY !== "false";
+    this.allowSendingWithoutReply =
+      process.env.ALLOW_SENDING_WITHOUT_REPLY !== "false";
     this.messageEffectId = process.env.MESSAGE_EFFECT_ID;
     this.businessConnectionId = process.env.BUSINESS_CONNECTION_ID;
 
     // File support
     this.filePath = process.env.FILE_PATH;
+    this.fileBase64 = process.env.FILE_BASE64;
+    this.fileName = process.env.FILE_NAME;
     this.fileType = process.env.FILE_TYPE || "document";
+    this.forceAsPhoto = process.env.FORCE_AS_PHOTO === "true";
     this.caption = process.env.CAPTION;
 
     // Template support
@@ -78,7 +83,7 @@ class TelegramNotify {
       runId: process.env.GITHUB_RUN_ID,
       runNumber: process.env.GITHUB_RUN_NUMBER,
       eventName: process.env.GITHUB_EVENT_NAME,
-      jobStatus: process.env.JOB_STATUS
+      jobStatus: process.env.JOB_STATUS,
     };
 
     this.baseUrl = `https://api.telegram.org/bot${this.token}`;
@@ -94,7 +99,9 @@ class TelegramNotify {
     try {
       return JSON.parse(jsonString);
     } catch (error) {
-      this.warning(`Failed to parse JSON: ${jsonString}. Error: ${error.message}`);
+      this.warning(
+        `Failed to parse JSON: ${jsonString}. Error: ${error.message}`
+      );
       return null;
     }
   }
@@ -107,7 +114,8 @@ class TelegramNotify {
       en: {
         tokenRequired: "TELEGRAM_TOKEN is required",
         chatIdRequired: "CHAT_ID is required",
-        messageOrFileRequired: "Either MESSAGE, FILE_PATH, or TEMPLATE is required",
+        messageOrFileRequired:
+          "Either MESSAGE, FILE_PATH, or TEMPLATE is required",
         sendingMessage: "Sending new Telegram message...",
         sendingFile: "Sending file to Telegram...",
         sendingToThread: "Sending message to thread:",
@@ -120,10 +128,11 @@ class TelegramNotify {
         requestFailed: "Request failed:",
         retryAttempt: "Retry attempt",
         maxRetriesReached: "Maximum retry attempts reached",
-        conditionalSkip: "Skipping notification due to conditional sending rules",
+        conditionalSkip:
+          "Skipping notification due to conditional sending rules",
         templateNotFound: "Template not found:",
         fileNotFound: "File not found:",
-        invalidFileType: "Invalid file type:"
+        invalidFileType: "Invalid file type:",
       },
       ru: {
         tokenRequired: "Требуется TELEGRAM_TOKEN",
@@ -144,8 +153,8 @@ class TelegramNotify {
         conditionalSkip: "Пропуск уведомления из-за условных правил отправки",
         templateNotFound: "Шаблон не найден:",
         fileNotFound: "Файл не найден:",
-        invalidFileType: "Недопустимый тип файла:"
-      }
+        invalidFileType: "Недопустимый тип файла:",
+      },
     };
 
     return messages[this.language] || messages.en;
@@ -174,7 +183,7 @@ Workflow: {{workflow}}
 Автор: {{actor}}
 Workflow: {{workflow}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       error: {
         en: `❌ <b>Error</b>
@@ -196,7 +205,7 @@ Job Status: {{jobStatus}}
 Workflow: {{workflow}}
 Статус задачи: {{jobStatus}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       warning: {
         en: `⚠️ <b>Warning</b>
@@ -212,7 +221,7 @@ Workflow: {{workflow}}
 Ветка: {{refName}}
 Workflow: {{workflow}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       info: {
         en: `ℹ️ <b>Information</b>
@@ -228,7 +237,7 @@ Actor: {{actor}}
 Ветка: {{refName}}
 Автор: {{actor}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       deploy: {
         en: `🚀 <b>Deployment</b>
@@ -252,7 +261,7 @@ Status: {{deployStatus}}
 Развернул: {{actor}}
 Статус: {{deployStatus}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       test: {
         en: `🧪 <b>Test Results</b>
@@ -276,7 +285,7 @@ Coverage: {{coverage}}
 Статус тестов: {{testStatus}}
 Покрытие: {{coverage}}
 
-{{customMessage}}`
+{{customMessage}}`,
       },
       release: {
         en: `🎉 <b>New Release</b>
@@ -298,8 +307,8 @@ Released by: {{actor}}
 
 {{releaseNotes}}
 
-{{customMessage}}`
-      }
+{{customMessage}}`,
+      },
     };
 
     return templates;
@@ -310,29 +319,47 @@ Released by: {{actor}}
    */
   cleanHtmlContent(content) {
     if (!content) return content;
-    
+
     // Telegram supports only these HTML tags: b, strong, i, em, u, ins, s, strike, del, span, tg-spoiler, a, code, pre
-    const supportedTags = ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'tg-spoiler', 'a', 'code', 'pre'];
-    
+    const supportedTags = [
+      "b",
+      "strong",
+      "i",
+      "em",
+      "u",
+      "ins",
+      "s",
+      "strike",
+      "del",
+      "span",
+      "tg-spoiler",
+      "a",
+      "code",
+      "pre",
+    ];
+
     let cleanContent = content;
-    
+
     // Remove all HTML tags except supported ones
-    cleanContent = cleanContent.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^<>]*>/gi, (match, tagName) => {
-      if (supportedTags.includes(tagName.toLowerCase())) {
-        return match; // Keep supported tags
+    cleanContent = cleanContent.replace(
+      /<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^<>]*>/gi,
+      (match, tagName) => {
+        if (supportedTags.includes(tagName.toLowerCase())) {
+          return match; // Keep supported tags
+        }
+        return ""; // Remove unsupported tags
       }
-      return ''; // Remove unsupported tags
-    });
-    
+    );
+
     // Also clean up any remaining malformed tags
     cleanContent = cleanContent.replace(/<[^>]*>/g, (match) => {
       // If it doesn't match a proper tag pattern, remove it
       if (!/^<\/?[a-zA-Z][a-zA-Z0-9]*(\s[^>]*)?>$/.test(match)) {
-        return '';
+        return "";
       }
       return match;
     });
-    
+
     return cleanContent;
   }
 
@@ -344,25 +371,28 @@ Released by: {{actor}}
 
     const templates = this.getMessageTemplates();
     const templateData = templates[this.template];
-    
+
     if (!templateData) {
       throw new Error(`${this.messages.templateNotFound} ${this.template}`);
     }
 
     const templateText = templateData[this.language] || templateData.en;
-    
+
     // Merge GitHub context with template variables
     const allVars = {
       ...this.githubContext,
       customMessage: this.message || "",
-      ...this.templateVars
+      ...this.templateVars,
     };
 
     // Replace template variables
-    const processedText = templateText.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return allVars[key] || match;
-    });
-    
+    const processedText = templateText.replace(
+      /\{\{(\w+)\}\}/g,
+      (match, key) => {
+        return allVars[key] || match;
+      }
+    );
+
     return this.cleanHtmlContent(processedText);
   }
 
@@ -393,8 +423,11 @@ Released by: {{actor}}
     if (!this.chatId) {
       throw new Error(this.messages.chatIdRequired);
     }
-    if (!this.message && !this.filePath && !this.template) {
+    if (!this.message && !this.filePath && !this.fileBase64 && !this.template) {
       throw new Error(this.messages.messageOrFileRequired);
+    }
+    if (this.fileBase64 && !this.fileName) {
+      throw new Error("FILE_NAME is required when using FILE_BASE64");
     }
   }
 
@@ -444,7 +477,7 @@ Released by: {{actor}}
    * Sleep for specified milliseconds
    */
   async sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -457,7 +490,7 @@ Released by: {{actor}}
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
         const options = {
-          method: "POST"
+          method: "POST",
         };
 
         if (isFormData) {
@@ -472,7 +505,9 @@ Released by: {{actor}}
 
         if (!response.ok || !data.ok) {
           throw new Error(
-            `${this.messages.telegramApiError} ${data.description || "Unknown error"}`
+            `${this.messages.telegramApiError} ${
+              data.description || "Unknown error"
+            }`
           );
         }
 
@@ -480,39 +515,49 @@ Released by: {{actor}}
         return data;
       } catch (error) {
         lastError = error;
-        
+
         // Handle rate limiting with longer delay
         if (error.message.includes("Too Many Requests")) {
           const retryAfterMatch = error.message.match(/retry after (\d+)/);
-          const retryAfter = retryAfterMatch ? parseInt(retryAfterMatch[1]) : 30;
+          const retryAfter = retryAfterMatch
+            ? parseInt(retryAfterMatch[1])
+            : 30;
           if (attempt < this.maxRetries) {
-            this.warning(`Rate limited. Waiting ${retryAfter} seconds before retry...`);
+            this.warning(
+              `Rate limited. Waiting ${retryAfter} seconds before retry...`
+            );
             await this.sleep(retryAfter * 1000);
             continue; // Skip to next iteration immediately
           }
           // If we've reached max retries, break out of the loop
           break;
         }
-        
+
         // Normal retry logic (only if not rate limited)
         if (attempt < this.maxRetries) {
           const delay = this.retryDelay * Math.pow(2, attempt) * 1000; // Exponential backoff
-          this.warning(`${this.messages.retryAttempt} ${attempt + 1}/${this.maxRetries + 1} after ${delay}ms`);
+          this.warning(
+            `${this.messages.retryAttempt} ${attempt + 1}/${
+              this.maxRetries + 1
+            } after ${delay}ms`
+          );
           await this.sleep(delay);
         }
       }
     }
 
-    this.error(`${this.messages.maxRetriesReached}. ${this.messages.requestFailed} ${lastError.message}`);
+    this.error(
+      `${this.messages.maxRetriesReached}. ${this.messages.requestFailed} ${lastError.message}`
+    );
   }
   prepareInlineKeyboard() {
     if (!this.inlineKeyboard) return null;
-    
+
     let keyboard = this.inlineKeyboard;
     if (Array.isArray(keyboard) && keyboard.length > 0) {
       // If first element is not an array, wrap each button in an array
       if (!Array.isArray(keyboard[0])) {
-        keyboard = keyboard.map(button => [button]);
+        keyboard = keyboard.map((button) => [button]);
       }
       return { inline_keyboard: keyboard };
     }
@@ -530,7 +575,7 @@ Released by: {{actor}}
       chat_id: this.chatId,
       parse_mode: this.parseMode,
       disable_web_page_preview: this.disableWebPagePreview,
-      disable_notification: this.disableNotification
+      disable_notification: this.disableNotification,
     };
 
     // Add optional parameters
@@ -553,9 +598,11 @@ Released by: {{actor}}
       payload.business_connection_id = this.businessConnectionId;
     }
     if (this.inlineKeyboard) {
-      let keyboard = Array.isArray(this.inlineKeyboard) ? this.inlineKeyboard : [this.inlineKeyboard];
+      let keyboard = Array.isArray(this.inlineKeyboard)
+        ? this.inlineKeyboard
+        : [this.inlineKeyboard];
       if (keyboard.length > 0 && !Array.isArray(keyboard[0])) {
-        keyboard = keyboard.map(button => [button]);
+        keyboard = keyboard.map((button) => [button]);
       }
       payload.reply_markup = { inline_keyboard: keyboard };
     }
@@ -567,21 +614,45 @@ Released by: {{actor}}
    * Send file to Telegram
    */
   async sendFile() {
-    if (!fs.existsSync(this.filePath)) {
-      throw new Error(`${this.messages.fileNotFound} ${this.filePath}`);
-    }
-
-    const validFileTypes = ['photo', 'document', 'video', 'audio', 'animation', 'voice', 'video_note', 'sticker'];
+    const validFileTypes = [
+      "photo",
+      "document",
+      "video",
+      "audio",
+      "animation",
+      "voice",
+      "video_note",
+      "sticker",
+    ];
     if (!validFileTypes.includes(this.fileType)) {
       throw new Error(`${this.messages.invalidFileType} ${this.fileType}`);
     }
 
+    let fileBuffer, fileName, fileSize;
+
+    // Handle file from path or base64
+    if (this.filePath) {
+      if (!fs.existsSync(this.filePath)) {
+        throw new Error(`${this.messages.fileNotFound} ${this.filePath}`);
+      }
+      fileBuffer = fs.readFileSync(this.filePath);
+      fileName = path.basename(this.filePath);
+      const stats = fs.statSync(this.filePath);
+      fileSize = stats.size;
+    } else if (this.fileBase64) {
+      try {
+        fileBuffer = Buffer.from(this.fileBase64, "base64");
+        fileName = this.fileName;
+        fileSize = fileBuffer.length;
+      } catch (error) {
+        throw new Error(`Invalid base64 data: ${error.message}`);
+      }
+    } else {
+      throw new Error("Either FILE_PATH or FILE_BASE64 must be provided");
+    }
+
     const formData = new FormData();
-    const fileBuffer = fs.readFileSync(this.filePath);
-    const fileName = path.basename(this.filePath);
-    const stats = fs.statSync(this.filePath);
-    const fileSize = stats.size;
-    
+
     // Check file size limits
     const maxSizes = {
       photo: 10 * 1024 * 1024, // 10MB for photos
@@ -591,94 +662,142 @@ Released by: {{actor}}
       animation: 50 * 1024 * 1024, // 50MB for animations
       voice: 50 * 1024 * 1024, // 50MB for voice
       video_note: 50 * 1024 * 1024, // 50MB for video notes
-      sticker: 512 * 1024 // 512KB for stickers
+      sticker: 512 * 1024, // 512KB for stickers
     };
-    
+
     const maxSize = maxSizes[this.fileType] || 50 * 1024 * 1024;
     if (fileSize > maxSize) {
-      throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(2)}MB. Max allowed: ${(maxSize / 1024 / 1024).toFixed(2)}MB for ${this.fileType}`);
+      throw new Error(
+        `File too large: ${(fileSize / 1024 / 1024).toFixed(
+          2
+        )}MB. Max allowed: ${(maxSize / 1024 / 1024).toFixed(2)}MB for ${
+          this.fileType
+        }`
+      );
     }
-    
-    this.info(`File info: ${fileName} (${(fileSize / 1024).toFixed(2)}KB, type: ${this.fileType})`);
-    
+
+    this.info(
+      `File info: ${fileName} (${(fileSize / 1024).toFixed(2)}KB, type: ${
+        this.fileType
+      })`
+    );
+
     // Detect MIME type based on file extension
     const mimeTypes = {
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.gif': 'image/gif',
-      '.webp': 'image/webp',
-      '.bmp': 'image/bmp',
-      '.tiff': 'image/tiff',
-      '.mp4': 'video/mp4',
-      '.avi': 'video/avi',
-      '.mov': 'video/quicktime',
-      '.webm': 'video/webm',
-      '.mp3': 'audio/mpeg',
-      '.wav': 'audio/wav',
-      '.ogg': 'audio/ogg',
-      '.pdf': 'application/pdf',
-      '.txt': 'text/plain',
-      '.doc': 'application/msword',
-      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ".png": "image/png",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".gif": "image/gif",
+      ".webp": "image/webp",
+      ".bmp": "image/bmp",
+      ".tiff": "image/tiff",
+      ".mp4": "video/mp4",
+      ".avi": "video/avi",
+      ".mov": "video/quicktime",
+      ".webm": "video/webm",
+      ".mp3": "audio/mpeg",
+      ".wav": "audio/wav",
+      ".ogg": "audio/ogg",
+      ".pdf": "application/pdf",
+      ".txt": "text/plain",
+      ".doc": "application/msword",
+      ".docx":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     };
-    
+
     const ext = path.extname(fileName).toLowerCase();
-    const mimeType = mimeTypes[ext] || 'application/octet-stream';
-    
+    const mimeType = mimeTypes[ext] || "application/octet-stream";
+
     // Special handling for PNG files with metadata (like C2PA)
     const processedBuffer = fileBuffer;
-    if (ext === '.png' && this.fileType === 'photo') {
-      // Check if PNG has problematic metadata
-      const pngSignature = fileBuffer.slice(0, 8);
-      const expectedSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
-      
-      if (pngSignature.equals(expectedSignature)) {
-        // Look for C2PA or other problematic chunks
-        const bufferStr = fileBuffer.toString('binary');
-        if (bufferStr.includes('c2pa') || bufferStr.includes('C2PA') || bufferStr.includes('jumb')) {
-          this.warning('PNG contains C2PA metadata which may cause processing issues. Consider using document type instead of photo.');
-          
+
+    // Detect if this is a PNG file (either from extension or signature)
+    const isPNG =
+      ext === ".png" ||
+      (fileBuffer.length >= 8 &&
+        fileBuffer
+          .slice(0, 8)
+          .equals(
+            Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+          ));
+
+    if (isPNG && this.fileType === "photo") {
+      // Look for C2PA or other problematic chunks
+      const bufferStr = fileBuffer.toString("binary");
+      if (
+        bufferStr.includes("c2pa") ||
+        bufferStr.includes("C2PA") ||
+        bufferStr.includes("jumb")
+      ) {
+        const source = this.filePath
+          ? `file ${fileName}`
+          : `base64 data ${fileName}`;
+        if (this.forceAsPhoto) {
+          this.warning(
+            `PNG ${source} contains C2PA metadata which may cause processing issues. Forcing to send as photo as requested (force_as_photo=true).`
+          );
+        } else {
+          this.warning(
+            `PNG ${source} contains C2PA metadata which may cause processing issues. Consider using document type instead of photo.`
+          );
+
           // Try sending as document instead of photo if it's a photo
-          if (this.fileType === 'photo') {
-            this.warning('Switching from photo to document type for better compatibility...');
-            this.fileType = 'document';
+          if (this.fileType === "photo") {
+            this.warning(
+              "Switching from photo to document type for better compatibility..."
+            );
+            this.fileType = "document";
           }
         }
       }
     }
-    
+
     // Create a Blob from the buffer with proper MIME type
     const blob = new Blob([processedBuffer], { type: mimeType });
     formData.append(this.fileType, blob, fileName);
 
     // Add other parameters
     const payload = this.getBasePayload();
-    Object.keys(payload).forEach(key => {
+    Object.keys(payload).forEach((key) => {
       if (payload[key] !== undefined) {
-        formData.append(key, typeof payload[key] === 'object' ? JSON.stringify(payload[key]) : payload[key]);
+        formData.append(
+          key,
+          typeof payload[key] === "object"
+            ? JSON.stringify(payload[key])
+            : payload[key]
+        );
       }
     });
 
     if (this.caption) {
-      formData.append('caption', this.caption);
+      formData.append("caption", this.caption);
     }
 
-    const endpoint = this.fileType === 'photo' ? 'sendPhoto' : 
-                    this.fileType === 'video' ? 'sendVideo' :
-                    this.fileType === 'audio' ? 'sendAudio' :
-                    this.fileType === 'animation' ? 'sendAnimation' :
-                    this.fileType === 'voice' ? 'sendVoice' :
-                    this.fileType === 'video_note' ? 'sendVideoNote' :
-                    this.fileType === 'sticker' ? 'sendSticker' :
-                    'sendDocument';
+    const endpoint =
+      this.fileType === "photo"
+        ? "sendPhoto"
+        : this.fileType === "video"
+        ? "sendVideo"
+        : this.fileType === "audio"
+        ? "sendAudio"
+        : this.fileType === "animation"
+        ? "sendAnimation"
+        : this.fileType === "voice"
+        ? "sendVoice"
+        : this.fileType === "video_note"
+        ? "sendVideoNote"
+        : this.fileType === "sticker"
+        ? "sendSticker"
+        : "sendDocument";
 
     this.info(this.messages.sendingFile);
     const response = await this.makeRequest(endpoint, formData, true);
 
     return {
       messageId: response.result.message_id,
-      fileId: response.result[this.fileType]?.file_id || response.result.document?.file_id
+      fileId:
+        response.result[this.fileType]?.file_id ||
+        response.result.document?.file_id,
     };
   }
 
@@ -689,7 +808,7 @@ Released by: {{actor}}
     const finalMessage = this.processTemplate();
     const payload = {
       ...this.getBasePayload(),
-      text: finalMessage
+      text: finalMessage,
     };
 
     if (this.messageThreadId) {
@@ -712,12 +831,14 @@ Released by: {{actor}}
       message_id: parseInt(this.messageId),
       text: finalMessage,
       parse_mode: this.parseMode,
-      disable_web_page_preview: this.disableWebPagePreview
+      disable_web_page_preview: this.disableWebPagePreview,
     };
     if (this.inlineKeyboard) {
-      let keyboard = Array.isArray(this.inlineKeyboard) ? this.inlineKeyboard : [this.inlineKeyboard];
+      let keyboard = Array.isArray(this.inlineKeyboard)
+        ? this.inlineKeyboard
+        : [this.inlineKeyboard];
       if (keyboard.length > 0 && !Array.isArray(keyboard[0])) {
-        keyboard = keyboard.map(button => [button]);
+        keyboard = keyboard.map((button) => [button]);
       }
       payload.reply_markup = { inline_keyboard: keyboard };
     }
@@ -744,7 +865,7 @@ Released by: {{actor}}
 
       let messageId, fileId;
 
-      if (this.filePath) {
+      if (this.filePath || this.fileBase64) {
         // Send file
         const result = await this.sendFile();
         messageId = result.messageId;
@@ -774,7 +895,7 @@ Released by: {{actor}}
 }
 
 // Export for testing
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = { TelegramNotify };
 }
 

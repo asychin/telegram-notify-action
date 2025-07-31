@@ -56,12 +56,22 @@ inputs:
   file_path:
     description: "Path to file to send (photo, document, video, etc.)"
     required: false
+  file_base64:
+    description: "Base64 encoded file content (alternative to file_path)"
+    required: false
+  file_name:
+    description: "File name for base64 content (required when using file_base64)"
+    required: false
   file_type:
     description: "Type of file to send (photo, document, video, audio, animation, voice, video_note, sticker)"
     required: false
     default: "document"
+  force_as_photo:
+    description: "Force sending as photo even if C2PA metadata is detected (may cause processing issues)"
+    required: false
+    default: "false"
   caption:
-    description: "Caption for the file (when file_path is provided)"
+    description: "Caption for the file (when file_path or file_base64 is provided)"
     required: false
   # Template support
   template:

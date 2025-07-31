@@ -1,0 +1,120 @@
+# Example: Base64 Image Upload
+# This example demonstrates how to send images using base64 encoding
+
+name: Base64 Upload Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  base64-upload-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Example 1: Convert existing image to base64 and send
+      - name: 📸 Convert image to base64
+        id: convert-image
+        run: |
+          # Convert test image to base64
+          base64_data=$(base64 -i test-image.png)
+          echo "base64_data=$base64_data" >> $GITHUB_OUTPUT
+          echo "Image converted to base64 (${#base64_data} characters)"
+
+        - name: 🖼️ Send image via base64 (Photo - Auto C2PA handling)
+          uses: ./
+          with:
+            telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+            file_base64: ${{ steps.convert-image.outputs.base64_data }}
+            file_name: "test-image-from-base64.png"
+            file_type: "photo"
+            caption: |
+              📸 **Image sent via Base64 encoding (Auto C2PA handling)**
+
+              This image was converted to base64. If C2PA metadata is detected,
+              it will be automatically converted to document type.
+            language: "en"
+
+        - name: 🖼️ Send image via base64 (Force as Photo)
+          uses: ./
+          with:
+            telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+            file_base64: ${{ steps.convert-image.outputs.base64_data }}
+            file_name: "test-image-forced-photo.png"
+            file_type: "photo"
+            force_as_photo: "true"
+            caption: |
+              🖼️ **Image forced as Photo (force_as_photo=true)**
+
+              This image is sent as photo even if C2PA metadata is detected.
+              May cause processing issues on Telegram side.
+            language: "ru"
+
+      # Example 2: Send as document (recommended for C2PA images)
+      - name: 📄 Send image via base64 (Document)
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_base64: ${{ steps.convert-image.outputs.base64_data }}
+          file_name: "document-from-base64.png"
+          file_type: "document"
+          caption: |
+            📄 **Document from Base64**
+
+            Same image sent as document type - recommended for images with metadata.
+          language: "ru"
+
+      # Example 3: Create simple image and send via base64
+      - name: 🎨 Create simple test image
+        id: create-image
+        run: |
+          # Create a simple 100x100 red PNG image using ImageMagick or simple method
+          # This is a minimal 1x1 PNG for demonstration
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" > simple.b64
+          echo "base64_simple=$(cat simple.b64)" >> $GITHUB_OUTPUT
+
+      - name: 🔴 Send generated image via base64
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_base64: ${{ steps.create-image.outputs.base64_simple }}
+          file_name: "generated-1x1-red.png"
+          file_type: "photo"
+          caption: "🔴 Generated 1x1 red pixel image sent via base64"
+          template: "success"
+          template_vars: |
+            {
+              "customMessage": "Base64 upload examples completed successfully!"
+            }
+
+  # Example with error handling
+  base64-error-handling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Example 4: Invalid base64 handling
+      - name: ❌ Test invalid base64 (should fail gracefully)
+        uses: ./
+        continue-on-error: true
+        id: invalid-test
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file_base64: "invalid-base64-data!!!"
+          file_name: "test.png"
+          file_type: "photo"
+          caption: "This should fail gracefully"
+
+      - name: 📊 Report error handling result
+        run: |
+          echo "Invalid base64 test result: ${{ steps.invalid-test.outcome }}"
+          if [ "${{ steps.invalid-test.outcome }}" = "failure" ]; then
+            echo "✅ Error handling worked correctly - invalid base64 was rejected"
+          else
+            echo "❌ Unexpected result - invalid base64 should have failed"
+          fi

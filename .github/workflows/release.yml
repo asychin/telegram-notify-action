@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release'
+        description: "Version to release"
         required: true
-        default: 'v2.0.0'
+        default: "v2.0.0"
       prerelease:
-        description: 'Is this a prerelease?'
+        description: "Is this a prerelease?"
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Get release info
         id: release-info
         run: |
@@ -38,20 +38,20 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Create release asset (changelog)
         run: |
           cat > RELEASE_NOTES.md << 'EOF'
           # Release ${{ steps.release-info.outputs.version }}
-          
+
           **Repository:** ${{ github.repository }}
           **Released by:** ${{ github.actor }}
           **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           **Prerelease:** ${{ steps.release-info.outputs.prerelease }}
-          
+
           ## Release Notes
           ${{ steps.release-info.outputs.release_notes }}
-          
+
           ## What's Changed
           - Enhanced Telegram notifications with file support
           - Added message templates for different scenarios
@@ -59,7 +59,7 @@ jobs:
           - Added inline keyboard support
           - Comprehensive testing suite
           - Improved error handling and logging
-          
+
           ## Installation
           ```yaml
           - uses: asychin/telegram-notify-action@${{ steps.release-info.outputs.version }}
@@ -68,13 +68,13 @@ jobs:
               chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
               message: "Your notification message"
           ```
-          
+
           ## Links
           - [Download](${{ steps.release-info.outputs.download_url }})
           - [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)
           - [Examples](https://github.com/${{ github.repository }}/tree/main/examples)
           EOF
-      
+
       - name: Send release notification to Telegram
         uses: ./
         with:
@@ -91,9 +91,9 @@ jobs:
             }
           message: |
             🎉 **New Release Available!**
-            
+
             Version ${{ steps.release-info.outputs.version }} has been published.
-            
+
             Key improvements:
             • Enhanced file upload capabilities
             • Advanced message templating
@@ -106,7 +106,7 @@ jobs:
               {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"}
             ]
           language: en
-      
+
       - name: Send release notes as document
         uses: ./
         with:
@@ -116,12 +116,12 @@ jobs:
           file_type: document
           caption: |
             📋 **Release Notes**
-            
+
             Complete release notes for ${{ steps.release-info.outputs.version }}
-            
+
             Repository: ${{ github.repository }}
             Released: $(date -u +"%Y-%m-%d %H:%M UTC")
-      
+
       - name: Notify development team (if prerelease)
         if: steps.release-info.outputs.prerelease == 'true'
         uses: ./
@@ -131,7 +131,7 @@ jobs:
           template: warning
           message: |
             🚧 **Prerelease Published**
-            
+
             A prerelease version ${{ steps.release-info.outputs.version }} has been published.
             Please test thoroughly before promoting to stable release.
           template_vars: |
@@ -151,12 +151,12 @@ jobs:
     if: github.event.release.prerelease != true
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Update marketplace listing
         run: |
           echo "Updating GitHub Marketplace listing..."
           # Add logic to update marketplace if needed
-      
+
       - name: Notify success
         uses: ./
         with:
@@ -165,7 +165,7 @@ jobs:
           template: success
           message: |
             ✅ **Release Process Completed**
-            
+
             All post-release tasks have been completed successfully.
             The action is now available on GitHub Marketplace.
           template_vars: |
