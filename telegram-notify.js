@@ -307,7 +307,7 @@ class TelegramNotify {
           }
           break;
 
-        case "push":
+        case "push": {
           eventContext.pusher = safeGet(eventData, "pusher.name");
           eventContext.pusherId = safeGet(eventData, "pusher.id");
           eventContext.commitCount = safeGet(eventData, "commits.length") || 0;
@@ -321,6 +321,7 @@ class TelegramNotify {
             eventContext.lastCommitId = safeGet(lastCommit, "id");
           }
           break;
+        }
 
         case "workflow_run":
           if (eventData.workflow_run) {
