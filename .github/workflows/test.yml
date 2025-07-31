@@ -394,6 +394,7 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse_mode: "Markdown"
           template: ${{ needs.integration-tests.result == 'success' && needs.conditional-tests.result == 'success' && needs.file-upload-tests.result == 'success' && needs.template-tests.result == 'success' && needs.image-upload-tests.result == 'success' && 'success' || 'error' }}
           message: |
             **Test Suite Completed**
