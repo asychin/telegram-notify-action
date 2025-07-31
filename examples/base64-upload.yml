@@ -86,10 +86,6 @@ jobs:
           file_type: "photo"
           caption: "🔴 Generated 1x1 red pixel image sent via base64"
           template: "success"
-          template_vars: |
-            {
-              "customMessage": "Base64 upload examples completed successfully!"
-            }
 
   # Example with error handling
   base64-error-handling:
