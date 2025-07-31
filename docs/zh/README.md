@@ -204,6 +204,116 @@
 | `template`      | 模板名称         | -      | `success`, `error`, `warning`, `info`, `deploy`, `test`, `release` |
 | `template_vars` | 模板变量（JSON） | `{}`   | `{"version": "v1.0.0"}`                                        |
 
+## 🔄 自动上下文变量
+
+Action 自动提供对 GitHub Actions 上下文变量的访问，无需在 `template_vars` 中手动配置。所有变量都可以在消息中以 `{{variableName}}` 格式使用。
+
+### 仓库变量
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{repository}}` | 完整仓库名称 | `owner/repo-name` |
+| `{{repositoryOwner}}` | 仓库所有者 | `owner` |
+| `{{repositoryId}}` | 仓库 ID | `123456789` |
+| `{{repositoryOwnerId}}` | 仓库所有者 ID | `987654321` |
+
+### Git 上下文
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{ref}}` | 完整分支/标签引用 | `refs/heads/main` |
+| `{{refName}}` | 分支或标签名称 | `main` |
+| `{{refType}}` | 引用类型 | `branch` |
+| `{{refProtected}}` | 分支是否受保护 | `true` |
+| `{{baseRef}}` | PR 的基础分支 | `main` |
+| `{{headRef}}` | PR 的源分支 | `feature-branch` |
+| `{{sha}}` | 提交 SHA | `abc123def456...` |
+
+### 工作流上下文
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{workflow}}` | 工作流名称 | `CI/CD Pipeline` |
+| `{{workflowRef}}` | 工作流引用 | `refs/heads/main` |
+| `{{workflowSha}}` | 工作流提交 SHA | `abc123def456...` |
+| `{{job}}` | 当前作业名称 | `build` |
+| `{{jobStatus}}` | 作业状态 | `success` |
+
+### 运行信息
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{runId}}` | 工作流运行 ID | `1234567890` |
+| `{{runNumber}}` | 运行编号 | `42` |
+| `{{runAttempt}}` | 尝试编号 | `1` |
+| `{{eventName}}` | 事件类型 | `push` |
+| `{{eventPath}}` | 事件文件路径 | `/github/workflow/event.json` |
+
+### 用户信息
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{actor}}` | 触发工作流的用户 | `username` |
+| `{{actorId}}` | 用户 ID | `12345` |
+| `{{triggeredBy}}` | 发起事件的用户 | `username` |
+
+### 运行器信息
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{runnerName}}` | 运行器名称 | `GitHub Actions 2` |
+| `{{runnerOs}}` | 操作系统 | `Linux` |
+| `{{runnerArch}}` | 架构 | `X64` |
+| `{{runnerEnvironment}}` | 环境类型 | `github-hosted` |
+| `{{runnerToolCache}}` | 工具缓存路径 | `/opt/hostedtoolcache` |
+| `{{runnerTemp}}` | 临时目录 | `/tmp` |
+| `{{runnerDebug}}` | 调试模式 | `1` |
+
+### GitHub URLs 和 API
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{serverUrl}}` | GitHub 服务器 URL | `https://github.com` |
+| `{{apiUrl}}` | GitHub API URL | `https://api.github.com` |
+| `{{graphqlUrl}}` | GraphQL API URL | `https://api.github.com/graphql` |
+
+### 附加变量
+
+| 变量 | 描述 | 示例 |
+|------|------|------|
+| `{{workspace}}` | 工作目录 | `/github/workspace` |
+| `{{ci}}` | CI 环境指示器 | `true` |
+| `{{retentionDays}}` | 工件保留天数 | `90` |
+| `{{secretSource}}` | 密钥源 | `Actions` |
+| `{{actionRef}}` | Action 引用 | `v1` |
+| `{{actionRepository}}` | Action 仓库 | `owner/action-repo` |
+
+### 使用示例
+
+```yaml
+- name: 发送带有自动上下文的通知
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: |
+      🚀 **部署完成**
+      
+      **仓库：** {{repository}}
+      **分支：** {{refName}}
+      **提交：** {{sha}}
+      **执行者：** {{actor}}
+      **运行器：** {{runnerName}} 在 {{runnerOs}}
+      **状态：** {{jobStatus}}
+    inline_keyboard: |
+      [
+        [
+          {"text": "🏠 仓库", "url": "{{serverUrl}}/{{repository}}"},
+          {"text": "🔄 此次运行", "url": "{{serverUrl}}/{{repository}}/actions/runs/{{runId}}"}
+        ]
+      ]
+```
+
 ### 交互功能
 
 | 参数              | 描述             | 默认值 | 示例                                               |
