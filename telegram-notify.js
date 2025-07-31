@@ -306,10 +306,41 @@ Released by: {{actor}}
   }
 
   /**
+   * Clean HTML content to remove unsupported tags
+   */
+  cleanHtmlContent(content) {
+    if (!content) return content;
+    
+    // Telegram supports only these HTML tags: b, strong, i, em, u, ins, s, strike, del, span, tg-spoiler, a, code, pre
+    const supportedTags = ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'tg-spoiler', 'a', 'code', 'pre'];
+    
+    let cleanContent = content;
+    
+    // Remove all HTML tags except supported ones
+    cleanContent = cleanContent.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^<>]*>/gi, (match, tagName) => {
+      if (supportedTags.includes(tagName.toLowerCase())) {
+        return match; // Keep supported tags
+      }
+      return ''; // Remove unsupported tags
+    });
+    
+    // Also clean up any remaining malformed tags
+    cleanContent = cleanContent.replace(/<[^>]*>/g, (match) => {
+      // If it doesn't match a proper tag pattern, remove it
+      if (!/^<\/?[a-zA-Z][a-zA-Z0-9]*(\s[^>]*)?>$/.test(match)) {
+        return '';
+      }
+      return match;
+    });
+    
+    return cleanContent;
+  }
+
+  /**
    * Process message template
    */
   processTemplate() {
-    if (!this.template) return this.message;
+    if (!this.template) return this.cleanHtmlContent(this.message);
 
     const templates = this.getMessageTemplates();
     const templateData = templates[this.template];
@@ -328,9 +359,11 @@ Released by: {{actor}}
     };
 
     // Replace template variables
-    return templateText.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    const processedText = templateText.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return allVars[key] || match;
     });
+    
+    return this.cleanHtmlContent(processedText);
   }
 
   /**

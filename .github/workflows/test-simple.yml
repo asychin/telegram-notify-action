@@ -44,14 +44,7 @@ jobs:
         with:
           telegram_token: "dummy_token_for_testing"
           chat_id: "123456789"
-          message: |
-            🧪 **Test Message**
-            
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-            
-            This is a test of the enhanced Telegram Notify Action!
+          message: "🧪 Test Message - Repository: telegram-notify-action - This is a basic test!"
           max_retries: 1
           retry_delay: 1
         id: test-action
