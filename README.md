@@ -137,6 +137,17 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 </div>
 
+### 🎯 Featured Example: Advanced Repository Monitoring
+
+**NEW!** Check out our comprehensive monitoring example with advanced template usage:
+
+- **📝 Dynamic template selection** based on GitHub events
+- **🌍 Multi-language support** (Russian templates)
+- **📊 Rich monitoring** for Issues, PRs, and repository health
+- **🎨 Creative template usage** (deploy for PRs, test for health checks)
+
+👉 **[examples/advanced-monitoring.yml](examples/advanced-monitoring.yml)**
+
 ## ⚙️ Configuration / 配置 / Конфигурация
 
 ### Required Parameters / 必需参数 / Обязательные параметры

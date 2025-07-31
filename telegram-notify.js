@@ -183,6 +183,17 @@ class TelegramNotify {
 
   /**
    * Get predefined message templates
+   * 
+   * Available templates:
+   * - success ✅: For successful operations
+   * - error ❌: For failed operations  
+   * - warning ⚠️: For warnings and issues
+   * - info ℹ️: For general information
+   * - deploy 🚀: For deployments (can be used creatively for PRs)
+   * - test 🧪: For test results (can be used for health checks)
+   * - release 🎉: For new releases
+   * 
+   * Each template supports multiple languages: en, ru, zh
    */
   getMessageTemplates() {
     const templates = {
