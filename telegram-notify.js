@@ -182,23 +182,32 @@ class TelegramNotify {
   }
 
   /**
-   * Get predefined message templates
-   * 
+   * Get predefined message templates with format-aware content
+   *
    * Available templates:
    * - success ✅: For successful operations
-   * - error ❌: For failed operations  
+   * - error ❌: For failed operations
    * - warning ⚠️: For warnings and issues
    * - info ℹ️: For general information
    * - deploy 🚀: For deployments (can be used creatively for PRs)
    * - test 🧪: For test results (can be used for health checks)
    * - release 🎉: For new releases
-   * 
+   *
    * Each template supports multiple languages: en, ru, zh
+   * Each template automatically adapts to HTML or Markdown based on parse_mode
    */
   getMessageTemplates() {
+    const isHTML = this.parseMode === "HTML";
+    const bold = isHTML ? "<b>" : "**";
+    const boldEnd = isHTML ? "</b>" : "**";
+    const italic = isHTML ? "<i>" : "*";
+    const italicEnd = isHTML ? "</i>" : "*";
+    const code = isHTML ? "<code>" : "`";
+    const codeEnd = isHTML ? "</code>" : "`";
+
     const templates = {
       success: {
-        en: `✅ **Success**
+        en: `✅ ${bold}Success${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -207,7 +216,7 @@ Actor: {{actor}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `✅ **Успех**
+        ru: `✅ ${bold}Успех${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -216,7 +225,7 @@ Workflow: {{workflow}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `✅ **成功**
+        zh: `✅ ${bold}成功${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -227,7 +236,7 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       error: {
-        en: `❌ **Error**
+        en: `❌ ${bold}Error${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -237,7 +246,7 @@ Workflow: {{workflow}}
 Job Status: {{jobStatus}}
 
 {{customMessage}}`,
-        ru: `❌ **Ошибка**
+        ru: `❌ ${bold}Ошибка${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -247,7 +256,7 @@ Workflow: {{workflow}}
 Статус задачи: {{jobStatus}}
 
 {{customMessage}}`,
-        zh: `❌ **错误**
+        zh: `❌ ${bold}错误${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -259,21 +268,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       warning: {
-        en: `⚠️ **Warning**
+        en: `⚠️ ${bold}Warning${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `⚠️ **Предупреждение**
+        ru: `⚠️ ${bold}Предупреждение${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `⚠️ **警告**
+        zh: `⚠️ ${bold}警告${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -282,21 +291,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       info: {
-        en: `ℹ️ **Information**
+        en: `ℹ️ ${bold}Information${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
 Actor: {{actor}}
 
 {{customMessage}}`,
-        ru: `ℹ️ **Информация**
+        ru: `ℹ️ ${bold}Информация${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Автор: {{actor}}
 
 {{customMessage}}`,
-        zh: `ℹ️ **信息**
+        zh: `ℹ️ ${bold}信息${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -305,7 +314,7 @@ Actor: {{actor}}
 {{customMessage}}`,
       },
       deploy: {
-        en: `🚀 **Deployment**
+        en: `🚀 ${bold}Deployment${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -316,7 +325,7 @@ Deployed by: {{actor}}
 Status: {{deployStatus}}
 
 {{customMessage}}`,
-        ru: `🚀 **Развертывание**
+        ru: `🚀 ${bold}Развертывание${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -327,7 +336,7 @@ Status: {{deployStatus}}
 Статус: {{deployStatus}}
 
 {{customMessage}}`,
-        zh: `🚀 **部署**
+        zh: `🚀 ${bold}部署${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -340,7 +349,7 @@ Status: {{deployStatus}}
 {{customMessage}}`,
       },
       test: {
-        en: `🧪 **Test Results**
+        en: `🧪 ${bold}Test Results${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -351,7 +360,7 @@ Test Status: {{testStatus}}
 Coverage: {{coverage}}
 
 {{customMessage}}`,
-        ru: `🧪 **Результаты тестов**
+        ru: `🧪 ${bold}Результаты тестов${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -362,7 +371,7 @@ Coverage: {{coverage}}
 Покрытие: {{coverage}}
 
 {{customMessage}}`,
-        zh: `🧪 **测试结果**
+        zh: `🧪 ${bold}测试结果${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -375,7 +384,7 @@ Coverage: {{coverage}}
 {{customMessage}}`,
       },
       release: {
-        en: `🎉 **New Release**
+        en: `🎉 ${bold}New Release${boldEnd}
 
 Repository: {{repository}}
 Version: {{version}}
@@ -385,7 +394,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        ru: `🎉 **Новый релиз**
+        ru: `🎉 ${bold}Новый релиз${boldEnd}
 
 Репозиторий: {{repository}}
 Версия: {{version}}
@@ -395,7 +404,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        zh: `🎉 **新版本发布**
+        zh: `🎉 ${bold}新版本发布${boldEnd}
 
 仓库: {{repository}}
 版本: {{version}}

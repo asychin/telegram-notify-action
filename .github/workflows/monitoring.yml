@@ -177,7 +177,7 @@ jobs:
             **Файлов изменено:** ${{ github.event.pull_request.changed_files }}
             **Коммитов:** ${{ github.event.pull_request.commits }}
             **Изменения:** `+${{ github.event.pull_request.additions }} -${{ github.event.pull_request.deletions }}`
-            
+
             **📝 Краткое описание:**
             *${{ github.event.pull_request.title }}*
           template_vars: |
