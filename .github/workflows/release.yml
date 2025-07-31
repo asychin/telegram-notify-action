@@ -138,7 +138,7 @@ jobs:
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_DEV_CHAT_ID }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: warning
           message: |
             🚧 **Пре-релиз опубликован**
