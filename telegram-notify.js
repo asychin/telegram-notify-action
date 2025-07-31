@@ -488,9 +488,10 @@ Released by: {{actor}}
           if (attempt < this.maxRetries) {
             this.warning(`Rate limited. Waiting ${retryAfter} seconds before retry...`);
             await this.sleep(retryAfter * 1000);
+            continue; // Skip to next iteration immediately
           }
-          // Skip normal retry logic for rate limiting
-          continue;
+          // If we've reached max retries, break out of the loop
+          break;
         }
         
         // Normal retry logic (only if not rate limited)
