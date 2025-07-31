@@ -257,6 +257,10 @@ jobs:
         run: |
           echo "Running repository health checks..."
 
+          # Generate current timestamp
+          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
+
           # Check for security vulnerabilities
           AUDIT_RESULT=$(npm audit --audit-level high --json || echo '{}')
           VULNERABILITIES=$(echo "$AUDIT_RESULT" | jq -r '.metadata.vulnerabilities.total // 0')
@@ -299,7 +303,7 @@ jobs:
             ${{ steps.health-check.outputs.health_emoji }} **Daily Health Check**
 
             **Repository:** ${{ github.repository }}
-            **Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            **Date:** ${{ steps.health-check.outputs.current_date }}
 
             📊 **Metrics:**
             • Security vulnerabilities: ${{ steps.health-check.outputs.vulnerabilities }}
@@ -333,6 +337,10 @@ jobs:
       - name: Generate repository statistics
         id: stats
         run: |
+          # Generate current timestamp
+          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
+
           # Get commit statistics
           TOTAL_COMMITS=$(git rev-list --all --count)
           COMMITS_THIS_MONTH=$(git rev-list --since="1 month ago" --count HEAD)
@@ -362,7 +370,7 @@ jobs:
             📊 **Repository Statistics Report**
 
             **Repository:** ${{ github.repository }}
-            **Generated:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            **Generated:** ${{ steps.stats.outputs.current_date }}
 
             **Development Activity:**
             • Total commits: ${{ steps.stats.outputs.total_commits }}
