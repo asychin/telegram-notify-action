@@ -96,7 +96,7 @@ jobs:
           template: ${{ steps.notification-type.outputs.template }}
           # 🌍 Russian language templates
           language: ru
-          # 📝 HTML formatting support
+          # 📝 HTML formatting support (also supports "Markdown")
           parse_mode: "HTML"
           # 💬 Custom message combined with template
           message: |
@@ -483,6 +483,12 @@ jobs:
 #
 # 🌍 LANGUAGE SUPPORT:
 # All templates support: en (English), ru (Russian), zh (Chinese)
+#
+# 🎨 FORMATTING MODES:
+# Templates automatically adapt to your parse_mode setting:
+# • parse_mode: "HTML" → Uses <b>bold</b>, <i>italic</i>, <code>code</code>
+# • parse_mode: "Markdown" → Uses **bold**, *italic*, `code`
+# Templates are format-aware and work seamlessly with both modes!
 #
 # 🔧 TEMPLATE VARIABLES:
 # Each template automatically gets GitHub context variables:

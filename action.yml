@@ -86,13 +86,17 @@ inputs:
     required: false
   # Retry configuration
   max_retries:
-    description: "Maximum number of retry attempts"
+    description: "Maximum number of retry attempts for regular errors"
     required: false
-    default: "3"
+    default: "5"
   retry_delay:
     description: "Initial delay between retries in seconds"
     required: false
     default: "1"
+  max_rate_limit_retries:
+    description: "Maximum number of retry attempts for rate limiting (separate from max_retries)"
+    required: false
+    default: "8"
   # Conditional sending
   send_on_failure:
     description: "Send notification only on workflow failure"

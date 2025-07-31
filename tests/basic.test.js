@@ -69,7 +69,7 @@ describe("Telegram Notify Action - Basic Tests", () => {
       expect(notify.chatId).toBe("123456789");
       expect(notify.message).toBe("Test message");
       expect(notify.language).toBe("en");
-      expect(notify.maxRetries).toBe(3);
+      expect(notify.maxRetries).toBe(5);
       expect(notify.retryDelay).toBe(1);
     } finally {
       // Restore environment

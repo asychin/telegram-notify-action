@@ -65,8 +65,10 @@ class TelegramNotify {
     this.inlineKeyboard = this.parseJSON(process.env.INLINE_KEYBOARD);
 
     // Retry configuration
-    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 3;
+    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 5;
     this.retryDelay = parseInt(process.env.RETRY_DELAY) || 1;
+    this.maxRateLimitRetries =
+      parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
 
     // Conditional sending
     this.sendOnFailure = process.env.SEND_ON_FAILURE === "true";
@@ -182,12 +184,28 @@ class TelegramNotify {
   }
 
   /**
-   * Get predefined message templates
+   * Get predefined message templates with format-aware content
+   *
+   * Available templates:
+   * - success ✅: For successful operations
+   * - error ❌: For failed operations
+   * - warning ⚠️: For warnings and issues
+   * - info ℹ️: For general information
+   * - deploy 🚀: For deployments (can be used creatively for PRs)
+   * - test 🧪: For test results (can be used for health checks)
+   * - release 🎉: For new releases
+   *
+   * Each template supports multiple languages: en, ru, zh
+   * Each template automatically adapts to HTML or Markdown based on parse_mode
    */
   getMessageTemplates() {
+    const isHTML = this.parseMode === "HTML";
+    const bold = isHTML ? "<b>" : "**";
+    const boldEnd = isHTML ? "</b>" : "**";
+
     const templates = {
       success: {
-        en: `✅ <b>Success</b>
+        en: `✅ ${bold}Success${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -196,7 +214,7 @@ Actor: {{actor}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `✅ <b>Успех</b>
+        ru: `✅ ${bold}Успех${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -205,7 +223,7 @@ Workflow: {{workflow}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `✅ <b>成功</b>
+        zh: `✅ ${bold}成功${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -216,7 +234,7 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       error: {
-        en: `❌ <b>Error</b>
+        en: `❌ ${bold}Error${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -226,7 +244,7 @@ Workflow: {{workflow}}
 Job Status: {{jobStatus}}
 
 {{customMessage}}`,
-        ru: `❌ <b>Ошибка</b>
+        ru: `❌ ${bold}Ошибка${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -236,7 +254,7 @@ Workflow: {{workflow}}
 Статус задачи: {{jobStatus}}
 
 {{customMessage}}`,
-        zh: `❌ <b>错误</b>
+        zh: `❌ ${bold}错误${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -248,21 +266,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       warning: {
-        en: `⚠️ <b>Warning</b>
+        en: `⚠️ ${bold}Warning${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        ru: `⚠️ <b>Предупреждение</b>
+        ru: `⚠️ ${bold}Предупреждение${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Workflow: {{workflow}}
 
 {{customMessage}}`,
-        zh: `⚠️ <b>警告</b>
+        zh: `⚠️ ${bold}警告${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -271,21 +289,21 @@ Workflow: {{workflow}}
 {{customMessage}}`,
       },
       info: {
-        en: `ℹ️ <b>Information</b>
+        en: `ℹ️ ${bold}Information${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
 Actor: {{actor}}
 
 {{customMessage}}`,
-        ru: `ℹ️ <b>Информация</b>
+        ru: `ℹ️ ${bold}Информация${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
 Автор: {{actor}}
 
 {{customMessage}}`,
-        zh: `ℹ️ <b>信息</b>
+        zh: `ℹ️ ${bold}信息${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -294,7 +312,7 @@ Actor: {{actor}}
 {{customMessage}}`,
       },
       deploy: {
-        en: `🚀 <b>Deployment</b>
+        en: `🚀 ${bold}Deployment${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -305,7 +323,7 @@ Deployed by: {{actor}}
 Status: {{deployStatus}}
 
 {{customMessage}}`,
-        ru: `🚀 <b>Развертывание</b>
+        ru: `🚀 ${bold}Развертывание${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -316,7 +334,7 @@ Status: {{deployStatus}}
 Статус: {{deployStatus}}
 
 {{customMessage}}`,
-        zh: `🚀 <b>部署</b>
+        zh: `🚀 ${bold}部署${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -329,7 +347,7 @@ Status: {{deployStatus}}
 {{customMessage}}`,
       },
       test: {
-        en: `🧪 <b>Test Results</b>
+        en: `🧪 ${bold}Test Results${boldEnd}
 
 Repository: {{repository}}
 Branch: {{refName}}
@@ -340,7 +358,7 @@ Test Status: {{testStatus}}
 Coverage: {{coverage}}
 
 {{customMessage}}`,
-        ru: `🧪 <b>Результаты тестов</b>
+        ru: `🧪 ${bold}Результаты тестов${boldEnd}
 
 Репозиторий: {{repository}}
 Ветка: {{refName}}
@@ -351,7 +369,7 @@ Coverage: {{coverage}}
 Покрытие: {{coverage}}
 
 {{customMessage}}`,
-        zh: `🧪 <b>测试结果</b>
+        zh: `🧪 ${bold}测试结果${boldEnd}
 
 仓库: {{repository}}
 分支: {{refName}}
@@ -364,7 +382,7 @@ Coverage: {{coverage}}
 {{customMessage}}`,
       },
       release: {
-        en: `🎉 <b>New Release</b>
+        en: `🎉 ${bold}New Release${boldEnd}
 
 Repository: {{repository}}
 Version: {{version}}
@@ -374,7 +392,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        ru: `🎉 <b>Новый релиз</b>
+        ru: `🎉 ${bold}Новый релиз${boldEnd}
 
 Репозиторий: {{repository}}
 Версия: {{version}}
@@ -384,7 +402,7 @@ Released by: {{actor}}
 {{releaseNotes}}
 
 {{customMessage}}`,
-        zh: `🎉 <b>新版本发布</b>
+        zh: `🎉 ${bold}新版本发布${boldEnd}
 
 仓库: {{repository}}
 版本: {{version}}
@@ -572,6 +590,7 @@ Released by: {{actor}}
   async makeRequest(endpoint, payload, isFormData = false) {
     const url = `${this.baseUrl}/${endpoint}`;
     let lastError;
+    let rateLimitRetries = 0;
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
@@ -602,21 +621,29 @@ Released by: {{actor}}
       } catch (error) {
         lastError = error;
 
-        // Handle rate limiting with longer delay
+        // Handle rate limiting with separate retry counter
         if (error.message.includes("Too Many Requests")) {
           const retryAfterMatch = error.message.match(/retry after (\d+)/);
           const retryAfter = retryAfterMatch
             ? parseInt(retryAfterMatch[1])
             : 30;
-          if (attempt < this.maxRetries) {
+
+          // Rate limiting gets separate retry attempts
+          if (rateLimitRetries < this.maxRateLimitRetries) {
+            rateLimitRetries++;
             this.warning(
-              `Rate limited. Waiting ${retryAfter} seconds before retry...`
+              `Rate limited (${rateLimitRetries}/${this.maxRateLimitRetries}). Waiting ${retryAfter} seconds before retry...`
             );
             await this.sleep(retryAfter * 1000);
-            continue; // Skip to next iteration immediately
+
+            // Don't increment attempt counter for rate limiting
+            attempt--;
+            continue;
+          } else {
+            this.error(
+              `Maximum rate limit retries reached (${this.maxRateLimitRetries}). ${this.messages.requestFailed} ${error.message}`
+            );
           }
-          // If we've reached max retries, break out of the loop
-          break;
         }
 
         // Normal retry logic (only if not rate limited)
