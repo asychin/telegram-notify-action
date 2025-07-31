@@ -170,4 +170,90 @@ describe('Telegram Notify - Workflow Dispatch Tests', () => {
       ]
     });
   });
+
+  test('pull_request event creates proper PR context', () => {
+    // Create mock event data for pull_request
+    const eventData = {
+      pull_request: {
+        number: 123,
+        title: 'Test PR',
+        html_url: 'https://github.com/test/repo/pull/123',
+        body: 'This is a test PR',
+        user: {
+          login: 'pr-author'
+        },
+        base: {
+          ref: 'main'
+        },
+        head: {
+          ref: 'feature-branch',
+          sha: 'abc123def456'
+        },
+        commits: 5,
+        additions: 100,
+        deletions: 20,
+        changed_files: 3
+      }
+    };
+    
+    fs.writeFileSync(tempEventPath, JSON.stringify(eventData));
+    process.env.GITHUB_EVENT_PATH = tempEventPath;
+    
+    const notifier = new TelegramNotify();
+    notifier.githubContext.eventName = 'pull_request';
+    
+    const eventContext = notifier.getEventContext();
+    
+    expect(eventContext.prNumber).toBe(123);
+    expect(eventContext.prTitle).toBe('Test PR');
+    expect(eventContext.prUrl).toBe('https://github.com/test/repo/pull/123');
+    expect(eventContext.prBody).toBe('This is a test PR');
+    expect(eventContext.author).toBe('pr-author');
+    expect(eventContext.prBaseRef).toBe('main');
+    expect(eventContext.prHeadRef).toBe('feature-branch');
+    expect(eventContext.prHeadSha).toBe('abc123def456');
+    expect(eventContext.prCommits).toBe(5);
+    expect(eventContext.prAdditions).toBe(100);
+    expect(eventContext.prDeletions).toBe(20);
+    expect(eventContext.prChangedFiles).toBe(3);
+  });
+
+  test('pull_request_review event includes prUrl', () => {
+    // Create mock event data for pull_request_review
+    const eventData = {
+      pull_request: {
+        number: 123,
+        title: 'Test PR',
+        html_url: 'https://github.com/test/repo/pull/123',
+        user: {
+          login: 'pr-author'
+        }
+      },
+      review: {
+        user: {
+          login: 'reviewer'
+        },
+        state: 'approved',
+        body: 'LGTM!',
+        id: 456
+      }
+    };
+    
+    fs.writeFileSync(tempEventPath, JSON.stringify(eventData));
+    process.env.GITHUB_EVENT_PATH = tempEventPath;
+    
+    const notifier = new TelegramNotify();
+    notifier.githubContext.eventName = 'pull_request_review';
+    
+    const eventContext = notifier.getEventContext();
+    
+    expect(eventContext.prNumber).toBe(123);
+    expect(eventContext.prTitle).toBe('Test PR');
+    expect(eventContext.prUrl).toBe('https://github.com/test/repo/pull/123');
+    expect(eventContext.author).toBe('pr-author');
+    expect(eventContext.reviewAuthor).toBe('reviewer');
+    expect(eventContext.reviewState).toBe('approved');
+    expect(eventContext.reviewBody).toBe('LGTM!');
+    expect(eventContext.reviewId).toBe(456);
+  });
 });

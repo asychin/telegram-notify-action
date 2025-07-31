@@ -190,6 +190,8 @@ class TelegramNotify {
             eventContext.issueTitle = safeGet(eventData, "issue.title");
             eventContext.issueState = safeGet(eventData, "issue.state");
             eventContext.issueBody = safeGet(eventData, "issue.body");
+            eventContext.issueUrl = safeGet(eventData, "issue.html_url");
+            eventContext.issueAuthor = safeGet(eventData, "issue.user.login");
             eventContext.createdAt = safeGet(eventData, "issue.created_at");
             eventContext.updatedAt = safeGet(eventData, "issue.updated_at");
 
@@ -205,6 +207,11 @@ class TelegramNotify {
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
           }
+          
+          // Add action for issues events
+          if (eventData.action) {
+            eventContext.action = eventData.action;
+          }
           break;
 
         case "issue_comment":
@@ -213,6 +220,8 @@ class TelegramNotify {
             eventContext.issueNumber = safeGet(eventData, "issue.number");
             eventContext.issueTitle = safeGet(eventData, "issue.title");
             eventContext.issueState = safeGet(eventData, "issue.state");
+            eventContext.issueUrl = safeGet(eventData, "issue.html_url");
+            eventContext.issueAuthor = safeGet(eventData, "issue.user.login");
           }
           if (eventData.comment) {
             eventContext.commentAuthor = safeGet(
@@ -221,6 +230,7 @@ class TelegramNotify {
             );
             eventContext.commentBody = safeGet(eventData, "comment.body");
             eventContext.commentId = safeGet(eventData, "comment.id");
+            eventContext.commentUrl = safeGet(eventData, "comment.html_url");
             eventContext.commentCreatedAt = safeGet(
               eventData,
               "comment.created_at"
@@ -267,6 +277,23 @@ class TelegramNotify {
             eventContext.assignees = Array.isArray(assignees)
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
+
+            // Add missing PR variables
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
+            eventContext.prBaseRef = safeGet(eventData, "pull_request.base.ref");
+            eventContext.prHeadRef = safeGet(eventData, "pull_request.head.ref");
+            eventContext.prHeadSha = safeGet(eventData, "pull_request.head.sha");
+            eventContext.prCommits = safeGet(eventData, "pull_request.commits");
+            eventContext.prAdditions = safeGet(eventData, "pull_request.additions");
+            eventContext.prDeletions = safeGet(eventData, "pull_request.deletions");
+            eventContext.prChangedFiles = safeGet(eventData, "pull_request.changed_files");
+            eventContext.prAuthor = safeGet(eventData, "pull_request.user.login");
+          }
+          
+          // Add action for pull_request events
+          if (eventData.action) {
+            eventContext.prAction = eventData.action;
+            eventContext.action = eventData.action;
           }
           break;
 
@@ -275,12 +302,14 @@ class TelegramNotify {
             eventContext.author = safeGet(eventData, "pull_request.user.login");
             eventContext.prNumber = safeGet(eventData, "pull_request.number");
             eventContext.prTitle = safeGet(eventData, "pull_request.title");
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
           }
           if (eventData.review) {
             eventContext.reviewAuthor = safeGet(eventData, "review.user.login");
             eventContext.reviewState = safeGet(eventData, "review.state");
             eventContext.reviewBody = safeGet(eventData, "review.body");
             eventContext.reviewId = safeGet(eventData, "review.id");
+            eventContext.reviewUrl = safeGet(eventData, "review.html_url");
           }
           break;
 
@@ -319,6 +348,11 @@ class TelegramNotify {
             eventContext.lastCommitMessage = safeGet(lastCommit, "message");
             eventContext.lastCommitAuthor = safeGet(lastCommit, "author.name");
             eventContext.lastCommitId = safeGet(lastCommit, "id");
+          }
+
+          // Handle tag pushes
+          if (this.githubContext.ref && this.githubContext.ref.startsWith('refs/tags/')) {
+            eventContext.tagName = this.githubContext.refName;
           }
           break;
 
@@ -377,6 +411,27 @@ class TelegramNotify {
               eventContext.releaseBody = `Release ${eventData.inputs.version} triggered manually via workflow_dispatch`;
               eventContext.releaseNotes = eventContext.releaseBody;
             }
+          }
+          break;
+
+        case "discussion":
+        case "discussion_comment":
+          if (eventData.discussion) {
+            eventContext.discussionId = safeGet(eventData, "discussion.number");
+            eventContext.discussionTitle = safeGet(eventData, "discussion.title");
+            eventContext.discussionBody = safeGet(eventData, "discussion.body");
+            eventContext.discussionUrl = safeGet(eventData, "discussion.html_url");
+            eventContext.discussionAuthor = safeGet(eventData, "discussion.user.login");
+            eventContext.discussionCategory = safeGet(eventData, "discussion.category.name");
+          }
+          if (eventData.comment) {
+            eventContext.commentAuthor = safeGet(eventData, "comment.user.login");
+            eventContext.commentBody = safeGet(eventData, "comment.body");
+            eventContext.commentUrl = safeGet(eventData, "comment.html_url");
+            eventContext.commentCreatedAt = safeGet(eventData, "comment.created_at");
+          }
+          if (eventData.action) {
+            eventContext.action = eventData.action;
           }
           break;
 
