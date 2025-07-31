@@ -293,6 +293,8 @@ class TelegramNotify {
             eventContext.releaseName = safeGet(eventData, "release.name");
             eventContext.releaseTag = safeGet(eventData, "release.tag_name");
             eventContext.releaseBody = safeGet(eventData, "release.body");
+            eventContext.releaseUrl = safeGet(eventData, "release.html_url");
+            eventContext.releaseNotes = safeGet(eventData, "release.body");
             eventContext.isPrerelease = safeGet(
               eventData,
               "release.prerelease"
