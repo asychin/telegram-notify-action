@@ -73,15 +73,15 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.notification-type.outputs.template }}
           language: ru
-          parse_mode: "HTML"
+          parse_mode: "Markdown"
           message: |
-            <b>🎯 Детали Issue:</b>
+            **🎯 Детали Issue:**
 
-            <b>Статус:</b> ${{ steps.notification-type.outputs.action_text }}
-            <b>Автор:</b> <code>${{ github.event.issue.user.login }}</code>
-            <b>Метки:</b> ${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}
+            **Статус:** ${{ steps.notification-type.outputs.action_text }}
+            **Автор:** `${{ github.event.issue.user.login }}`
+            **Метки:** ${{ join(github.event.issue.labels.*.name, ', ') || 'Нет меток' }}
 
-            ${{ github.event.issue.body && format('<b>Описание:</b>\n<pre>{0}</pre>', github.event.issue.body) || '' }}
+            ${{ github.event.issue.body && '**📄 Есть описание**' || '**📄 Без описания**' }}
           template_vars: |
             {
               "issueNumber": "${{ github.event.issue.number }}",
@@ -169,16 +169,17 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: deploy # Используем шаблон deploy для PR как развертывания кода
           language: ru
-          parse_mode: "HTML"
+          parse_mode: "Markdown"
           message: |
-            <b>📈 Статистика изменений:</b>
+            **📈 Статистика изменений:**
 
-            <b>Ветка:</b> <code>${{ github.event.pull_request.head.ref }}</code> → <code>${{ github.event.pull_request.base.ref }}</code>
-            <b>Файлов изменено:</b> ${{ github.event.pull_request.changed_files }}
-            <b>Коммитов:</b> ${{ github.event.pull_request.commits }}
-            <b>Статус проверок:</b> ${{ github.event.pull_request.mergeable_state || 'в процессе' }}
-
-            ${{ github.event.pull_request.body && format('<b>Описание:</b>\n<i>{0}</i>', github.event.pull_request.body) || '' }}
+            **Ветка:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Файлов изменено:** ${{ github.event.pull_request.changed_files }}
+            **Коммитов:** ${{ github.event.pull_request.commits }}
+            **Изменения:** `+${{ github.event.pull_request.additions }} -${{ github.event.pull_request.deletions }}`
+            
+            **📝 Краткое описание:**
+            *${{ github.event.pull_request.title }}*
           template_vars: |
             {
               "prNumber": "${{ github.event.pull_request.number }}",
@@ -316,15 +317,15 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: test # Используем шаблон test для health check
           language: ru
-          parse_mode: "HTML"
+          parse_mode: "Markdown"
           message: |
-            <b>🏥 Детальный отчет здоровья:</b>
+            **🏥 Детальный отчет здоровья:**
 
-            <b>Дата проверки:</b> ${{ steps.health-check.outputs.current_date }}
-            <b>Размер репозитория:</b> <code>${{ steps.health-check.outputs.repo_size }}</code>
-            <b>Общий статус:</b> ${{ steps.health-check.outputs.status == 'success' && '✅ Здоров' || '⚠️ Требует внимания' }}
+            **Дата проверки:** ${{ steps.health-check.outputs.current_date }}
+            **Размер репозитория:** `${{ steps.health-check.outputs.repo_size }}`
+            **Общий статус:** ${{ steps.health-check.outputs.status == 'success' && '✅ Здоров' || '⚠️ Требует внимания' }}
 
-            <b>📋 Рекомендации:</b>
+            **📋 Рекомендации:**
             ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Обновить зависимости с уязвимостями' || '• ✅ Безопасность в порядке' }}
             ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Обновить {0} устаревших пакетов', steps.health-check.outputs.outdated) || '• ✅ Все пакеты актуальны' }}
           template_vars: |
