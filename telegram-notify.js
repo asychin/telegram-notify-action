@@ -589,7 +589,7 @@ Released by: {{actor}}
     }
 
     this.info(`${this.messages.editingMessage} ${this.messageId}`);
-    const response = await this.makeRequest("editMessageText", payload);
+    await this.makeRequest("editMessageText", payload);
 
     return this.messageId;
   }
