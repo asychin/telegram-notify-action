@@ -200,10 +200,6 @@ class TelegramNotify {
     const isHTML = this.parseMode === "HTML";
     const bold = isHTML ? "<b>" : "**";
     const boldEnd = isHTML ? "</b>" : "**";
-    const italic = isHTML ? "<i>" : "*";
-    const italicEnd = isHTML ? "</i>" : "*";
-    const code = isHTML ? "<code>" : "`";
-    const codeEnd = isHTML ? "</code>" : "`";
 
     const templates = {
       success: {
