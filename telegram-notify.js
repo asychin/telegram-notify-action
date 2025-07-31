@@ -65,8 +65,9 @@ class TelegramNotify {
     this.inlineKeyboard = this.parseJSON(process.env.INLINE_KEYBOARD);
 
     // Retry configuration
-    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 3;
+    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 5;
     this.retryDelay = parseInt(process.env.RETRY_DELAY) || 1;
+    this.maxRateLimitRetries = parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
 
     // Conditional sending
     this.sendOnFailure = process.env.SEND_ON_FAILURE === "true";
@@ -588,6 +589,7 @@ Released by: {{actor}}
   async makeRequest(endpoint, payload, isFormData = false) {
     const url = `${this.baseUrl}/${endpoint}`;
     let lastError;
+    let rateLimitRetries = 0;
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
@@ -618,21 +620,29 @@ Released by: {{actor}}
       } catch (error) {
         lastError = error;
 
-        // Handle rate limiting with longer delay
+        // Handle rate limiting with separate retry counter
         if (error.message.includes("Too Many Requests")) {
           const retryAfterMatch = error.message.match(/retry after (\d+)/);
           const retryAfter = retryAfterMatch
             ? parseInt(retryAfterMatch[1])
             : 30;
-          if (attempt < this.maxRetries) {
+          
+          // Rate limiting gets separate retry attempts
+          if (rateLimitRetries < this.maxRateLimitRetries) {
+            rateLimitRetries++;
             this.warning(
-              `Rate limited. Waiting ${retryAfter} seconds before retry...`
+              `Rate limited (${rateLimitRetries}/${this.maxRateLimitRetries}). Waiting ${retryAfter} seconds before retry...`
             );
             await this.sleep(retryAfter * 1000);
-            continue; // Skip to next iteration immediately
+            
+            // Don't increment attempt counter for rate limiting
+            attempt--;
+            continue;
+          } else {
+            this.error(
+              `Maximum rate limit retries reached (${this.maxRateLimitRetries}). ${this.messages.requestFailed} ${error.message}`
+            );
           }
-          // If we've reached max retries, break out of the loop
-          break;
         }
 
         // Normal retry logic (only if not rate limited)
