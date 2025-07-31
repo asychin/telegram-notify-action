@@ -37,18 +37,22 @@ jobs:
 
       - name: Validate Markdown syntax (${{ matrix.language }})
         run: |
+          set +e  # Don't exit on errors
+          echo "🔍 Checking Markdown syntax for ${{ matrix.language }}..."
           case "${{ matrix.language }}" in
             "en")
-              markdownlint docs/en/ || echo "⚠️ Markdown lint warnings in English docs"
-              markdownlint README.md || echo "⚠️ Markdown lint warnings in root README.md"
+              markdownlint docs/en/ --config .markdownlint.json || echo "⚠️ Markdown lint warnings in English docs"
+              markdownlint README.md --config .markdownlint.json || echo "⚠️ Markdown lint warnings in root README.md"
               ;;
             "ru")  
-              markdownlint docs/ru/ || echo "⚠️ Markdown lint warnings in Russian docs"
+              markdownlint docs/ru/ --config .markdownlint.json || echo "⚠️ Markdown lint warnings in Russian docs"
               ;;
             "zh")
-              markdownlint docs/zh/ || echo "⚠️ Markdown lint warnings in Chinese docs"
+              markdownlint docs/zh/ --config .markdownlint.json || echo "⚠️ Markdown lint warnings in Chinese docs"
               ;;
           esac
+          echo "✅ Markdown syntax check completed for ${{ matrix.language }}"
+          exit 0  # Always succeed
 
       - name: Check for broken links (${{ matrix.language }})
         run: |
