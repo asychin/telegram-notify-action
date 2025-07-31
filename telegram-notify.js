@@ -202,6 +202,7 @@ class TelegramNotify {
             eventContext.prTitle = safeGet(eventData, "pull_request.title");
             eventContext.prState = safeGet(eventData, "pull_request.state");
             eventContext.prBody = safeGet(eventData, "pull_request.body");
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
             eventContext.baseBranch = safeGet(
               eventData,
               "pull_request.base.ref"
@@ -242,6 +243,7 @@ class TelegramNotify {
             eventContext.author = safeGet(eventData, "pull_request.user.login");
             eventContext.prNumber = safeGet(eventData, "pull_request.number");
             eventContext.prTitle = safeGet(eventData, "pull_request.title");
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
           }
           if (eventData.review) {
             eventContext.reviewAuthor = safeGet(eventData, "review.user.login");
