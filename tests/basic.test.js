@@ -143,3 +143,67 @@ describe('Telegram Notify Action - Basic Tests', () => {
     }
   });
 });
+  test('Rate limiting handling works correctly', () => {
+    const originalMain = require.main;
+    require.main = null;
+
+    try {
+      const { TelegramNotify } = require('../telegram-notify.js');
+      
+      process.env = { 
+        TELEGRAM_TOKEN: 'token', 
+        CHAT_ID: '123', 
+        MESSAGE: 'test',
+        MAX_RETRIES: '1'
+      };
+      
+      const notify = new TelegramNotify();
+      
+      // Test rate limiting regex
+      const rateLimitError = 'Telegram API error: Too Many Requests: retry after 30';
+      const match = rateLimitError.match(/retry after (\d+)/);
+      
+      expect(match).not.toBeNull();
+      expect(parseInt(match[1])).toBe(30);
+      
+    } finally {
+      require.main = originalMain;
+      delete require.cache[require.resolve('../telegram-notify.js')];
+    }
+  });
+
+  test('Inline keyboard formatting works correctly', () => {
+    const originalMain = require.main;
+    require.main = null;
+
+    try {
+      const { TelegramNotify } = require('../telegram-notify.js');
+      
+      // Test single button array
+      process.env = { 
+        TELEGRAM_TOKEN: 'token', 
+        CHAT_ID: '123', 
+        MESSAGE: 'test',
+        INLINE_KEYBOARD: '[{"text": "Button", "url": "https://example.com"}]'
+      };
+      
+      let notify = new TelegramNotify();
+      let payload = notify.getBasePayload();
+      
+      expect(payload.reply_markup).toBeDefined();
+      expect(Array.isArray(payload.reply_markup.inline_keyboard)).toBe(true);
+      expect(Array.isArray(payload.reply_markup.inline_keyboard[0])).toBe(true);
+      
+      // Test already formatted array of arrays
+      process.env.INLINE_KEYBOARD = '[[{"text": "Button1", "url": "https://example1.com"}, {"text": "Button2", "url": "https://example2.com"}]]';
+      
+      notify = new TelegramNotify();
+      payload = notify.getBasePayload();
+      
+      expect(payload.reply_markup.inline_keyboard[0]).toHaveLength(2);
+      
+    } finally {
+      require.main = originalMain;
+      delete require.cache[require.resolve('../telegram-notify.js')];
+    }
+  });

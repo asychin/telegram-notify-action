@@ -490,9 +490,7 @@ Released by: {{actor}}
             await this.sleep(retryAfter * 1000);
             continue;
           }
-        }
-        
-        if (attempt < this.maxRetries) {
+        } else if (attempt < this.maxRetries) {
           const delay = this.retryDelay * Math.pow(2, attempt) * 1000; // Exponential backoff
           this.warning(`${this.messages.retryAttempt} ${attempt + 1}/${this.maxRetries + 1} after ${delay}ms`);
           await this.sleep(delay);
@@ -502,10 +500,6 @@ Released by: {{actor}}
 
     this.error(`${this.messages.maxRetriesReached}. ${this.messages.requestFailed} ${lastError.message}`);
   }
-
-  /**
-   * Prepare inline keyboard for Telegram API
-   */
   prepareInlineKeyboard() {
     if (!this.inlineKeyboard) return null;
     
