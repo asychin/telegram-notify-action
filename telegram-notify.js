@@ -361,6 +361,25 @@ class TelegramNotify {
           }
           break;
 
+        case "workflow_dispatch":
+          // Handle manual workflow dispatch
+          if (eventData.inputs) {
+            // For release workflows triggered manually
+            if (eventData.inputs.version) {
+              eventContext.releaseTag = eventData.inputs.version;
+              eventContext.releaseName = eventData.inputs.version;
+              eventContext.isPrerelease = eventData.inputs.prerelease === 'true' || eventData.inputs.prerelease === true;
+              eventContext.isDraft = false;
+              eventContext.releaseAuthor = this.githubContext.actor;
+              eventContext.releaseCreatedAt = new Date().toISOString();
+              // Construct release URL based on repository and version
+              eventContext.releaseUrl = `${this.githubContext.serverUrl}/${this.githubContext.repository}/releases/tag/${eventData.inputs.version}`;
+              eventContext.releaseBody = `Release ${eventData.inputs.version} triggered manually via workflow_dispatch`;
+              eventContext.releaseNotes = eventContext.releaseBody;
+            }
+          }
+          break;
+
         case "deployment_status":
           if (eventData.deployment_status) {
             eventContext.deploymentState = safeGet(
@@ -786,7 +805,12 @@ Released by: {{actor}}
       const processedMessage = (this.message || '').replace(
         /\{\{(\w+)\}\}/g,
         (match, key) => {
-          return allVars[key] || match;
+          const value = allVars[key];
+          // Return the original match if value is undefined, null, or empty string
+          if (value === undefined || value === null || value === '') {
+            return match;
+          }
+          return value;
         }
       );
       
@@ -834,7 +858,12 @@ Released by: {{actor}}
     const processedText = templateText.replace(
       /\{\{(\w+)\}\}/g,
       (match, key) => {
-        return allVars[key] || match;
+        const value = allVars[key];
+        // Return the original match if value is undefined, null, or empty string
+        if (value === undefined || value === null || value === '') {
+          return match;
+        }
+        return value;
       }
     );
 
@@ -1028,13 +1057,27 @@ Released by: {{actor}}
           if (processedButton.text) {
             processedButton.text = processedButton.text.replace(
               /\{\{(\w+)\}\}/g,
-              (match, key) => allVars[key] || match
+              (match, key) => {
+                const value = allVars[key];
+                // Return the original match if value is undefined, null, or empty string
+                if (value === undefined || value === null || value === '') {
+                  return match;
+                }
+                return value;
+              }
             );
           }
           if (processedButton.url) {
             processedButton.url = processedButton.url.replace(
               /\{\{(\w+)\}\}/g,
-              (match, key) => allVars[key] || match
+              (match, key) => {
+                const value = allVars[key];
+                // Return the original match if value is undefined, null, or empty string
+                if (value === undefined || value === null || value === '') {
+                  return match;
+                }
+                return value;
+              }
             );
           }
           return processedButton;
@@ -1379,6 +1422,7 @@ Released by: {{actor}}
 // Export for testing
 if (typeof module !== "undefined" && module.exports) {
   module.exports = TelegramNotify;
+  module.exports.TelegramNotify = TelegramNotify;
 }
 
 // Execute the action only when run directly (not when imported)
