@@ -74,8 +74,8 @@ jobs:
           # Check if all variables from code are documented
           echo "Checking if all auto-context variables are documented..."
           
-          # Extract variables from JavaScript code
-          grep -o 'this\.githubContext\.\w*' telegram-notify.js | sed 's/this\.githubContext\.//' | sort | uniq > /tmp/code_vars.txt
+          # Extract variables from JavaScript code (from object definition)
+          sed -n '/this\.githubContext = {/,/^    };/p' telegram-notify.js | grep -o '^\s*[a-zA-Z][a-zA-Z0-9]*:' | sed 's/[[:space:]]*\([^:]*\):.*/\1/' | sort | uniq > /tmp/code_vars.txt
           
           # Extract variables from documentation  
           grep -o '{{[^}]*}}' docs/AUTO-CONTEXT-VARIABLES.md | sed 's/{{//' | sed 's/}}//' | sort | uniq > /tmp/doc_vars.txt
