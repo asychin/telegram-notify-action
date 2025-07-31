@@ -163,6 +163,7 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse_mode: "Markdown"
           message: |
             🧪 **Conditional Test: ${{ matrix.condition.name }}**
 
@@ -209,6 +210,7 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse_mode: "Markdown"
           file_path: test-file.${{ matrix.file-type.extension }}
           file_type: ${{ matrix.file-type.type }}
           caption: |
