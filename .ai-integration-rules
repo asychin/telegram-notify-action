@@ -21,17 +21,35 @@ https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rule
 
 ### 🧠 **For AI Systems**
 These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) when users request:
+
+**🆕 NEW INTEGRATION:**
 - "Add Telegram notifications to my project"
 - "Integrate telegram-notify-action into my workflows"  
 - "Set up GitHub Actions notifications"
 - "Add deployment notifications"
 
+**🔍 EXISTING INTEGRATION AUDIT:**
+- "Check my telegram-notify-action setup"
+- "Fix errors in my Telegram notifications"
+- "Update my old telegram notifications"
+- "Review my workflow files for issues"
+- "My notifications aren't working properly"
+
 🚨 **MANDATORY PROCESS:**
+
+**📋 For NEW integrations:**
 1. **NEVER** generate code immediately
 2. **ALWAYS** start with full questionnaire from Step 2
 3. **WAIT** for complete user responses
 4. **THEN** generate customized integration
 5. This prevents the common problem of generating incorrect integrations
+
+**🔍 For EXISTING integration audit:**
+1. **FIRST** analyze existing telegram-notify-action code
+2. **IDENTIFY** all errors against current rules (v3.1.0)
+3. **ASK** user about desired improvements (questionnaire)
+4. **PROVIDE** detailed error report with fixes
+5. **GENERATE** corrected code with explanations
 
 ### 📚 **Documentation Links**
 - **Full Documentation**: https://github.com/asychin/telegram-notify-action/tree/main/docs
@@ -558,6 +576,244 @@ Ask the user these REQUIRED questions:
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
+## 🔍 **EXISTING INTEGRATION AUDIT PROCESS**
+
+### **When User Has Existing telegram-notify-action Code**
+
+If user mentions existing implementation, provides files, or asks to "fix/check/update" notifications:
+
+#### **Audit Step 1: Comprehensive Code Analysis**
+
+**🔍 MANDATORY: Analyze ALL provided files for these errors:**
+
+1. **❌ Template Validation Errors:**
+   - Non-existent templates: `deployment_start`, `monitoring_report`, `critical_alert`, etc.
+   - ONLY valid: `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+
+2. **❌ Deprecated Parameter Errors:**
+   - `message_thread_id` parameter (removed in v3.0+)
+   - Old version references (`@v1`, `@v2`, `@main`)
+   - Deprecated input names from older versions
+
+3. **❌ Format Errors:**
+   ```yaml
+   # WRONG - bash style
+   template_vars: |
+     status=success
+     message=Hello
+   
+   # CORRECT - JSON format  
+   template_vars: |
+     {
+       "status": "success",
+       "message": "Hello"
+     }
+   ```
+
+4. **❌ Parameter Conflict Errors:**
+   ```yaml
+   # WRONG - both template and message
+   template: deploy
+   message: "Custom message"
+   
+   # CORRECT - either template OR message
+   template: deploy
+   template_vars: |
+     {"customMessage": "Details"}
+   ```
+
+5. **❌ Variable Scope Errors:**
+   ```yaml
+   # WRONG - template variables in JSON/shell context
+   template_vars: |
+     {
+       "msg": "Repository {{repository}}"
+     }
+   run: echo "{{repository}}"
+   
+   # CORRECT - GitHub variables in JSON/shell
+   template_vars: |
+     {
+       "msg": "Repository ${{ github.repository }}"
+     }
+   run: echo "${{ github.repository }}"
+   ```
+
+6. **❌ Syntax Errors:**
+   - Handlebars/Mustache syntax: `{{#if}}`, `{{#each}}`
+   - Invalid YAML structure
+   - Missing required parameters
+
+#### **Audit Step 2: Documentation Cross-Reference**
+
+**📚 MANDATORY: Read ALL documentation before audit:**
+
+🚨 **CRITICAL:** AI MUST read and understand these docs before analyzing user code:
+
+1. **Template System Documentation:**
+   ```bash
+   https://github.com/asychin/telegram-notify-action/blob/main/docs/en/TEMPLATE-SYSTEM.md
+   ```
+   - Full list of available variables
+   - Template variable vs GitHub variable usage rules
+   - Examples of correct variable usage
+
+2. **Main Documentation (All Languages):**
+   ```bash
+   https://github.com/asychin/telegram-notify-action/blob/main/docs/en/README.md
+   https://github.com/asychin/telegram-notify-action/blob/main/docs/ru/README.md  
+   https://github.com/asychin/telegram-notify-action/blob/main/docs/zh/README.md
+   ```
+   - Current parameters and their usage
+   - Deprecated features and migration paths
+   - Version compatibility information
+
+3. **Examples Repository:**
+   ```bash
+   https://github.com/asychin/telegram-notify-action/tree/main/examples
+   ```
+   - Current best practices
+   - Correct implementation patterns
+   - Real-world usage examples
+
+4. **Validation Steps:**
+   - Cross-reference used variables with documented variables
+   - Check if custom variables are passed via `template_vars`
+   - Compare used features against current version capabilities
+   - Identify deprecated/removed features
+   - Validate YAML structure and parameter combinations
+
+#### **Audit Step 3: Error Report Generation**
+
+**📋 MANDATORY: Create detailed error report:**
+
+```markdown
+# 🔍 Telegram-Notify-Action Audit Report
+
+## ❌ Errors Found: [X] issues
+
+### 1. Template Errors ([count])
+- Line X: `template: deployment_start` → Use `template: deploy`
+- Line Y: `template: monitoring_report` → Use custom `message:` instead
+
+### 2. Parameter Errors ([count])  
+- Line X: `message_thread_id` → Remove (deprecated in v3.0+)
+- Line Y: `@v2` → Update to `@v3.1.0`
+
+### 3. Format Errors ([count])
+- Line X: bash-style template_vars → Convert to JSON format
+- Line Y: template + message conflict → Choose one approach
+
+[Continue for all error categories...]
+
+## ✅ Recommendations
+1. Update to `asychin/telegram-notify-action@v3.1.0`
+2. Replace custom templates with built-in templates
+3. Convert template_vars to JSON format
+4. Remove deprecated parameters
+5. Fix variable scope issues
+
+## 📋 Next Steps
+Would you like me to:
+- [ ] Generate corrected versions of all files
+- [ ] Explain each fix in detail  
+- [ ] Update to different notification preferences
+- [ ] Add new notification types
+```
+
+#### **Audit Step 4: User Preference Collection**
+
+**After error report, ask user:**
+
+1. "🔧 Do you want to keep the same notification behavior, or would you like to improve it?"
+2. "📋 Should I fix errors while maintaining current functionality, or redesign based on your preferences?"
+3. If redesign: Use full questionnaire from Step 2
+4. If maintain: Proceed with minimal fixes
+
+#### **Audit Step 5: Generate Corrected Code**
+
+**Based on audit and user preferences:**
+
+1. **Create corrected versions** of all problematic files
+2. **Show before/after comparisons** for each fix
+3. **Explain reasoning** for each change
+4. **Validate final result** against all rules
+5. **Provide migration instructions**
+
+### **Example Audit Interaction Flow**
+
+```
+👤 User: "Check my telegram notifications, they have errors"
+[Provides files with custom templates, deprecated parameters]
+
+🤖 AI: "I'll audit your telegram-notify-action setup against v3.1.0 standards.
+
+🔍 **ANALYSIS COMPLETE - Found 15 errors:**
+
+❌ **Template Errors (8):**
+- monitoring.yaml:134: `template: monitoring_report` (doesn't exist)
+- deployment.yaml:42: `template: deployment_start` (doesn't exist)  
+[... detailed list ...]
+
+❌ **Deprecated Parameters (4):**
+- monitoring.yaml:133: `message_thread_id` (removed in v3.0+)
+[... detailed list ...]
+
+❌ **Format Errors (3):**
+- Line 136: bash-style template_vars (should be JSON)
+[... detailed list ...]
+
+📋 **Recommendations:**
+1. Replace custom templates with built-in: deploy, success, error
+2. Remove message_thread_id parameters  
+3. Convert template_vars to JSON format
+4. Update to @v3.1.0
+
+🔧 **Next Steps:**
+Do you want me to:
+- [ ] Fix all errors while keeping same behavior
+- [ ] Redesign notifications with better approach  
+- [ ] Explain each fix in detail first"
+
+👤 User: "Fix all errors, keep same behavior"
+
+🤖 AI: "Perfect! Here are your corrected files with explanations..."
+[Provides fixed versions with before/after comparisons]
+```
+
+### **🔧 Quick Audit Checklist for AI**
+
+**Before providing audit results, verify ALL items:**
+
+- [ ] **Templates:** All templates are built-in (`success`, `error`, `warning`, `info`, `deploy`, `test`, `release`)
+- [ ] **Parameters:** No `message_thread_id` or other deprecated parameters  
+- [ ] **Versions:** Using `@v3.1.0` or newer (not `@main`, `@v1`, `@v2`)
+- [ ] **template_vars:** All in JSON format, no bash-style assignments
+- [ ] **Conflicts:** No mixing of `template:` and `message:` parameters
+- [ ] **Variable Scopes:** `{{}}` only in `message:`/`caption:` WITH `template:`, `${{}}` in JSON/shell
+- [ ] **Syntax:** No Handlebars (`{{#if}}`, `{{#each}}`) or invalid YAML
+- [ ] **Documentation:** Cross-referenced against current docs
+- [ ] **Variables:** All used variables exist in documentation or passed via `template_vars`
+- [ ] **Migration:** Provided clear upgrade path for deprecated features
+
+### **📊 Audit Error Categories Priority**
+
+**🔴 Critical (Must Fix):**
+- Non-existent templates 
+- Deprecated parameters (`message_thread_id`)
+- Wrong variable scopes
+- Version references to non-existent versions
+
+**🟡 Important (Should Fix):**  
+- template_vars format (bash → JSON)
+- Template + message conflicts
+- Version updates (`@v2` → `@v3.1.0`)
+
+**🟢 Minor (Nice to Fix):**
+- Code formatting and organization
+- Adding more informative messages
+- Optimization of notification frequency
+
 #### **Step 3: Generate Integration (ONLY after complete questionnaire)**
 - Apply appropriate template based on user answers  
 - Create workflow files based on user responses
@@ -619,6 +875,8 @@ Please answer ALL questions before I create your integration."
 ```
 
 ### **❌ WRONG AI Behavior (What NOT to do)**
+
+#### **🆕 New Integration Mistakes:**
 ```
 👤 User: "Add Telegram notifications to my project"
 
@@ -629,6 +887,27 @@ Please answer ALL questions before I create your integration."
 
 🤖 AI: "Let me fix that..." [More iterations]
 ```
+
+#### **🔍 Audit Mistakes:**
+```
+👤 User: "Check my telegram notifications setup"
+[Provides files with 15+ errors]
+
+🤖 AI: "I see some issues. Here's the fixed version:"
+[Provides corrected code without explaining what was wrong or why]
+
+👤 User: "What exactly was wrong? I don't understand the changes"
+
+🤖 AI: [Tries to explain afterwards, confusing the user]
+```
+
+**🚨 Problems with wrong audit approach:**
+- No systematic error analysis
+- Skipped documentation cross-reference
+- No detailed error report
+- Immediate code generation without explanation
+- No user preference collection
+- Missing before/after comparisons
 
 ### 📝 **Integration Examples Reference**
 
@@ -842,6 +1121,10 @@ message: |
 ```
 
 ### **🔧 Quick Validation Checklist for AI:**
+
+#### **📋 For NEW integrations:**
+- [ ] Asked complete questionnaire BEFORE generating code
+- [ ] User provided ALL answers 
 - [ ] Templates: Only `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
 - [ ] No `message_thread_id` parameter
 - [ ] `template_vars` in JSON format
@@ -849,6 +1132,16 @@ message: |
 - [ ] Version `@v3.1.0` or newer
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
+
+#### **🔍 For AUDIT scenarios:**
+- [ ] Read ALL documentation before analysis
+- [ ] Created comprehensive error report
+- [ ] Cross-referenced against current v3.1.0 standards
+- [ ] Provided before/after comparisons
+- [ ] Explained reasoning for each fix
+- [ ] Asked user preferences for fixes vs redesign
+- [ ] Validated final result against all rules
+- [ ] Included migration instructions
 
 ---
 
