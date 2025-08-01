@@ -369,6 +369,29 @@ class TelegramNotify {
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
 
+            // Additional PR statistics and information
+            eventContext.prMerged = safeGet(eventData, "pull_request.merged");
+            eventContext.prMergedAt = safeGet(eventData, "pull_request.merged_at");
+            eventContext.prMergedBy = safeGet(eventData, "pull_request.merged_by.login");
+            eventContext.prCommits = safeGet(eventData, "pull_request.commits");
+            eventContext.prAdditions = safeGet(eventData, "pull_request.additions");
+            eventContext.prDeletions = safeGet(eventData, "pull_request.deletions");
+            eventContext.prChangedFiles = safeGet(eventData, "pull_request.changed_files");
+            eventContext.prReviewComments = safeGet(eventData, "pull_request.review_comments");
+            eventContext.prComments = safeGet(eventData, "pull_request.comments");
+            eventContext.prRequestedReviewers = Array.isArray(safeGet(eventData, "pull_request.requested_reviewers"))
+              ? safeGet(eventData, "pull_request.requested_reviewers").map(r => r.login).join(", ")
+              : "";
+            eventContext.prAutoMerge = safeGet(eventData, "pull_request.auto_merge") !== null;
+            
+            // Branch comparison info
+            eventContext.branchComparison = `${eventContext.headBranch} → ${eventContext.baseBranch}`;
+            
+            // Changes summary
+            const additions = eventContext.prAdditions || 0;
+            const deletions = eventContext.prDeletions || 0;
+            eventContext.changesStats = `+${additions} ➕ -${deletions} ➖`;
+            
             // For PR events, use headBranch as the main branch name instead of refName
             eventContext.branchName = eventContext.headBranch || this.githubContext.refName;
           }
@@ -750,6 +773,77 @@ class TelegramNotify {
 
 {{customMessage}}`,
       },
+      deploy_detailed: {
+        en: `🚀 ${bold}Deployment${boldEnd}
+
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+📝 ${bold}Commit:${boldEnd} {{shortSha}}
+🔢 ${bold}Run:${boldEnd} #{{runNumber}}
+
+👤 ${bold}Deployed by:${boldEnd} {{actor}}
+📊 ${bold}Status:${boldEnd} {{deployStatus}}
+
+📈 ${bold}Change Statistics:${boldEnd}
+
+🌿 ${bold}Branch:${boldEnd} {{branchComparison}}
+📁 ${bold}Files changed:${boldEnd} {{prChangedFiles}}
+📝 ${bold}Commits:${boldEnd} {{prCommits}}
+📊 ${bold}Changes:${boldEnd} {{changesStats}}
+👤 ${bold}Author:${boldEnd} {{author}}
+📅 ${bold}Created:${boldEnd} {{prCreatedAt}}
+
+📝 ${bold}Description:${boldEnd}
+{{prTitle}}
+
+{{customMessage}}`,
+        ru: `🚀 ${bold}Развертывание${boldEnd}
+
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+📝 ${bold}Коммит:${boldEnd} {{shortSha}}
+🔢 ${bold}Запуск:${boldEnd} #{{runNumber}}
+
+👤 ${bold}Развернул:${boldEnd} {{actor}}
+📊 ${bold}Статус:${boldEnd} {{deployStatus}}
+
+📈 ${bold}Статистика изменений:${boldEnd}
+
+🌿 ${bold}Ветка:${boldEnd} {{branchComparison}}
+📁 ${bold}Файлов изменено:${boldEnd} {{prChangedFiles}}
+📝 ${bold}Коммитов:${boldEnd} {{prCommits}}
+📊 ${bold}Изменения:${boldEnd} {{changesStats}}
+👤 ${bold}Автор:${boldEnd} {{author}}
+📅 ${bold}Создан:${boldEnd} {{prCreatedAt}}
+
+📝 ${bold}Краткое описание:${boldEnd}
+{{prTitle}}
+
+{{customMessage}}`,
+        zh: `🚀 ${bold}部署${boldEnd}
+
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+📝 ${bold}提交:${boldEnd} {{shortSha}}
+🔢 ${bold}运行:${boldEnd} #{{runNumber}}
+
+👤 ${bold}部署者:${boldEnd} {{actor}}
+📊 ${bold}状态:${boldEnd} {{deployStatus}}
+
+📈 ${bold}变更统计:${boldEnd}
+
+🌿 ${bold}分支:${boldEnd} {{branchComparison}}
+📁 ${bold}文件变更:${boldEnd} {{prChangedFiles}}
+📝 ${bold}提交:${boldEnd} {{prCommits}}
+📊 ${bold}变更:${boldEnd} {{changesStats}}
+👤 ${bold}作者:${boldEnd} {{author}}
+📅 ${bold}创建时间:${boldEnd} {{prCreatedAt}}
+
+📝 ${bold}描述:${boldEnd}
+{{prTitle}}
+
+{{customMessage}}`,
+      },
       test: {
         en: `🧪 ${bold}Test Results${boldEnd}
 
@@ -782,6 +876,77 @@ class TelegramNotify {
 
 📊 ${bold}测试状态:${boldEnd} {{testStatus}}
 📈 ${bold}覆盖率:${boldEnd} {{coverage}}
+
+{{customMessage}}`,
+      },
+      pr_detailed: {
+        en: `🔄 ${bold}Pull Request${boldEnd}
+
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🔢 ${bold}PR #{{prNumber}}:${boldEnd} {{prTitle}}
+👤 ${bold}Author:${boldEnd} {{author}}
+📊 ${bold}Status:${boldEnd} {{prState}}
+
+📈 ${bold}Change Statistics:${boldEnd}
+
+🌿 ${bold}Branch:${boldEnd} {{branchComparison}}
+📁 ${bold}Files changed:${boldEnd} {{prChangedFiles}}
+📝 ${bold}Commits:${boldEnd} {{prCommits}}
+📊 ${bold}Changes:${boldEnd} {{changesStats}}
+💬 ${bold}Comments:${boldEnd} {{prComments}}
+📝 ${bold}Review Comments:${boldEnd} {{prReviewComments}}
+
+📅 ${bold}Created:${boldEnd} {{prCreatedAt}}
+🏷️ ${bold}Labels:${boldEnd} {{labels}}
+👥 ${bold}Assignees:${boldEnd} {{assignees}}
+
+🔗 ${bold}Link:${boldEnd} {{prUrl}}
+
+{{customMessage}}`,
+        ru: `🔄 ${bold}Pull Request${boldEnd}
+
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🔢 ${bold}PR #{{prNumber}}:${boldEnd} {{prTitle}}
+👤 ${bold}Автор:${boldEnd} {{author}}
+📊 ${bold}Статус:${boldEnd} {{prState}}
+
+📈 ${bold}Статистика изменений:${boldEnd}
+
+🌿 ${bold}Ветка:${boldEnd} {{branchComparison}}
+📁 ${bold}Файлов изменено:${boldEnd} {{prChangedFiles}}
+📝 ${bold}Коммитов:${boldEnd} {{prCommits}}
+📊 ${bold}Изменения:${boldEnd} {{changesStats}}
+💬 ${bold}Комментариев:${boldEnd} {{prComments}}
+📝 ${bold}Комментариев к коду:${boldEnd} {{prReviewComments}}
+
+📅 ${bold}Создан:${boldEnd} {{prCreatedAt}}
+🏷️ ${bold}Метки:${boldEnd} {{labels}}
+👥 ${bold}Назначены:${boldEnd} {{assignees}}
+
+🔗 ${bold}Ссылка:${boldEnd} {{prUrl}}
+
+{{customMessage}}`,
+        zh: `🔄 ${bold}拉取请求${boldEnd}
+
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🔢 ${bold}PR #{{prNumber}}:${boldEnd} {{prTitle}}
+👤 ${bold}作者:${boldEnd} {{author}}
+📊 ${bold}状态:${boldEnd} {{prState}}
+
+📈 ${bold}变更统计:${boldEnd}
+
+🌿 ${bold}分支:${boldEnd} {{branchComparison}}
+📁 ${bold}文件变更:${boldEnd} {{prChangedFiles}}
+📝 ${bold}提交:${boldEnd} {{prCommits}}
+📊 ${bold}变更:${boldEnd} {{changesStats}}
+💬 ${bold}评论:${boldEnd} {{prComments}}
+📝 ${bold}代码评论:${boldEnd} {{prReviewComments}}
+
+📅 ${bold}创建时间:${boldEnd} {{prCreatedAt}}
+🏷️ ${bold}标签:${boldEnd} {{labels}}
+👥 ${bold}指派:${boldEnd} {{assignees}}
+
+🔗 ${bold}链接:${boldEnd} {{prUrl}}
 
 {{customMessage}}`,
       },

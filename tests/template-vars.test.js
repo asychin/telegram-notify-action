@@ -149,4 +149,52 @@ describe("Template Variables in template_vars", () => {
     // Clean up
     fs.unlinkSync(eventPath);
   });
+
+  test("should provide rich PR statistics in detailed templates", () => {
+    // Mock detailed PR event
+    const mockEventData = {
+      pull_request: {
+        number: 789,
+        title: "Feature: Add awesome functionality",
+        state: "open",
+        user: { login: "developer" },
+        head: { ref: "feature/awesome" },
+        base: { ref: "main" },
+        created_at: "2025-01-01T12:00:00Z",
+        html_url: "https://github.com/test/repo/pull/789",
+        commits: 5,
+        additions: 150,
+        deletions: 25,
+        changed_files: 3,
+        comments: 2,
+        review_comments: 4,
+        labels: [{ name: "feature" }, { name: "enhancement" }],
+        assignees: [{ login: "reviewer" }]
+      }
+    };
+
+    const fs = require("fs");
+    const path = require("path");
+    const eventPath = path.join(__dirname, "rich-pr-mock-event.json");
+    fs.writeFileSync(eventPath, JSON.stringify(mockEventData, null, 2));
+    process.env.GITHUB_EVENT_PATH = eventPath;
+    process.env.GITHUB_REF_NAME = "789/merge";
+
+    const TelegramNotify = require("../telegram-notify.js");
+    const notifier = new TelegramNotify();
+    const eventContext = notifier.getEventContext();
+
+    // Verify rich statistics are available
+    expect(eventContext.branchComparison).toBe("feature/awesome → main");
+    expect(eventContext.changesStats).toBe("+150 ➕ -25 ➖");
+    expect(eventContext.prChangedFiles).toBe(3);
+    expect(eventContext.prCommits).toBe(5);
+    expect(eventContext.prAdditions).toBe(150);
+    expect(eventContext.prDeletions).toBe(25);
+    expect(eventContext.prComments).toBe(2);
+    expect(eventContext.prReviewComments).toBe(4);
+
+    // Clean up
+    fs.unlinkSync(eventPath);
+  });
 });
