@@ -41,6 +41,10 @@ jobs:
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: 🕐 Get current timestamp
+        id: timestamp
+        run: echo "time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+
       - name: Create release asset (changelog)
         run: |
           cat > RELEASE_NOTES.md << 'EOF'
@@ -48,7 +52,7 @@ jobs:
 
           **Repository:** ${{ github.repository }}
           **Released by:** ${{ github.actor }}
-          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Date:** ${{ steps.timestamp.outputs.time }}
           **Prerelease:** ${{ steps.release-info.outputs.prerelease }}
 
           ## Release Notes
