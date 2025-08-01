@@ -1,6 +1,6 @@
 {
   "name": "telegram-notify-action",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Enhanced GitHub Action for sending and editing Telegram notifications with file support, templates, and advanced features",
   "main": "telegram-notify.js",
   "scripts": {
@@ -69,7 +69,12 @@
     },
     "rules": {
       "no-console": "off",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_"
+        }
+      ],
       "prefer-const": "error",
       "no-var": "error"
     }

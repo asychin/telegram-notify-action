@@ -1,5 +1,34 @@
 # 📝 Changelog
 
+## [v3.1.0] - 2025-08-01
+
+### 🐛 **Bug Fixes**
+
+#### ✅ **Deploy Template Variable Substitution**
+- **🔧 Fixed "Dry Data" Issue** - All template variables now properly substitute in `deploy` template
+- **📊 Enhanced Push Event Support** - Added `filesChanged`, `additions`, `deletions`, `commitCount` extraction for push events
+- **🎯 Universal Deploy Template** - Now works correctly for all GitHub event types (push, workflow_run, deployment, release)
+- **🛡️ Default Value Fallbacks** - Provides sensible defaults when specific event data is unavailable
+
+#### 🔧 **Event Context Improvements**
+- **⚡ Push Event Variables** - Extract branch info from `refs/heads/` format
+- **📈 File Change Statistics** - Calculate file changes from commit data for push events
+- **👤 Author Information** - Consistent author extraction across event types
+- **📅 Timestamp Handling** - Proper date formatting for all event types
+
+#### 🧪 **Debug and Testing**
+- **🐛 Enhanced Debug Script** - Updated `debug-template.js` with mock event data support
+- **✨ Multi-language Testing** - Comprehensive testing for EN/RU/ZH templates
+- **🔍 Template Validation** - Better testing coverage for variable substitution
+
+### 📝 **Technical Details**
+- Fixed template variables `{{baseBranch}}`, `{{headBranch}}`, `{{filesChanged}}`, `{{additions}}`, `{{deletions}}`, `{{author}}`, `{{prTitle}}`, `{{prCreatedAt}}`, `{{deployStatus}}` not substituting in non-PR events
+- Enhanced `getEventContext()` function with comprehensive push event support
+- Added universal fallback values for all deploy template variables
+- Improved code formatting and ESLint compliance
+
+---
+
 ## [v3.0.0] - 2025-01-31
 
 ### 🎯 **Major Features - v3.0.0 Release**
