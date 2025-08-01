@@ -77,7 +77,7 @@ class TelegramNotify {
     // GitHub context
     this.githubContext = {
       repository: process.env.GITHUB_REPOSITORY,
-      refName: process.env.GITHUB_REF_NAME,
+      refName: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME,
       sha: process.env.GITHUB_SHA,
       actor: process.env.GITHUB_ACTOR,
       workflow: process.env.GITHUB_WORKFLOW,
@@ -86,6 +86,7 @@ class TelegramNotify {
       runNumber: process.env.GITHUB_RUN_NUMBER,
       eventName: process.env.GITHUB_EVENT_NAME,
       jobStatus: process.env.JOB_STATUS,
+
       // Дополнительные GitHub переменные
       repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER,
       repositoryId: process.env.GITHUB_REPOSITORY_ID,
@@ -109,6 +110,58 @@ class TelegramNotify {
       workflowSha: process.env.GITHUB_WORKFLOW_SHA,
       retentionDays: process.env.GITHUB_RETENTION_DAYS,
       secretSource: process.env.GITHUB_SECRET_SOURCE,
+      jobId: process.env.GITHUB_JOB_ID,
+      actionPath: process.env.GITHUB_ACTION_PATH,
+      stepSummary: process.env.GITHUB_STEP_SUMMARY,
+      envPath: process.env.GITHUB_ENV,
+      path: process.env.GITHUB_PATH,
+
+      // Вычисляемые полезные переменные
+      shortSha: process.env.GITHUB_SHA
+        ? process.env.GITHUB_SHA.substring(0, 7)
+        : "",
+      repositoryName: process.env.GITHUB_REPOSITORY
+        ? process.env.GITHUB_REPOSITORY.split("/")[1]
+        : "",
+      repositoryOwnerName: process.env.GITHUB_REPOSITORY
+        ? process.env.GITHUB_REPOSITORY.split("/")[0]
+        : "",
+      workflowUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/workflows/${process.env.GITHUB_WORKFLOW}`
+          : "",
+      runUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_RUN_ID
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+          : "",
+      commitUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_SHA
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`
+          : "",
+      compareUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_SHA &&
+        process.env.GITHUB_BASE_REF
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/compare/${process.env.GITHUB_BASE_REF}...${process.env.GITHUB_SHA}`
+          : "",
+      issuesUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/issues`
+          : "",
+      pullRequestsUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/pulls`
+          : "",
+      releasesUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases`
+          : "",
+
       // Runner переменные
       runnerOs: process.env.RUNNER_OS,
       runnerArch: process.env.RUNNER_ARCH,
@@ -117,6 +170,7 @@ class TelegramNotify {
       runnerTemp: process.env.RUNNER_TEMP,
       runnerToolCache: process.env.RUNNER_TOOL_CACHE,
       runnerDebug: process.env.RUNNER_DEBUG,
+
       // CI переменная
       ci: process.env.CI,
     };
@@ -235,6 +289,7 @@ class TelegramNotify {
             eventContext.prTitle = safeGet(eventData, "pull_request.title");
             eventContext.prState = safeGet(eventData, "pull_request.state");
             eventContext.prBody = safeGet(eventData, "pull_request.body");
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
             eventContext.baseBranch = safeGet(
               eventData,
               "pull_request.base.ref"
@@ -267,6 +322,16 @@ class TelegramNotify {
             eventContext.assignees = Array.isArray(assignees)
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
+
+            // PR change statistics
+            eventContext.filesChanged =
+              safeGet(eventData, "pull_request.changed_files") || 0;
+            eventContext.additions =
+              safeGet(eventData, "pull_request.additions") || 0;
+            eventContext.deletions =
+              safeGet(eventData, "pull_request.deletions") || 0;
+            eventContext.commitCount =
+              safeGet(eventData, "pull_request.commits") || 0;
           }
           break;
 
@@ -275,6 +340,7 @@ class TelegramNotify {
             eventContext.author = safeGet(eventData, "pull_request.user.login");
             eventContext.prNumber = safeGet(eventData, "pull_request.number");
             eventContext.prTitle = safeGet(eventData, "pull_request.title");
+            eventContext.prUrl = safeGet(eventData, "pull_request.html_url");
           }
           if (eventData.review) {
             eventContext.reviewAuthor = safeGet(eventData, "review.user.login");
@@ -305,7 +371,7 @@ class TelegramNotify {
           }
           break;
 
-        case "push":
+        case "push": {
           eventContext.pusher = safeGet(eventData, "pusher.name");
           eventContext.pusherId = safeGet(eventData, "pusher.id");
           eventContext.commitCount = safeGet(eventData, "commits.length") || 0;
@@ -319,6 +385,7 @@ class TelegramNotify {
             eventContext.lastCommitId = safeGet(lastCommit, "id");
           }
           break;
+        }
 
         case "workflow_run":
           if (eventData.workflow_run) {
@@ -500,211 +567,250 @@ class TelegramNotify {
       success: {
         en: `✅ ${bold}Success${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `✅ ${bold}Успех${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{refName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `✅ ${bold}成功${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{refName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
+🔄 ${bold}工作流:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       error: {
         en: `❌ ${bold}Error${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
-Job Status: {{jobStatus}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
+🚨 ${bold}Job Status:${boldEnd} {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `❌ ${bold}Ошибка${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
-Статус задачи: {{jobStatus}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{refName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
+🚨 ${bold}Статус задачи:${boldEnd} {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `❌ ${bold}错误${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
-任务状态: {{jobStatus}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{refName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
+🔄 ${bold}工作流:${boldEnd} {{workflow}}
+🚨 ${bold}任务状态:${boldEnd} {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       warning: {
         en: `⚠️ ${bold}Warning${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Workflow: {{workflow}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `⚠️ ${bold}Предупреждение${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Workflow: {{workflow}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{refName}}
+🔄 ${bold}Workflow:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `⚠️ ${bold}警告${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-工作流: {{workflow}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{refName}}
+🔄 ${bold}工作流:${boldEnd} {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       info: {
         en: `ℹ️ ${bold}Information${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Actor: {{actor}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `ℹ️ ${bold}Информация${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Автор: {{actor}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{refName}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `ℹ️ ${bold}信息${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-执行者: {{actor}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{refName}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       deploy: {
         en: `🚀 ${bold}Deployment${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+📦 Repository: {{repository}}
+🌿 Branch: {{refName}}
+📝 Commit: {{shortSha}}
+🔢 Run: #{{runNumber}}
 
-Deployed by: {{actor}}
-Status: {{deployStatus}}
+👤 Deployed by: {{actor}}
+📊 Status: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 Change Statistics:
+
+🌿 Branch: {{baseBranch}} → {{headBranch}}
+📁 Files changed: {{filesChanged}}
+📝 Commits: {{commitCount}}
+📊 Changes: {{additions}} ➕ {{deletions}} ➖
+👤 Author: {{author}}
+📅 Created: {{prCreatedAt}}
+
+📝 Description:
+{{prTitle}}`,
         ru: `🚀 ${bold}Развертывание${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+📦 Репозиторий: {{repository}}
+🌿 Ветка: {{refName}}
+📝 Коммит: {{shortSha}}
+🔢 Запуск: #{{runNumber}}
 
-Развернул: {{actor}}
-Статус: {{deployStatus}}
+👤 Развернул: {{actor}}
+📊 Статус: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 Статистика изменений:
+
+🌿 Ветка: {{baseBranch}} → {{headBranch}}
+📁 Файлов изменено: {{filesChanged}}
+📝 Коммитов: {{commitCount}}
+📊 Изменения: {{additions}} ➕ {{deletions}} ➖
+👤 Автор: {{author}}
+📅 Создан: {{prCreatedAt}}
+
+📝 Описание:
+{{prTitle}}`,
         zh: `🚀 ${bold}部署${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+📦 仓库: {{repository}}
+🌿 分支: {{refName}}
+📝 提交: {{shortSha}}
+🔢 运行: #{{runNumber}}
 
-部署者: {{actor}}
-状态: {{deployStatus}}
+👤 部署者: {{actor}}
+📊 状态: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 变更统计:
+
+🌿 分支: {{baseBranch}} → {{headBranch}}
+📁 文件变更: {{filesChanged}}
+📝 提交数: {{commitCount}}
+📊 变更: {{additions}} ➕ {{deletions}} ➖
+👤 作者: {{author}}
+📅 创建时间: {{prCreatedAt}}
+
+📝 描述:
+{{prTitle}}`,
       },
       test: {
         en: `🧪 ${bold}Test Results${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+🔢 ${bold}Run:${boldEnd} #{{runNumber}}
 
-Test Status: {{testStatus}}
-Coverage: {{coverage}}
+📊 ${bold}Test Status:${boldEnd} {{testStatus}}
+📈 ${bold}Coverage:${boldEnd} {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `🧪 ${bold}Результаты тестов${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{refName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+🔢 ${bold}Запуск:${boldEnd} #{{runNumber}}
 
-Статус тестов: {{testStatus}}
-Покрытие: {{coverage}}
+📊 ${bold}Статус тестов:${boldEnd} {{testStatus}}
+📈 ${bold}Покрытие:${boldEnd} {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `🧪 ${bold}测试结果${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{refName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+🔢 ${bold}运行:${boldEnd} #{{runNumber}}
 
-测试状态: {{testStatus}}
-覆盖率: {{coverage}}
+📊 ${bold}测试状态:${boldEnd} {{testStatus}}
+📈 ${bold}覆盖率:${boldEnd} {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       release: {
         en: `🎉 ${bold}New Release${boldEnd}
 
-Repository: {{repository}}
-Version: {{version}}
-Tag: {{tag}}
-Released by: {{actor}}
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🏷️ ${bold}Version:${boldEnd} {{version}}
+🔖 ${bold}Tag:${boldEnd} {{tag}}
+👤 ${bold}Released by:${boldEnd} {{actor}}
 
+📋 ${bold}Release Notes:${boldEnd}
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `🎉 ${bold}Новый релиз${boldEnd}
 
-Репозиторий: {{repository}}
-Версия: {{version}}
-Тег: {{tag}}
-Выпустил: {{actor}}
+🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
+🏷️ ${bold}Версия:${boldEnd} {{version}}
+🔖 ${bold}Тег:${boldEnd} {{tag}}
+👤 ${bold}Выпустил:${boldEnd} {{actor}}
 
+📋 ${bold}Заметки к релизу:${boldEnd}
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `🎉 ${bold}新版本发布${boldEnd}
 
-仓库: {{repository}}
-版本: {{version}}
-标签: {{tag}}
-发布者: {{actor}}
+🏠 ${bold}仓库:${boldEnd} {{repository}}
+🏷️ ${bold}版本:${boldEnd} {{version}}
+🔖 ${bold}标签:${boldEnd} {{tag}}
+👤 ${bold}发布者:${boldEnd} {{actor}}
 
+📋 ${bold}发布说明:${boldEnd}
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
     };
 
@@ -779,7 +885,7 @@ Released by: {{actor}}
     const allVars = {
       ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
       ...this.getEventContext(), // Automatic event-specific variables
-      customMessage: this.message || "",
+      customMessage: this.message || "", // Always include customMessage, even if empty
       ...this.templateVars, // User-defined variables (highest priority)
     };
 
@@ -802,7 +908,9 @@ Released by: {{actor}}
     const processedText = templateText.replace(
       /\{\{(\w+)\}\}/g,
       (match, key) => {
-        return allVars[key] || match;
+        return Object.prototype.hasOwnProperty.call(allVars, key)
+          ? allVars[key]
+          : match;
       }
     );
 
@@ -1319,6 +1427,7 @@ Released by: {{actor}}
 // Export for testing
 if (typeof module !== "undefined" && module.exports) {
   module.exports = TelegramNotify;
+  module.exports.TelegramNotify = TelegramNotify;
 }
 
 // Execute the action only when run directly (not when imported)

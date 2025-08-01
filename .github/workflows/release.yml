@@ -81,31 +81,59 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: release
+          parse_mode: "Markdown"
+          language: en
           template_vars: |
             {
               "version": "${{ steps.release-info.outputs.version }}",
               "tag": "${{ steps.release-info.outputs.version }}",
               "releaseNotes": "${{ steps.release-info.outputs.release_notes }}",
-              "isPrerelease": "${{ steps.release-info.outputs.prerelease }}",
-              "downloadUrl": "${{ steps.release-info.outputs.download_url }}"
+              "customMessage": "New release ${{ steps.release-info.outputs.version }} for project ${{ github.repository }} published!"
             }
           message: |
             🎉 **New Release Available!**
 
-            Version ${{ steps.release-info.outputs.version }} has been published.
+            **🏷️ Version:** {{releaseName}}
+            **🏠 Repository:** {{repository}}
+            **👤 Release Author:** {{releaseAuthor}}
+            **📅 Date:** {{releaseCreatedAt}}
+            **🔖 Tag:** {{releaseTag}}
+            **🧪 Prerelease:** {{isPrerelease}}
+            **📝 Draft:** {{isDraft}}
 
-            Key improvements:
-            • Enhanced file upload capabilities
-            • Advanced message templating
-            • Improved error handling
-            • Better performance and reliability
+            **✨ Key Improvements in This Version:**
+            • 🎯 Automatic Event Context Extraction
+            • 🌐 Ready-to-Use URL Variables
+            • 🔄 Enhanced Retry Logic
+            • 📤 Advanced File Upload
+            • 🛡️ Additional Security Features
+            • 🧪 Comprehensive Testing
+            • 📖 Completely Updated Documentation
+
+            **📋 Release Notes:**
+            {{releaseBody}}
+
+            **🚀 Usage:**
+            ```yaml
+            - uses: asychin/telegram-notify-action@{{releaseTag}}
+              with:
+                telegram_token: ${{ '{{' }} secrets.TELEGRAM_BOT_TOKEN {{ '}}' }}
+                chat_id: ${{ '{{' }} secrets.TELEGRAM_CHAT_ID {{ '}}' }}
+                message: "Your notification message"
+            ```
           inline_keyboard: |
             [
-              {"text": "📥 Download", "url": "${{ steps.release-info.outputs.download_url }}"},
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
-              {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"}
+              {"text": "📥 Download Release", "url": "${{ steps.release-info.outputs.download_url }}"},
+              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
+            ],
+            [
+              {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"},
+              {"text": "🐛 Report Issue", "url": "https://github.com/${{ github.repository }}/issues/new"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
+              {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
             ]
-          language: en
 
       - name: Send release notes as document
         uses: ./
@@ -114,13 +142,24 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           file_path: RELEASE_NOTES.md
           file_type: document
+          parse_mode: "Markdown"
           caption: |
-            📋 **Release Notes**
+            📋 **Complete Release Notes**
 
-            Complete release notes for ${{ steps.release-info.outputs.version }}
+            **🏷️ Version:** ${{ steps.release-info.outputs.version }}
+            **🏠 Repository:** ${{ github.repository }}
+            **👤 Owner:** ${{ github.repository_owner }}
+            **📅 Published:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            **🔖 Tag:** ${{ steps.release-info.outputs.version }}
+            **👤 Author:** ${{ github.actor }}
 
-            Repository: ${{ github.repository }}
-            Released: $(date -u +"%Y-%m-%d %H:%M UTC")
+            **📄 File Contents:**
+            • Detailed description of changes
+            • Installation instructions
+            • Usage examples
+            • Documentation links
+
+            File contains comprehensive information about the new release ${{ steps.release-info.outputs.version }}
 
       - name: Notify development team (if prerelease)
         if: steps.release-info.outputs.prerelease == 'true'
@@ -129,19 +168,50 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_DEV_CHAT_ID }}
           template: warning
+          parse_mode: "Markdown"
+          language: en
           message: |
-            🚧 **Prerelease Published**
+            🚧 **Prerelease Published!**
 
+            **🏷️ Version:** {{releaseName}}
+            **🏠 Repository:** {{repository}}
+            **👤 Author:** {{releaseAuthor}}
+            **📅 Published:** {{releaseCreatedAt}}
+            **🔖 Tag:** {{releaseTag}}
+
+            **⚠️ Development Team Attention:**
             A prerelease version ${{ steps.release-info.outputs.version }} has been published.
+
+            **📋 Required Actions:**
+            • 🧪 Conduct thorough testing
+            • 🔍 Check compatibility
+            • 📝 Update documentation
+            • 🐛 Fix any found bugs
+            • ✅ Confirm readiness for stable release
+
+            **📋 Release Notes:**
+            {{releaseBody}}
+
             Please test thoroughly before promoting to stable release.
+
+            **🌿 Branch:** {{refName}}
+            **👤 Workflow:** {{workflow}}
           template_vars: |
             {
-              "version": "${{ steps.release-info.outputs.version }}"
+              "customMessage": "Attention! New prerelease ${{ steps.release-info.outputs.version }} requires team testing"
             }
           inline_keyboard: |
             [
               {"text": "🧪 Test Release", "url": "${{ steps.release-info.outputs.download_url }}"},
-              {"text": "🐛 Report Issues", "url": "https://github.com/${{ github.repository }}/issues/new"}
+              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
+            ],
+            [
+              {"text": "🐛 Report Bug", "url": "https://github.com/${{ github.repository }}/issues/new"},
+              {"text": "💬 Discussion", "url": "https://github.com/${{ github.repository }}/discussions"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
+              {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
             ]
 
   post-release-tasks:

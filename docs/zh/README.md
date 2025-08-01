@@ -1,6 +1,6 @@
 # 📱 Telegram Notify Action - 增强版
 
-[![版本](https://img.shields.io/badge/version-2.0.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-3.0.0-blue.svg)](#)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](#)
 [![许可证](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![测试](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
@@ -11,8 +11,8 @@
 ### 🌐 语言 / Language / Язык
 
 | [🇺🇸 English](../en/README.md) | [🇨🇳 **中文**](README.md) | [🇷🇺 Русский](../ru/README.md) |
-|:-------------------------------:|:-------------------------:|:-------------------------------:|
-| **Complete Documentation**     | **完整文档**               | **Полная документация**         |
+| :---------------------------: | :----------------------: | :---------------------------: |
+|  **Complete Documentation**   |       **完整文档**       |    **Полная документация**    |
 
 </div>
 
@@ -54,7 +54,7 @@
 
 ```yaml
 - name: 发送 Telegram 通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -65,7 +65,7 @@
 
 ```yaml
 - name: 成功通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -83,7 +83,7 @@
 
 ```yaml
 - name: 发送报告
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -96,7 +96,7 @@
 
 ```yaml
 - name: 交互式通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -119,7 +119,7 @@
   id: convert
 
 - name: 发送 Base64 图像
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -133,7 +133,7 @@
 
 ```yaml
 - name: 发送带 C2PA 处理的图像
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -143,7 +143,7 @@
     caption: "🖼️ 智能处理的图像"
 
 - name: 强制作为照片发送
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -153,56 +153,167 @@
     caption: "🖼️ 强制作为照片（可能有处理问题）"
 ```
 
+## 🤖 AI 驱动的自动集成
+
+**v3 新功能！** 让 AI 自动将 `telegram-notify-action` 集成到您的仓库中，并进行最佳配置。
+
+### 🧠 智能分析
+
+AI 集成系统会自动分析您的仓库以：
+
+- 🔍 **检测项目类型** - Node.js、Python、Go、Docker、Kubernetes 等
+- 📋 **分析现有工作流** - 了解您当前的 CI/CD 管道
+- 🎯 **识别部署模式** - 简单、复杂或企业级部署
+- 🔒 **检查安全设置** - 扫描现有的 Telegram 密钥和配置
+
+### 💬 交互式配置
+
+系统会智能地询问您：
+
+#### 通知偏好
+
+- **基础** - 简单的成功/失败通知
+- **详细** - 包括提交信息、分支、持续时间
+- **动态** - 实时更新与进度跟踪
+- **全面** - 完整的管道与统计信息
+
+#### 视觉格式
+
+- **最小** - 仅文本通知
+- **标准** - 基本状态表情符号
+- **丰富** - 增强的表情符号和格式
+- **动画** - 进度条和动态指示器
+
+#### 交付风格
+
+- **分离** - 每个阶段的单独消息
+- **更新** - 带有进度更新的单条消息
+- **线程** - 主题中的线程消息
+- **混合** - 组合更新与最终摘要
+
+### 🎯 智能模板选择
+
+基于您的项目结构，AI 自动选择最佳模板：
+
+| 项目类型     | 推荐模板           | 功能              |
+| ------------ | ------------------ | ----------------- |
+| **基础项目** | `success`/`error`  | 简单状态通知      |
+| **标准项目** | `deploy`           | 构建 + 部署与统计 |
+| **企业级**   | `comprehensive`    | 多阶段与进度跟踪  |
+| **微服务**   | `service-specific` | 按服务通知        |
+
+### 🛠️ 集成策略
+
+#### 非破坏性集成
+
+- ✅ 保留现有工作流结构
+- ✅ 添加通知而不破坏更改
+- ✅ 条件通知（仅成功/失败）
+
+#### 增强集成
+
+- 🔄 作业间实时进度跟踪
+- 📊 动态消息更新与统计
+- ⏱️ 部署时间和性能指标
+
+#### 企业集成
+
+- 🌍 多环境通知
+- 🎯 按服务进度跟踪
+- 🛡️ 高级故障分析和调试
+- 🔄 回滚通知和健康检查
+
+### 📋 自动 PR 生成
+
+AI 系统创建全面的 Pull Request：
+
+```markdown
+🔔 使用 telegram-notify-action@v3 添加 Telegram 通知
+
+## 📋 已添加内容:
+
+- [x] 智能部署通知
+- [x] 实时进度更新
+- [x] 丰富的表情符号格式
+- [x] 安全的密钥配置
+
+## ⚙️ 需要设置:
+
+1. 将 `TELEGRAM_BOT_TOKEN` 添加到仓库密钥
+2. 将 `TELEGRAM_CHAT_ID` 添加到仓库密钥
+3. 审查和自定义通知偏好
+
+## 🧪 测试:
+
+- 测试通知将发送到指定聊天
+- 使用分期部署验证配置
+```
+
+### 🔒 安全与最佳实践
+
+AI 集成确保：
+
+- 🛡️ **从不暴露令牌** 在代码或日志中
+- 🔐 **使用仓库密钥** 处理所有敏感数据
+- 📊 **清理错误消息** 防止数据泄露
+- ⚡ **最小性能影响** 对现有工作流
+
+### 🚀 开始使用 AI 集成
+
+> **即将推出：** AI 驱动的集成将通过 GitHub Marketplace 和独立工具提供。敬请期待更新！
+
+目前，请使用上述全面的手动集成示例，或联系我们获取企业 AI 集成服务。
+
 ## 📖 输入参数
 
 ### 必需参数
 
-| 参数             | 描述             | 示例                                |
-| ---------------- | ---------------- | ----------------------------------- |
+| 参数             | 描述                | 示例                                |
+| ---------------- | ------------------- | ----------------------------------- |
 | `telegram_token` | Telegram 机器人令牌 | `${{ secrets.TELEGRAM_BOT_TOKEN }}` |
-| `chat_id`        | Telegram 聊天 ID   | `${{ secrets.TELEGRAM_CHAT_ID }}`   |
+| `chat_id`        | Telegram 聊天 ID    | `${{ secrets.TELEGRAM_CHAT_ID }}`   |
 
 ### 消息参数
 
-| 参数                       | 描述             | 默认值  | 示例                             |
-| -------------------------- | ---------------- | ------- | -------------------------------- |
-| `message`                  | 消息文本         | -       | `"你好世界!"`                    |
-| `parse_mode`               | 消息解析模式     | `HTML`  | `HTML`, `Markdown`, `MarkdownV2` |
-| `disable_web_page_preview` | 禁用链接预览     | `true`  | `true`, `false`                  |
-| `disable_notification`     | 静默发送         | `false` | `true`, `false`                  |
-| `language`                 | 界面语言         | `en`    | `en`, `ru`, `zh`                 |
+| 参数                       | 描述         | 默认值  | 示例                             |
+| -------------------------- | ------------ | ------- | -------------------------------- |
+| `message`                  | 消息文本     | -       | `"你好世界!"`                    |
+| `parse_mode`               | 消息解析模式 | `HTML`  | `HTML`, `Markdown`, `MarkdownV2` |
+| `disable_web_page_preview` | 禁用链接预览 | `true`  | `true`, `false`                  |
+| `disable_notification`     | 静默发送     | `false` | `true`, `false`                  |
+| `language`                 | 界面语言     | `en`    | `en`, `ru`, `zh`                 |
 
 ### 高级消息参数
 
-| 参数                          | 描述                     | 默认值  | 示例            |
-| ----------------------------- | ------------------------ | ------- | --------------- |
-| `message_thread_id`           | 论坛主题 ID              | -       | `123`           |
-| `message_id`                  | 要编辑的消息 ID          | -       | `456`           |
-| `reply_to_message_id`         | 回复消息 ID              | -       | `789`           |
-| `protect_content`             | 保护内容免受转发         | `false` | `true`, `false` |
-| `allow_sending_without_reply` | 如果回复目标丢失则发送   | `true`  | `true`, `false` |
-| `message_effect_id`           | 消息效果 ID              | -       | `effect_id`     |
-| `business_connection_id`      | 商业连接 ID              | -       | `business_id`   |
+| 参数                          | 描述                   | 默认值  | 示例            |
+| ----------------------------- | ---------------------- | ------- | --------------- |
+| `message_thread_id`           | 论坛主题 ID            | -       | `123`           |
+| `message_id`                  | 要编辑的消息 ID        | -       | `456`           |
+| `reply_to_message_id`         | 回复消息 ID            | -       | `789`           |
+| `protect_content`             | 保护内容免受转发       | `false` | `true`, `false` |
+| `allow_sending_without_reply` | 如果回复目标丢失则发送 | `true`  | `true`, `false` |
+| `message_effect_id`           | 消息效果 ID            | -       | `effect_id`     |
+| `business_connection_id`      | 商业连接 ID            | -       | `business_id`   |
 
 ### 文件上传参数
 
-| 参数             | 描述                           | 默认值     | 示例                              |
-| ---------------- | ------------------------------ | ---------- | --------------------------------- |
-| `file_path`      | 文件路径                       | -          | `./report.pdf`                    |
-| `file_base64`    | Base64 编码的文件内容          | -          | `iVBORw0KGgoAAAANSUhEUgAAAA...`  |
-| `file_name`      | 文件名（base64 时必需）        | -          | `"screenshot.png"`                |
-| `file_type`      | 文件类型                       | `document` | `photo`, `document`, `video`, `audio` |
-| `force_as_photo` | 即使有元数据也强制作为照片     | `false`    | `true`, `false`                   |
-| `caption`        | 文件说明                       | -          | `"📊 报告"`                       |
+| 参数             | 描述                       | 默认值     | 示例                                  |
+| ---------------- | -------------------------- | ---------- | ------------------------------------- |
+| `file_path`      | 文件路径                   | -          | `./report.pdf`                        |
+| `file_base64`    | Base64 编码的文件内容      | -          | `iVBORw0KGgoAAAANSUhEUgAAAA...`       |
+| `file_name`      | 文件名（base64 时必需）    | -          | `"screenshot.png"`                    |
+| `file_type`      | 文件类型                   | `document` | `photo`, `document`, `video`, `audio` |
+| `force_as_photo` | 即使有元数据也强制作为照片 | `false`    | `true`, `false`                       |
+| `caption`        | 文件说明                   | -          | `"📊 报告"`                           |
 
 > **注意**: 使用 `file_path` 或 `file_base64` 中的一个（不能同时使用）。使用 `file_base64` 时，`file_name` 是必需的。
 
 ### 模板参数
 
-| 参数            | 描述             | 默认值 | 示例                                                           |
-| --------------- | ---------------- | ------ | -------------------------------------------------------------- |
+| 参数            | 描述             | 默认值 | 示例                                                               |
+| --------------- | ---------------- | ------ | ------------------------------------------------------------------ |
 | `template`      | 模板名称         | -      | `success`, `error`, `warning`, `info`, `deploy`, `test`, `release` |
-| `template_vars` | 模板变量（JSON） | `{}`   | `{"version": "v1.0.0"}`                                        |
+| `template_vars` | 模板变量（JSON） | `{}`   | `{"version": "v1.0.0"}`                                            |
 
 ### 交互功能
 
@@ -212,10 +323,11 @@
 
 ### 重试配置
 
-| 参数          | 描述                   | 默认值 | 示例 |
-| ------------- | ---------------------- | ------ | ---- |
-| `max_retries` | 最大重试次数           | `3`    | `5`  |
-| `retry_delay` | 初始重试延迟（秒）     | `1`    | `2`  |
+| 参数                     | 描述                     | 默认值 | 示例 |
+| ------------------------ | ------------------------ | ------ | ---- |
+| `max_retries`            | 常规错误最大重试次数     | `5`    | `5`  |
+| `retry_delay`            | 初始重试延迟（秒）       | `1`    | `2`  |
+| `max_rate_limit_retries` | 速率限制错误最大重试次数 | `8`    | `10` |
 
 ### 条件发送
 
@@ -245,7 +357,7 @@
 
 ```yaml
 - name: 智能图像上传
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -258,7 +370,7 @@
 
 ```yaml
 - name: 强制照片上传
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -279,7 +391,7 @@ Base64 上传支持相同的智能处理：
 
 ```yaml
 - name: 带智能处理的 Base64
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -322,40 +434,119 @@ template_vars: |
   }
 ```
 
-### GitHub 上下文变量
+### 自动变量
 
-以下 GitHub 上下文变量会自动可用：
+Action 提供三种类型的自动变量：
 
-- `repository` - 仓库名称
-- `refName` - 分支/标签名称
-- `sha` - 提交 SHA
+#### GitHub 上下文变量
+
+基本的 GitHub 工作流信息自动可用：
+
+- `repository` - 仓库名称 (`user/repo`)
+- `refName` - 分支/标签名称 (`main`, `develop`)
+- `sha` - 完整提交 SHA
+- `shortSha` - 短提交 SHA（7 个字符）
 - `actor` - 触发工作流的用户
 - `workflow` - 工作流名称
 - `job` - 作业名称
 - `runId` - 工作流运行 ID
 - `runNumber` - 工作流运行编号
 - `eventName` - 触发工作流的事件
+- `repositoryName` - 仅仓库名称（不含所有者）
+- `repositoryOwnerName` - 仅仓库所有者名称
+
+#### 事件上下文变量（v3 新功能）
+
+基于 GitHub 事件类型自动提取的特定事件变量：
+
+**对于 `issues` 事件：**
+
+- `author` - Issue 作者
+- `issueNumber` - Issue 编号
+- `issueTitle` - Issue 标题
+- `issueState` - Issue 状态
+- `issueBody` - Issue 描述
+- `labels` - 逗号分隔的标签列表
+- `assignees` - 逗号分隔的受理人列表
+- `createdAt` - Issue 创建日期
+- `updatedAt` - Issue 最后更新日期
+
+**对于 `pull_request` 事件：**
+
+- `author` - PR 作者
+- `prNumber` - Pull Request 编号
+- `prTitle` - Pull Request 标题
+- `prState` - Pull Request 状态
+- `prBody` - Pull Request 描述
+- `prUrl` - Pull Request URL
+- `baseBranch` - 目标分支
+- `headBranch` - 源分支
+- `isDraft` - 是否为草稿
+- `mergeable` - 是否可合并
+- `labels` - 逗号分隔的标签列表
+- `assignees` - 逗号分隔的受理人列表
+
+**对于 `push` 事件：**
+
+- `pusher` - 推送用户
+- `commitCount` - 提交数量
+- `lastCommitMessage` - 最后一次提交消息
+- `lastCommitAuthor` - 最后一次提交作者
+- `lastCommitId` - 最后一次提交 ID
+
+**对于 `release` 事件：**
+
+- `releaseAuthor` - 发布作者
+- `releaseName` - 发布名称
+- `releaseTag` - 发布标签
+- `releaseBody` - 发布说明
+- `isPrerelease` - 是否为预发布
+- `isDraft` - 是否为草稿
+- `releaseCreatedAt` - 发布创建日期
+
+**对于 `workflow_run` 事件：**
+
+- `workflowName` - 工作流名称
+- `workflowStatus` - 工作流状态
+- `workflowConclusion` - 工作流结论
+- `workflowId` - 工作流 ID
+- `workflowRunNumber` - 工作流运行编号
+- `workflowActor` - 工作流执行者
+
+#### URL 变量（v3 新功能）
+
+现成可用的 GitHub URL：
+
+- `runUrl` - 当前工作流运行 URL
+- `commitUrl` - 当前提交 URL
+- `workflowUrl` - 工作流定义 URL
+- `compareUrl` - 与基础分支的比较 URL
+- `issuesUrl` - 仓库 Issues 页面 URL
+- `pullRequestsUrl` - 仓库 Pull Requests 页面 URL
+- `releasesUrl` - 仓库发布页面 URL
+
+> **注意**：所有这些变量在模板中自动可用，无需手动配置！
 
 ## 📁 文件上传支持
 
 ### 支持的文件类型
 
-| 类型          | 描述                     | 最大大小 |
-| ------------- | ------------------------ | -------- |
-| `photo`       | 图像（JPEG、PNG、WebP）  | 10 MB    |
-| `document`    | 任何文件类型             | 50 MB    |
-| `video`       | 视频文件                 | 50 MB    |
-| `audio`       | 音频文件                 | 50 MB    |
-| `animation`   | GIF 动画                 | 50 MB    |
-| `voice`       | 语音消息                 | 50 MB    |
-| `video_note`  | 视频笔记                 | 50 MB    |
-| `sticker`     | 贴纸文件                 | 50 MB    |
+| 类型         | 描述                    | 最大大小 |
+| ------------ | ----------------------- | -------- |
+| `photo`      | 图像（JPEG、PNG、WebP） | 10 MB    |
+| `document`   | 任何文件类型            | 50 MB    |
+| `video`      | 视频文件                | 50 MB    |
+| `audio`      | 音频文件                | 50 MB    |
+| `animation`  | GIF 动画                | 50 MB    |
+| `voice`      | 语音消息                | 50 MB    |
+| `video_note` | 视频笔记                | 50 MB    |
+| `sticker`    | 贴纸文件                | 50 MB    |
 
 ### 文件上传示例
 
 ```yaml
 - name: 上传测试结果
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -433,7 +624,7 @@ retry_delay: 2 # 初始延迟（秒）（每次重试翻倍）
 ```yaml
 - name: 失败通知
   if: failure()
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -447,7 +638,7 @@ retry_delay: 2 # 初始延迟（秒）（每次重试翻倍）
 
 ```yaml
 - name: 成功通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -528,7 +719,7 @@ jobs:
 
       - name: 测试结果
         if: always()
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -562,7 +753,7 @@ jobs:
         id: deploy
 
       - name: 部署通知
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -585,7 +776,7 @@ jobs:
     npm run test:report
 
 - name: 发送报告
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -608,7 +799,7 @@ jobs:
 ```yaml
 - name: 开始进程
   id: start
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -621,7 +812,7 @@ jobs:
     echo "部署完成！"
 
 - name: 更新状态
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -700,28 +891,58 @@ npm run lint
 
 通过在您的仓库中将 `ACTIONS_STEP_DEBUG` 密钥设置为 `true` 来启用调试日志记录。
 
-## 🆕 v2.0.0 新功能
+## 🆕 v3.0.0 新功能
 
-### 增强的文件上传
+### 🎯 自动事件上下文（新功能！）
+
+- **智能事件检测** - 根据 GitHub 事件类型自动提取相关变量
+- **Issue 变量** - 对于 `issues` 事件自动提供作者、标题、标签、受理人
+- **PR 变量** - 对于 `pull_request` 事件提供 PR 详情、分支、草稿状态
+- **Push 变量** - 对于 `push` 事件提供提交数量、最后提交信息
+- **Release 变量** - 对于 `release` 事件提供发布详情、说明、标签
+- **无需配置** - 所有变量无需手动设置即可使用
+
+### 🌐 现成可用的 URL 变量（新功能！）
+
+- **预构建 URL** - `{{runUrl}}`、`{{commitUrl}}`、`{{workflowUrl}}` 等
+- **简化模板** - 无需手动构建 URL
+- **一致格式** - 所有 URL 遵循相同模式
+- **GitHub 企业版支持** - 与自定义 GitHub 服务器兼容
+
+### 🔄 增强的重试逻辑
+
+- **分离速率限制** - 速率限制错误的独立重试计数器
+- **智能退避** - 针对不同错误类型的不同策略
+- **可配置限制** - `max_rate_limit_retries` 参数
+- **更好的错误消息** - 更丰富的重试日志
+
+### 📤 增强的文件上传
 
 - 📤 **Base64 上传支持** - 直接从 base64 编码数据发送文件
 - 🖼️ **智能图像处理** - 自动 C2PA 元数据检测
 - 🎛️ **强制照片模式** - 使用 `force_as_photo` 覆盖自动文件类型转换
 - 🔍 **智能处理** - 优化文件处理以更好地兼容 Telegram
 
-### 技术改进
+### 🛡️ 高级安全和功能
 
-- ✅ **16 个全面测试** 覆盖所有新功能
-- 🧪 **完整测试覆盖** base64 和 force_as_photo 功能
-- 🛡️ **健壮的错误处理** 用于无效的 base64 数据
-- 📊 **增强的验证** 用于文件参数
+- 🔒 **业务连接** - 支持 Telegram Business API
+- ✨ **消息效果** - 支持消息效果（星星、心形等）
+- 📊 **扩展的 GitHub 上下文** - 20+ 额外的 GitHub 变量可用
+- 🏃 **Runner 信息** - 操作系统、架构、环境详情
 
-### 开发者体验
+### 🧪 测试和质量
 
-- 📖 **更新的文档** 包含大量示例
-- 🎯 **清晰的使用指南** 用于 C2PA 元数据处理
-- ⚠️ **有用的警告** 关于潜在的处理问题
-- 🔧 **更好的调试** 信息
+- ✅ **全面的测试套件** 覆盖所有功能
+- 🛡️ **健壮的错误处理** 用于所有边缘情况
+- 📊 **增强的验证** 用于所有参数
+- 🔧 **更好的调试** 包含详细日志
+
+### 📖 文档
+
+- 📚 **完全重写** - 所有文档为 v3 更新
+- 🌍 **多语言** - 英文、俄文、中文文档
+- 📋 **更多示例** - 所有功能的广泛使用示例
+- 🎯 **清晰的迁移指南** - 从 v2 轻松升级
 
 ## 📞 支持
 
@@ -735,8 +956,8 @@ npm run lint
 
 - 感谢所有贡献者
 - 受 GitHub Actions 社区启发
-- 为开发者用❤️构建
+- 为开发者用 ❤️ 构建
 
 ---
 
-**由 [Sychin Andrey](https://github.com/asychin) 用❤️制作**
+**由 [Sychin Andrey](https://github.com/asychin) 用 ❤️ 制作**

@@ -188,6 +188,8 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 
 ### GitHub Context (automatically available)
 
+#### Basic GitHub Variables
+
 | Variable     | Description     | Example                |
 | ------------ | --------------- | ---------------------- |
 | `repository` | Repository name | `user/awesome-project` |
@@ -200,6 +202,212 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 | `runNumber`  | Run number      | `42`                   |
 | `eventName`  | Trigger event   | `push`, `pull_request` |
 | `jobStatus`  | Job status      | `success`, `failure`   |
+
+#### Extended GitHub Variables
+
+| Variable            | Description            | Example              |
+| ------------------- | ---------------------- | -------------------- |
+| `repositoryOwner`   | Repository owner       | `asychin`            |
+| `repositoryId`      | Repository ID          | `123456789`          |
+| `repositoryOwnerId` | Repository owner ID    | `987654321`          |
+| `ref`               | Full reference         | `refs/heads/main`    |
+| `refType`           | Reference type         | `branch`, `tag`      |
+| `refProtected`      | Is reference protected | `true`, `false`      |
+| `baseRef`           | Base reference         | `refs/heads/main`    |
+| `headRef`           | Head reference         | `refs/heads/feature` |
+| `triggeredBy`       | Triggering actor       | `john-doe`           |
+| `actorId`           | Actor ID               | `123456`             |
+| `runAttempt`        | Run attempt number     | `1`, `2`             |
+
+### URL Variables (automatically available)
+
+Ready-to-use links for inline keyboards and messages:
+
+| Variable          | Description        | Example                                                 |
+| ----------------- | ------------------ | ------------------------------------------------------- |
+| `workflowUrl`     | Workflow link      | `https://github.com/user/repo/actions/workflows/ci.yml` |
+| `runUrl`          | Current run link   | `https://github.com/user/repo/actions/runs/123456`      |
+| `commitUrl`       | Commit link        | `https://github.com/user/repo/commit/abc123...`         |
+| `compareUrl`      | Compare with base  | `https://github.com/user/repo/compare/main...feature`   |
+| `issuesUrl`       | Issues page        | `https://github.com/user/repo/issues`                   |
+| `pullRequestsUrl` | Pull requests page | `https://github.com/user/repo/pulls`                    |
+| `releasesUrl`     | Releases page      | `https://github.com/user/repo/releases`                 |
+
+### Formatted Variables (automatically available)
+
+| Variable              | Description          | Example                  |
+| --------------------- | -------------------- | ------------------------ |
+| `shortSha`            | Short SHA (7 chars)  | `abc1234`                |
+| `repositoryName`      | Repository name only | `telegram-notify-action` |
+| `repositoryOwnerName` | Owner name only      | `asychin`                |
+
+### System Variables (automatically available)
+
+#### GitHub API and Environment
+
+| Variable           | Description               | Example                          |
+| ------------------ | ------------------------- | -------------------------------- |
+| `serverUrl`        | GitHub server URL         | `https://github.com`             |
+| `apiUrl`           | GitHub API URL            | `https://api.github.com`         |
+| `graphqlUrl`       | GitHub GraphQL URL        | `https://api.github.com/graphql` |
+| `workspace`        | Workspace path            | `/home/runner/work/repo`         |
+| `eventPath`        | Event data file path      | `/github/workflow/event.json`    |
+| `jobId`            | Current job ID            | `1234567`                        |
+| `actionRef`        | Action reference          | `main`                           |
+| `actionRepository` | Action repository         | `actions/checkout`               |
+| `workflowRef`      | Workflow reference        | `refs/heads/main`                |
+| `workflowSha`      | Workflow SHA              | `abc123...`                      |
+| `retentionDays`    | Artifact retention days   | `90`                             |
+| `secretSource`     | Secret source             | `Actions`                        |
+| `actionPath`       | Action path               | `/home/runner/work/_actions/...` |
+| `stepSummary`      | Step summary file path    | `/github/step_summary`           |
+| `envPath`          | Environment file path     | `/github/env`                    |
+| `path`             | Path environment variable | `/usr/bin:/bin`                  |
+
+#### Runner Environment
+
+| Variable            | Description                 | Example                        |
+| ------------------- | --------------------------- | ------------------------------ |
+| `runnerOs`          | Runner operating system     | `Linux`, `Windows`, `macOS`    |
+| `runnerArch`        | Runner architecture         | `X64`, `ARM64`                 |
+| `runnerName`        | Runner machine name         | `GitHub Actions 2`             |
+| `runnerEnvironment` | Runner environment type     | `github-hosted`, `self-hosted` |
+| `runnerTemp`        | Runner temp directory       | `/tmp`                         |
+| `runnerToolCache`   | Runner tool cache directory | `/opt/hostedtoolcache`         |
+| `runnerDebug`       | Debug mode enabled          | `1`, `0`                       |
+| `ci`                | CI environment indicator    | `true`                         |
+
+### Event Context Variables (NEW in v3)
+
+Automatically extracted variables based on the GitHub event type:
+
+#### Common Event Variables (All Events)
+
+| Variable        | Description        | Example            |
+| --------------- | ------------------ | ------------------ |
+| `triggerUser`   | User who triggered | `john-doe`         |
+| `triggerUserId` | Trigger user ID    | `123456`           |
+| `action`        | Event action       | `opened`, `closed` |
+
+#### Issues Events
+
+| Variable      | Description            | Example                |
+| ------------- | ---------------------- | ---------------------- |
+| `author`      | Issue author           | `john-doe`             |
+| `issueNumber` | Issue number           | `42`                   |
+| `issueTitle`  | Issue title            | `Bug in login system`  |
+| `issueState`  | Issue state            | `open`, `closed`       |
+| `issueBody`   | Issue description      | `Description text...`  |
+| `labels`      | Labels (comma-sep.)    | `bug, frontend`        |
+| `assignees`   | Assignees (comma-sep.) | `user1, user2`         |
+| `createdAt`   | Creation date          | `2024-01-15T10:30:00Z` |
+| `updatedAt`   | Last update date       | `2024-01-16T14:20:00Z` |
+
+#### Pull Request Events
+
+| Variable      | Description            | Example                  |
+| ------------- | ---------------------- | ------------------------ |
+| `author`      | PR author              | `jane-doe`               |
+| `prNumber`    | Pull request number    | `123`                    |
+| `prTitle`     | Pull request title     | `Add new feature`        |
+| `prState`     | Pull request state     | `open`, `merged`         |
+| `prBody`      | Pull request desc.     | `This PR adds...`        |
+| `prUrl`       | Pull request URL       | `https://github.com/...` |
+| `baseBranch`  | Target branch          | `main`                   |
+| `headBranch`  | Source branch          | `feature/auth`           |
+| `prCreatedAt` | PR creation date       | `2024-01-15T10:30:00Z`   |
+| `prUpdatedAt` | PR last update         | `2024-01-16T14:20:00Z`   |
+| `isDraft`     | Is draft PR            | `true`, `false`          |
+| `mergeable`   | Is mergeable           | `true`, `false`          |
+| `labels`      | Labels (comma-sep.)    | `enhancement, frontend`  |
+| `assignees`   | Assignees (comma-sep.) | `user1, user2`           |
+
+#### Push Events
+
+| Variable            | Description         | Example              |
+| ------------------- | ------------------- | -------------------- |
+| `pusher`            | User who pushed     | `dev-user`           |
+| `commitCount`       | Number of commits   | `3`                  |
+| `lastCommitMessage` | Last commit message | `Fix authentication` |
+| `lastCommitAuthor`  | Last commit author  | `dev-user`           |
+| `lastCommitId`      | Last commit ID      | `a1b2c3d...`         |
+
+#### Release Events
+
+| Variable           | Description      | Example                |
+| ------------------ | ---------------- | ---------------------- |
+| `releaseAuthor`    | Release author   | `maintainer`           |
+| `releaseName`      | Release name     | `v2.1.0`               |
+| `releaseTag`       | Release tag      | `v2.1.0`               |
+| `releaseBody`      | Release notes    | `New features...`      |
+| `releaseCreatedAt` | Release created  | `2024-01-15T10:30:00Z` |
+| `isPrerelease`     | Is prerelease    | `true`, `false`        |
+| `isDraft`          | Is draft release | `true`, `false`        |
+
+#### Issue Comment Events
+
+| Variable           | Description           | Example                |
+| ------------------ | --------------------- | ---------------------- |
+| `author`           | Issue author          | `john-doe`             |
+| `issueNumber`      | Issue number          | `42`                   |
+| `issueTitle`       | Issue title           | `Bug in login system`  |
+| `issueState`       | Issue state           | `open`, `closed`       |
+| `commentAuthor`    | Comment author        | `jane-doe`             |
+| `commentBody`      | Comment text          | `This looks good!`     |
+| `commentId`        | Comment ID            | `987654321`            |
+| `commentCreatedAt` | Comment creation date | `2024-01-15T11:30:00Z` |
+
+#### Pull Request Review Events
+
+| Variable       | Description         | Example                         |
+| -------------- | ------------------- | ------------------------------- |
+| `author`       | PR author           | `jane-doe`                      |
+| `prNumber`     | Pull request number | `123`                           |
+| `prTitle`      | Pull request title  | `Add new feature`               |
+| `prUrl`        | Pull request URL    | `https://github.com/...`        |
+| `reviewAuthor` | Review author       | `maintainer`                    |
+| `reviewState`  | Review state        | `approved`, `changes_requested` |
+| `reviewBody`   | Review comment      | `Looks good to me!`             |
+| `reviewId`     | Review ID           | `987654321`                     |
+
+#### Workflow Run Events
+
+| Variable             | Description         | Example                    |
+| -------------------- | ------------------- | -------------------------- |
+| `workflowName`       | Workflow name       | `CI Pipeline`              |
+| `workflowStatus`     | Workflow status     | `completed`, `in_progress` |
+| `workflowConclusion` | Workflow conclusion | `success`, `failure`       |
+| `workflowId`         | Workflow ID         | `123456789`                |
+| `workflowRunNumber`  | Workflow run number | `42`                       |
+| `workflowActor`      | Workflow actor      | `john-doe`                 |
+
+#### Deployment Events
+
+| Variable                | Description          | Example                 |
+| ----------------------- | -------------------- | ----------------------- |
+| `deploymentId`          | Deployment ID        | `123456789`             |
+| `deploymentEnvironment` | Deployment env       | `production`, `staging` |
+| `deploymentRef`         | Deployment reference | `refs/heads/main`       |
+| `deploymentSha`         | Deployment SHA       | `abc123...`             |
+| `deploymentCreator`     | Deployment creator   | `deploy-bot`            |
+
+#### Deployment Status Events
+
+| Variable                   | Description            | Example                   |
+| -------------------------- | ---------------------- | ------------------------- |
+| `deploymentState`          | Deployment state       | `success`, `failure`      |
+| `deploymentDescription`    | Deployment description | `Deployed successfully`   |
+| `deploymentEnvironmentUrl` | Environment URL        | `https://staging.app.com` |
+| `deploymentEnvironment`    | Deployment environment | `production`, `staging`   |
+
+#### Push Events (Additional Details)
+
+| Variable   | Description  | Example    |
+| ---------- | ------------ | ---------- |
+| `pusher`   | Push user    | `dev-user` |
+| `pusherId` | Push user ID | `123456`   |
+
+> **Note**: Event context variables are automatically available based on the triggering event - no manual configuration required!
 
 ### Special Variables
 
@@ -251,7 +459,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Success Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -264,7 +472,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Test Results
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -285,7 +493,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Deployment Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -311,7 +519,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Conditional Template
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -325,13 +533,141 @@ If a template is not found for the specified language, the English version is us
       }
 ```
 
+### Using URL Variables for Inline Keyboards
+
+```yaml
+- name: Enhanced Notification with Links
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      ✅ **Build Successful!**
+
+      Repository: {{repositoryName}}
+      Commit: {{shortSha}} by {{actor}}
+      Branch: {{refName}}
+    inline_keyboard: |
+      [
+        {"text": "🔗 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
+        {"text": "📊 View Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+        {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+      ]
+```
+
+**Benefits of URL Variables:**
+
+- **Simplified syntax**: `{{runUrl}}` instead of `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+- **Consistent formatting**: No manual URL construction
+- **Ready-to-use**: Available in all templates without additional configuration
+
+> **Note**: URL variables like `{{runUrl}}`, `{{commitUrl}}` work only in **message text**, not in `inline_keyboard`. For inline keyboards, use GitHub Actions variables or pass URLs via `template_vars`.
+
+### Event Context Examples (NEW in v3)
+
+#### Issue Notification
+
+```yaml
+- name: Issue Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: warning
+    message: |
+      🐛 **New Issue Created**
+
+      **Title:** {{issueTitle}}
+      **Author:** {{author}}
+      **Number:** #{{issueNumber}}
+      **State:** {{issueState}}
+      **Labels:** {{labels}}
+
+      **Description:**
+      {{issueBody}}
+
+      **Assignees:** {{assignees}}
+      **Created:** {{createdAt}}
+```
+
+#### Pull Request Notification
+
+```yaml
+- name: PR Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: info
+    message: |
+      🔄 **Pull Request {{action}}**
+
+      **Title:** {{prTitle}}
+      **Author:** {{author}}
+      **Number:** #{{prNumber}}
+      **State:** {{prState}}
+
+      **Branches:** {{headBranch}} → {{baseBranch}}
+      **Draft:** {{isDraft}}
+      **Mergeable:** {{mergeable}}
+
+      **Labels:** {{labels}}
+      **Assignees:** {{assignees}}
+```
+
+#### Push Notification
+
+```yaml
+- name: Push Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      📤 **New Push to {{refName}}**
+
+      **Pusher:** {{pusher}}
+      **Commits:** {{commitCount}}
+
+      **Last Commit:**
+      • Author: {{lastCommitAuthor}}
+      • Message: {{lastCommitMessage}}
+      • ID: {{lastCommitId}}
+```
+
+#### Release Notification
+
+```yaml
+- name: Release Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: release
+    message: |
+      🎉 **New Release Published**
+
+      **Version:** {{releaseName}}
+      **Tag:** {{releaseTag}}
+      **Author:** {{releaseAuthor}}
+      **Prerelease:** {{isPrerelease}}
+      **Draft:** {{isDraft}}
+
+      **Release Notes:**
+      {{releaseBody}}
+
+      **Created:** {{releaseCreatedAt}}
+```
+
 ## 🎨 Creating Custom Messages
 
 ### Without Template
 
 ```yaml
 - name: Custom Message
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -349,7 +685,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Enhanced Template
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -512,7 +848,7 @@ env:
 
 ```yaml
 - name: Template Test
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}

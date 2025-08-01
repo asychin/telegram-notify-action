@@ -1,0 +1,252 @@
+# Cursor Rules for telegram-notify-action
+
+You are working on **telegram-notify-action** - a GitHub Action for sending enhanced Telegram notifications with file uploads, templates, and advanced features.
+
+## 🏗️ Project Structure
+
+This is a **Node.js GitHub Action** with the following key components:
+
+- `telegram-notify.js` - Main action logic
+- `action.yml` - GitHub Action definition
+- `docs/` - Multi-language documentation (EN/RU/ZH)
+- `examples/` - Usage examples
+- `.github/workflows/` - CI/CD workflows
+- `tests/` - Jest test suites
+
+## 🔧 Core Technologies
+
+- **Runtime**: Node.js 16+ (with polyfills for older versions)
+- **Testing**: Jest with coverage reporting
+- **Linting**: ESLint
+- **Package Manager**: npm
+- **API**: Telegram Bot API
+- **GitHub**: Actions API and Events
+
+## 📝 Critical Variable Usage Rules
+
+### Template Variables `{{var}}` - ONLY work in:
+
+- `message:` field WHEN `template:` is specified
+- `caption:` field WHEN `template:` is specified
+
+### GitHub Actions Variables `${{var}}` - MUST be used in:
+
+- `template_vars:` (JSON strings)
+- `inline_keyboard:` (JSON objects)
+- `run:` shell commands
+- `matrix:` definitions
+- `message:` field WITHOUT `template:`
+- `caption:` field WITHOUT `template:`
+- All other YAML fields
+
+### ❌ Common Mistakes to AVOID:
+
+```yaml
+# WRONG - template variables in JSON
+template_vars: |
+  {
+    "customMessage": "Repository {{repositoryName}}"
+  }
+
+# WRONG - template variables in shell commands
+run: echo "Repository: {{repository}}"
+
+# WRONG - template variables in inline keyboard
+inline_keyboard: |
+  [{"text": "View", "url": "{{runUrl}}"}]
+```
+
+### ✅ Correct Usage:
+
+```yaml
+# CORRECT - GitHub variables in JSON
+template_vars: |
+  {
+    "customMessage": "Repository ${{ github.repository }}"
+  }
+
+# CORRECT - Template variables with template
+template: success
+message: |
+  Repository: {{repository}}
+  Branch: {{refName}}
+```
+
+## 🎨 Formatting Rules
+
+### HTML vs Markdown Support:
+
+- System automatically detects `parseMode` (HTML/Markdown/MarkdownV2)
+- Templates use dynamic formatting: `${bold}Text${boldEnd}`
+- **NEVER** hardcode `**text**` or `<b>text</b>` in templates
+- Always use the formatting variables for cross-mode compatibility
+
+### Template Structure:
+
+```javascript
+const bold = isHTML ? "<b>" : "**";
+const boldEnd = isHTML ? "</b>" : "**";
+
+// CORRECT template usage
+en: `✅ ${bold}Success${boldEnd}
+
+🏠 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{refName}}`;
+```
+
+## 🌍 Multi-language Support
+
+### Documentation Languages:
+
+- English (`docs/en/`)
+- Russian (`docs/ru/`)
+- Chinese (`docs/zh/`)
+
+### When updating documentation:
+
+- **ALWAYS** update all 3 language versions
+- Keep structure and examples synchronized
+- Maintain consistent terminology across languages
+
+### Template Languages:
+
+- All templates support `en`, `ru`, `zh` variants
+- Use appropriate language fallbacks (`|| templates.en`)
+
+## 📧 GitHub Events & Context
+
+### Event Context Extraction:
+
+- Use `safeGet(eventData, "path.to.property")` for safe property access
+- Add `|| defaultValue` for fallback values
+- Extract event-specific variables in `getEventContext()` function
+
+### Branch Name Handling:
+
+- For PR events: `process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME`
+- In workflows: `${{ github.head_ref || github.ref_name }}`
+- This prevents "refs/pull/13/merge" display issues
+
+## 🧪 Testing Requirements
+
+### Test Categories:
+
+- **Unit Tests**: Core functionality (`tests/basic.test.js`)
+- **Integration Tests**: File handling (`tests/base64.test.js`)
+- **Context Tests**: Event processing (`tests/auto-context.test.js`)
+
+### When adding features:
+
+- Add corresponding test cases
+- Maintain >80% code coverage
+- Test both success and error scenarios
+- Test multi-language template variants
+
+### Running Tests:
+
+```bash
+npm test              # Run all tests
+npm run test:coverage # Run with coverage
+npm run lint          # ESLint check
+```
+
+## 🔒 Security Considerations
+
+### File Handling:
+
+- Validate file sizes against Telegram limits
+- Check MIME types and extensions
+- Handle C2PA metadata in images appropriately
+- Sanitize user inputs in templates
+
+### Secrets Management:
+
+- Never log sensitive data (tokens, chat IDs)
+- Use GitHub Secrets for credentials
+- Implement proper error handling without exposing secrets
+
+## 🎯 Code Style
+
+### Naming Conventions:
+
+- camelCase for variables and functions
+- PascalCase for classes
+- Use descriptive names (`telegramNotify` not `tn`)
+
+### Error Handling:
+
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Log warnings for non-critical issues
+- Use `this.error()`, `this.warning()`, `this.info()` methods
+
+### Comments:
+
+- Document complex logic and GitHub API interactions
+- Explain template variable processing
+- Note compatibility considerations
+
+## 🚀 Workflow Integration
+
+### GitHub Actions Best Practices:
+
+- Use specific action versions (`@v3` not `@main`)
+- Add meaningful step names with emojis
+- Group related steps logically
+- Use proper error handling (`continue-on-error` when appropriate)
+
+### Conditional Logic:
+
+- Test conditional sending logic thoroughly
+- Handle different event types appropriately
+- Validate input combinations
+
+## 📋 Development Workflow
+
+### Before Committing:
+
+1. Run `npm test` - ensure all tests pass
+2. Run `npm run lint` - fix linting issues
+3. Test with different `parseMode` values
+4. Verify multi-language template rendering
+5. Check variable substitution in all contexts
+
+### When Adding Features:
+
+1. Update main logic in `telegram-notify.js`
+2. Add/update tests in `tests/`
+3. Update documentation in all 3 languages
+4. Add usage examples if applicable
+5. Update `CHANGELOG.md`
+
+## 🎨 Visual Guidelines
+
+### Emoji Usage:
+
+- Use consistent emojis for similar concepts
+- 🏠 for Repository, 🌿 for Branch, 📝 for Commit
+- ✅ for Success, ❌ for Error, ⚠️ for Warning
+- Add emojis to workflow job names and steps
+
+### Message Formatting:
+
+- Use clear section headers
+- Group related information together
+- Maintain consistent spacing and structure
+- Make important information bold/emphasized
+
+## 🔍 Debugging
+
+### Template Variables:
+
+- Use `debug-template.js` for testing template rendering
+- Check `ACTIONS_STEP_DEBUG=true` for verbose logging
+- Verify variable availability in `getEventContext()`
+
+### Common Issues:
+
+- "Dry data" = template variables not substituting (wrong context)
+- Missing formatting = hardcoded formatting instead of variables
+- Empty values = missing event context extraction
+
+Remember: This is a production GitHub Action used by many developers. Maintain high code quality, thorough testing, and clear documentation.
