@@ -335,7 +335,7 @@ jobs:
             **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "New discussion in repository {{repositoryName}}"
+              "customMessage": "New discussion in repository ${{ github.event.repository.name }}"
             }
           inline_keyboard: |
             [
