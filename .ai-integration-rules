@@ -735,21 +735,66 @@ Ask the user these REQUIRED questions:
    - [ ] Thread/topic organization
    - [ ] Different chats for different types
 
-**🔍 Monitoring & Health Checks:**
-8. "📊 Do you want system monitoring notifications?"
-   - [ ] No monitoring needed
-   - [ ] Basic health checks (manual trigger)
-   - [ ] Scheduled monitoring (15min intervals) ← RECOMMENDED
-   - [ ] Comprehensive monitoring (health + performance + alerts)
-   - [ ] Weekly/monthly summary reports
+**🔍 Repository Monitoring:**
+8. "📊 What GitHub repository events do you want to monitor?"
 
-**🎯 Advanced Features:**
-9. "🚀 Which advanced patterns interest you?"
-   - [ ] Progressive deployment updates (single message updates)
-   - [ ] Real-time progress bars during CI/CD
-   - [ ] Critical alerting system with action buttons
-   - [ ] Multi-environment conditional notifications
-   - [ ] Scheduled reporting system
+   **[ ] Workflow results only (CI/CD pipeline status)**
+   • **What:** Notifications only for GitHub Actions workflow success/failure
+   • **When:** After build, test, deploy jobs complete
+   • **Best for:** Simple CI/CD monitoring without noise
+
+   **[ ] Pull requests (opened, merged, reviewed) ← RECOMMENDED**  
+   • **What:** Full PR lifecycle notifications with statistics
+   • **Includes:** PR opened, code reviews, merge/close status, file changes
+   • **Best for:** Active development teams with code review process
+
+   **[ ] Issues and comments**
+   • **What:** GitHub Issues activity and comment notifications  
+   • **Includes:** New issues, issue comments, label changes, assignments
+   • **Best for:** Projects with active issue tracking and discussions
+
+   **[ ] Releases and tags**
+   • **What:** New release and tag notifications with release notes
+   • **Includes:** Release published, pre-releases, tag creation
+   • **Best for:** Projects with regular releases and version management
+
+   **[ ] All repository activity (comprehensive)**
+   • **What:** Complete GitHub repository event monitoring
+   • **Includes:** All above + push events, branch creation, repository settings
+   • **Best for:** Critical projects requiring full activity tracking
+
+   **[ ] Weekly/monthly repository summary reports**
+   • **What:** Periodic summary of repository activity and statistics
+   • **Includes:** Commit count, PR statistics, issue resolution, contributor activity
+   • **Best for:** Management reporting and project health overview
+
+**🎯 Advanced GitHub Integration:**
+9. "🚀 Which GitHub-specific features interest you?"
+
+   **[ ] Progressive deployment updates (single message updates) ← RECOMMENDED**
+   • **What:** Update single message during CI/CD pipeline execution
+   • **How:** Start message "🚀 Deploying..." → update to "✅ Deployed successfully"
+   • **Best for:** Clean deployment tracking without message spam
+
+   **[ ] Real-time CI/CD progress bars**  
+   • **What:** Visual progress indicators during workflow execution
+   • **How:** ASCII progress bars: `Build ●●●○○ → Test ●●●●○ → Deploy ●●●●●`
+   • **Best for:** Long-running workflows where progress visibility matters
+
+   **[ ] Action buttons for GitHub operations (approve PR, merge, rerun workflow)**
+   • **What:** Interactive buttons for common GitHub Actions
+   • **Includes:** "👀 View PR", "✅ Approve", "🔄 Merge", "🔁 Rerun Workflow", "📝 Create Issue"
+   • **Best for:** Quick actions without leaving Telegram
+
+   **[ ] Multi-environment conditional notifications (prod/staging/dev)**
+   • **What:** Different notification rules for different environments
+   • **How:** Production gets all alerts, staging gets important only, dev gets minimal
+   • **Best for:** Multi-environment deployments with different criticality levels
+
+   **[ ] File attachments (logs, test reports, build artifacts)**
+   • **What:** Attach files from GitHub Actions to Telegram messages
+   • **Includes:** Build logs, test reports, coverage reports, build artifacts
+   • **Best for:** Detailed troubleshooting and report sharing
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
@@ -1318,9 +1363,9 @@ message: |
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
 - [ ] **Progressive notifications**: Used `message_id` for updates (recommended)
-- [ ] **Monitoring system**: Included scheduled health checks if requested
-- [ ] **Action buttons**: Added `inline_keyboard` for critical alerts
-- [ ] **Multi-environment**: Conditional logic for different environments
+- [ ] **GitHub integration**: Focused on repository events (PR, releases, workflows)
+- [ ] **Action buttons**: Added `inline_keyboard` for GitHub operations (view PR, merge, rerun)
+- [ ] **Multi-environment**: Conditional logic for different environments (prod/staging/dev)
 
 #### **🔍 For AUDIT scenarios:**
 - [ ] Read ALL documentation before analysis
@@ -1332,7 +1377,39 @@ message: |
 - [ ] Validated final result against all rules
 - [ ] Included migration instructions
 
+## 🎯 **PROJECT FOCUS: GitHub Events, Not Infrastructure Monitoring**
+
+**🚨 CRITICAL UNDERSTANDING:**
+telegram-notify-action is designed for **GitHub repository events**, not infrastructure monitoring:
+
+**✅ CORRECT Use Cases:**
+- Pull Request notifications (opened, merged, reviewed)
+- Deployment workflow status (CI/CD pipeline results)
+- Release announcements  
+- Issue and comment activity
+- Workflow execution results
+- GitHub Actions job status
+
+**❌ INCORRECT Use Cases:**
+- Server/API health monitoring (use dedicated monitoring tools)
+- Database performance tracking (use database monitoring)
+- Security vulnerability scanning (use security-specific tools)  
+- System resource monitoring (use infrastructure monitoring)
+- Application performance monitoring (use APM tools)
+
+**🎯 Key Principle:**
+If it's not a GitHub event or directly related to GitHub Actions execution, it's probably outside the scope of this action.
+
+**💡 Recommendation:**
+For infrastructure monitoring, recommend dedicated tools like:
+- Prometheus + Grafana for metrics
+- Datadog/New Relic for APM
+- PagerDuty for alerting
+- Sentry for error tracking
+
+telegram-notify-action should integrate with these tools to relay **their alerts** to Telegram, not replace them.
+
 ---
 
-*Last updated: v3.1.0 (2025-01-31) - telegram-notify-action by @asychin*  
+*Last updated: v3.1.1 (2025-01-31) - telegram-notify-action by @asychin*  
 *Latest rules: https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules*
