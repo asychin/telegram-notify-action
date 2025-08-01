@@ -688,114 +688,58 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 
 **🔴 STOP HERE - DO NOT PROCEED WITHOUT USER ANSWERS!**
 
+**📝 Answer Format:** User must respond with [y] for YES or [n] for NO in brackets for each question.
+**Example:** "1. [y]  2. [n]  3. [y]  4. [n]..." or on separate lines with numbers.
+
 Ask the user these REQUIRED questions:
 
-**📋 Integration Scope:**
-1. "🎯 What do you want to get notifications about?"
-   - [ ] Build/compilation results
-   - [ ] Deployment status  
-   - [ ] Test results
-   - [ ] Release announcements
-   - [ ] Monitoring/health checks
-   - [ ] Pull request updates
-   - [ ] Security alerts
-   - [ ] Custom: ___________
+**📋 Notification Types (answer [y] or [n] for each):**
+1. "🔨 Do you want build/compilation result notifications?" [ ]
+2. "🚀 Do you want deployment status notifications?" [ ]
+3. "🧪 Do you want test result notifications?" [ ]
+4. "🏷️ Do you want release announcement notifications?" [ ]
+5. "🔄 Do you want pull request update notifications?" [ ]
 
 **🎨 Notification Style:**
-2. "📱 What level of detail do you prefer?"
-   - [ ] Basic (✅/❌ status only)
-   - [ ] Standard (status + commit info)
-   - [ ] Detailed (status + metrics + timings)
-   - [ ] Progressive (real-time updates)
-
-3. "🎭 Visual preferences?"
-   - [ ] Minimal (text only)
-   - [ ] Standard (basic emojis)
-   - [ ] Rich (lots of emojis + formatting)
+6. "📊 Do you want detailed notifications with metrics and timings?" [ ]
+   (If [n], will use standard format with basic status + commit info)
+7. "🎭 Do you want rich formatting with lots of emojis?" [ ]
+   (If [n], will use minimal text-only format)
 
 **⚙️ Technical Setup:**
-4. "🌍 Which environments?" 
-   - [ ] Development
-   - [ ] Staging  
-   - [ ] Production
-   - [ ] Feature branches
-   - [ ] All branches
+8. "🏢 Do you want notifications for Production environment?" [ ]
+9. "🧪 Do you want notifications for Staging environment?" [ ]
+10. "💻 Do you want notifications for Development environment?" [ ]
+11. "🌿 Do you want notifications for all feature branches?" [ ]
 
-5. "📂 Existing workflow files you want to modify?"
-   - List specific .yml files or "create new"
-
-6. "🔐 Do you already have Telegram bot setup?"
-   - [ ] Yes, have TOKEN and CHAT_ID
-   - [ ] No, need setup instructions
-   - [ ] Need help with bot creation
+12. "🔐 Do you already have Telegram bot TOKEN and CHAT_ID?" [ ]
+    (If [n], I'll provide setup instructions)
 
 **⚡ Delivery Method:**
-7. "📨 How to send notifications?"
-   - [ ] Separate messages for each event
-   - [ ] Update single message (progressive) ← RECOMMENDED
-   - [ ] Thread/topic organization
-   - [ ] Different chats for different types
+13. "📨 Do you want progressive updates (single message that updates)?" [ ]
+    (If [n], will send separate messages for each event)
 
 **🔍 Repository Monitoring:**
-8. "📊 What GitHub repository events do you want to monitor?"
+14. "📊 Do you want notifications for GitHub Actions workflow results?" [ ]
+    (Build, test, deploy pipeline status notifications)
+15. "🔄 Do you want notifications for Pull Request activity?" [ ]
+    (PR opened, merged, reviewed, code changes)
+16. "🐛 Do you want notifications for GitHub Issues activity?" [ ]
+    (New issues, comments, label changes, assignments)
+17. "🏷️ Do you want notifications for Releases and Tags?" [ ]
+    (New releases, pre-releases, tag creation)
+18. "📈 Do you want weekly/monthly repository summary reports?" [ ]
+    (Commit statistics, PR metrics, issue resolution stats)
 
-   **[ ] Workflow results only (CI/CD pipeline status)**
-   • **What:** Notifications only for GitHub Actions workflow success/failure
-   • **When:** After build, test, deploy jobs complete
-   • **Best for:** Simple CI/CD monitoring without noise
-
-   **[ ] Pull requests (opened, merged, reviewed) ← RECOMMENDED**  
-   • **What:** Full PR lifecycle notifications with statistics
-   • **Includes:** PR opened, code reviews, merge/close status, file changes
-   • **Best for:** Active development teams with code review process
-
-   **[ ] Issues and comments**
-   • **What:** GitHub Issues activity and comment notifications  
-   • **Includes:** New issues, issue comments, label changes, assignments
-   • **Best for:** Projects with active issue tracking and discussions
-
-   **[ ] Releases and tags**
-   • **What:** New release and tag notifications with release notes
-   • **Includes:** Release published, pre-releases, tag creation
-   • **Best for:** Projects with regular releases and version management
-
-   **[ ] All repository activity (comprehensive)**
-   • **What:** Complete GitHub repository event monitoring
-   • **Includes:** All above + push events, branch creation, repository settings
-   • **Best for:** Critical projects requiring full activity tracking
-
-   **[ ] Weekly/monthly repository summary reports**
-   • **What:** Periodic summary of repository activity and statistics
-   • **Includes:** Commit count, PR statistics, issue resolution, contributor activity
-   • **Best for:** Management reporting and project health overview
-
-**🎯 Advanced GitHub Integration:**
-9. "🚀 Which GitHub-specific features interest you?"
-
-   **[ ] Progressive deployment updates (single message updates) ← RECOMMENDED**
-   • **What:** Update single message during CI/CD pipeline execution
-   • **How:** Start message "🚀 Deploying..." → update to "✅ Deployed successfully"
-   • **Best for:** Clean deployment tracking without message spam
-
-   **[ ] Real-time CI/CD progress bars**  
-   • **What:** Visual progress indicators during workflow execution
-   • **How:** ASCII progress bars: `Build ●●●○○ → Test ●●●●○ → Deploy ●●●●●`
-   • **Best for:** Long-running workflows where progress visibility matters
-
-   **[ ] Action buttons for GitHub operations (approve PR, merge, rerun workflow)**
-   • **What:** Interactive buttons for common GitHub Actions
-   • **Includes:** "👀 View PR", "✅ Approve", "🔄 Merge", "🔁 Rerun Workflow", "📝 Create Issue"
-   • **Best for:** Quick actions without leaving Telegram
-
-   **[ ] Multi-environment conditional notifications (prod/staging/dev)**
-   • **What:** Different notification rules for different environments
-   • **How:** Production gets all alerts, staging gets important only, dev gets minimal
-   • **Best for:** Multi-environment deployments with different criticality levels
-
-   **[ ] File attachments (logs, test reports, build artifacts)**
-   • **What:** Attach files from GitHub Actions to Telegram messages
-   • **Includes:** Build logs, test reports, coverage reports, build artifacts
-   • **Best for:** Detailed troubleshooting and report sharing
+**🎯 Advanced Features:**
+19. "🚀 Do you want interactive action buttons in messages?" [ ]
+    (Buttons for: View PR, Approve, Merge, Rerun Workflow, Create Issue)
+20. "📊 Do you want real-time progress bars during CI/CD?" [ ]
+    (Visual progress: Build ●●●○○ → Test ●●●●○ → Deploy ●●●●●)
+21. "🌍 Do you want different notification rules per environment?" [ ]
+    (Production: all alerts, Staging: important only, Dev: minimal)
+22. "📎 Do you want file attachments?" [ ]
+    (Attach build logs, test reports, coverage reports to messages)
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
@@ -1069,6 +1013,7 @@ Do you want me to:
 - Optimization of notification frequency
 
 #### **Step 3: Generate Integration (ONLY after complete questionnaire)**
+- **Parse user [y]/[n] answers:** Interpret each [y] as "YES, include this feature" and [n] as "NO, skip this"
 - Apply appropriate template based on user answers  
 - Create workflow files based on user responses
 - Use ONLY built-in templates (success, error, warning, info, deploy, test, release)
@@ -1093,45 +1038,56 @@ Do you want me to:
 ```
 👤 User: "Add Telegram notifications to my project"
 
-🤖 AI: "I'll help you integrate telegram-notify-action! First, I need to understand your requirements. Please answer these questions:
+🤖 AI: "I'll help you integrate telegram-notify-action! Please answer with [y] or [n] for each question:
 
-📋 **Integration Scope:**
-1. What do you want notifications about?
-   - [ ] Build/compilation results
-   - [ ] Deployment status  
-   - [ ] Test results
-   - [ ] Release announcements
-   - [ ] Monitoring/health checks
-   - [ ] Pull request updates
-   - [ ] Security alerts
-   - [ ] Custom: ___________
+📋 Notification Types:
+1. 🔨 Do you want build/compilation result notifications? [ ]
+2. 🚀 Do you want deployment status notifications? [ ]
+3. 🧪 Do you want test result notifications? [ ]
+4. 🏷️ Do you want release announcement notifications? [ ]
+5. 🔄 Do you want pull request update notifications? [ ]
 
-📱 **Detail Level:**
-2. What level of detail do you prefer?
-   - [ ] Basic (✅/❌ status only)
-   - [ ] Standard (status + commit info)
-   - [ ] Detailed (status + metrics + timings)
-   - [ ] Progressive (real-time updates)
+🎨 Notification Style:
+6. 📊 Do you want detailed notifications with metrics? [ ]
+7. 🎭 Do you want rich formatting with lots of emojis? [ ]
 
-[... all other questions ...]
+⚙️ Technical Setup:
+8. 🏢 Do you want notifications for Production environment? [ ]
+9. 🧪 Do you want notifications for Staging environment? [ ]
+10. 💻 Do you want notifications for Development environment? [ ]
+11. 🌿 Do you want notifications for all feature branches? [ ]
+12. 🔐 Do you already have Telegram bot TOKEN and CHAT_ID? [ ]
 
-Please answer ALL questions before I create your integration."
+⚡ Delivery Method:
+13. 📨 Do you want progressive updates (single message)? [ ]
 
-👤 User: [Provides all answers]
+🔍 Repository Monitoring:
+14. 📊 Do you want GitHub Actions workflow results? [ ]
+15. 🔄 Do you want Pull Request activity notifications? [ ]
+16. 🐛 Do you want GitHub Issues activity notifications? [ ]
+17. 🏷️ Do you want Releases and Tags notifications? [ ]
+18. 📈 Do you want weekly/monthly summary reports? [ ]
 
-🤖 AI: "Perfect! Based on your answers, I'll create a custom integration with:
-- Progressive deployment notifications (single message updates)
-- Real-time progress bars during CI/CD stages
-- Deploy template for final results
-- Scheduled health monitoring every 15 minutes
-- Critical alerting system with action buttons
-- Rich emoji formatting for production environment
+🎯 Advanced Features:
+19. 🚀 Do you want interactive action buttons? [ ]
+20. 📊 Do you want real-time progress bars? [ ]
+21. 🌍 Do you want different rules per environment? [ ]
+22. 📎 Do you want file attachments? [ ]"
+
+👤 User: "1.[y] 2.[y] 3.[y] 4.[n] 5.[y] 6.[n] 7.[y] 8.[y] 9.[n] 10.[n] 11.[n] 12.[y] 13.[y] 14.[y] 15.[y] 16.[n] 17.[n] 18.[n] 19.[y] 20.[y] 21.[n] 22.[n]"
+
+🤖 AI: "Perfect! Based on your [y]/[n] answers, I'll create:
+- ✅ Build, deploy, test, and PR notifications
+- ✅ Rich emoji formatting with progressive updates
+- ✅ Production environment only
+- ✅ Interactive buttons and progress bars
+- ❌ No release notifications or summary reports
 
 I'll generate:
-1. Progressive deployment workflow (message_id updates)
-2. Monitoring system workflow (scheduled health checks)
-3. Setup instructions for multiple chat IDs (alerts vs reports)
-4. Action buttons for quick responses to issues
+1. Progressive deployment workflow (single message updates)
+2. GitHub Actions integration with progress bars
+3. PR notification system with action buttons
+4. Rich template formatting for better readability
 
 [Generates CORRECT code with both deployment and monitoring workflows]"
 ```
