@@ -99,16 +99,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "💬 Add Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
-            ],
-            [
-              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "🔒 Close Issue", "url": "${{ github.event.issue.html_url }}"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              [
+                {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
+                {"text": "💬 Add Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+              ],
+              [
+                {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"},
+                {"text": "🔒 Close Issue", "url": "${{ github.event.issue.html_url }}"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              ]
             ]
 
       - name: Send comment notification
@@ -141,16 +143,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
-              {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
-            ],
-            [
-              {"text": "🔗 Go to Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              [
+                {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
+                {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+              ],
+              [
+                {"text": "🔗 Go to Issue", "url": "${{ github.event.issue.html_url }}"},
+                {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              ]
             ]
 
   pr-notifications:
@@ -234,20 +238,22 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"}
-            ],
-            [
-              {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
-              {"text": "❌ Request Changes", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
-            ],
-            [
-              {"text": "🔄 Merge PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "🔒 Close PR", "url": "${{ github.event.pull_request.html_url }}"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              [
+                {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
+                {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"}
+              ],
+              [
+                {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
+                {"text": "❌ Request Changes", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
+              ],
+              [
+                {"text": "🔄 Merge PR", "url": "${{ github.event.pull_request.html_url }}"},
+                {"text": "🔒 Close PR", "url": "${{ github.event.pull_request.html_url }}"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              ]
             ]
 
       - name: Send review notification
@@ -282,16 +288,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
-              {"text": "📝 Go to PR", "url": "${{ github.event.pull_request.html_url }}"}
-            ],
-            [
-              {"text": "💬 Reply to Review", "url": "${{ github.event.pull_request.html_url }}#discussion_r"},
-              {"text": "✏️ Edit PR", "url": "${{ github.event.pull_request.html_url }}"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              [
+                {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
+                {"text": "📝 Go to PR", "url": "${{ github.event.pull_request.html_url }}"}
+              ],
+              [
+                {"text": "💬 Reply to Review", "url": "${{ github.event.pull_request.html_url }}#discussion_r"},
+                {"text": "✏️ Edit PR", "url": "${{ github.event.pull_request.html_url }}"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              ]
             ]
 
   discussion-notifications:
@@ -331,16 +339,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "✍️ Reply", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
-            ],
-            [
-              {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "🔖 Subscribe", "url": "${{ github.event.discussion.html_url }}"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "💬 All Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              [
+                {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
+                {"text": "✍️ Reply", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
+              ],
+              [
+                {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"},
+                {"text": "🔖 Subscribe", "url": "${{ github.event.discussion.html_url }}"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "💬 All Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              ]
             ]
 
   health-check:
@@ -443,16 +453,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📊 Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔒 Security", "url": "${{ github.server_url }}/${{ github.repository }}/security"}
-            ],
-            [
-              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "📋 Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
-            ],
-            [
-              {"text": "🔧 Settings", "url": "${{ github.server_url }}/${{ github.repository }}/settings"},
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+              [
+                {"text": "📊 Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
+                {"text": "🔒 Security", "url": "${{ github.server_url }}/${{ github.repository }}/security"}
+              ],
+              [
+                {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
+                {"text": "📋 Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              ],
+              [
+                {"text": "🔧 Settings", "url": "${{ github.server_url }}/${{ github.repository }}/settings"},
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+              ]
             ]
 
   repository-stats:
@@ -542,18 +554,20 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"}
-            ],
-            [
-              {"text": "📊 Traffic", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
-              {"text": "🏷️ Releases", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
-            ],
-            [
-              {"text": "🌐 Network Graph", "url": "${{ github.server_url }}/${{ github.repository }}/network"},
-              {"text": "📋 All Commits", "url": "${{ github.server_url }}/${{ github.repository }}/commits"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "⚙️ New Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitoring.yml"}
+              [
+                {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
+                {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"}
+              ],
+              [
+                {"text": "📊 Traffic", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
+                {"text": "🏷️ Releases", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
+              ],
+              [
+                {"text": "🌐 Network Graph", "url": "${{ github.server_url }}/${{ github.repository }}/network"},
+                {"text": "📋 All Commits", "url": "${{ github.server_url }}/${{ github.repository }}/commits"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+                {"text": "⚙️ New Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitoring.yml"}
+              ]
             ]
