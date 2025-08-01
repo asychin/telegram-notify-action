@@ -1,5 +1,33 @@
 # 📝 Changelog
 
+## [v3.2.7] - 2025-08-02
+
+### 🔒 **SECURITY & TESTING IMPROVEMENTS**
+
+#### 🛡️ **Enhanced Security Measures**
+
+- **✅ IMPROVED:** Release workflow security with safer base64 handling using `printf` instead of `echo`
+- **🔧 FIXED:** More robust release notes processing with fallback error handling
+- **📋 ENHANCED:** Updated AI integration rules with comprehensive security patterns
+- **🧹 CLEANUP:** Removed deprecated `scripts/security-audit.sh` in favor of automated test-based validation
+
+#### 🧪 **Testing Infrastructure**
+
+- **🆕 NEW:** Added `tests/release-security.test.js` for comprehensive security validation
+- **📦 DEPENDENCY:** Added `js-yaml` dependency for YAML parsing in security tests  
+- **✅ VALIDATION:** Automated detection of shell injection vulnerabilities in workflows
+- **🔍 COVERAGE:** Enhanced test coverage for release workflow security patterns
+
+#### 🔧 **Technical Improvements**
+
+- **⚡ SAFER:** Release workflow now uses quoted heredoc delimiters (`'RELEASE_BODY_B64_END'`)
+- **🛡️ PRINTF:** Replaced `echo` with `printf '%s'` for dynamic content handling
+- **📝 FALLBACK:** Added fallback mechanisms for base64 decoding errors
+- **🎯 VALIDATION:** All workflow patterns now follow security-first approach
+
+**🔒 SECURITY FOCUS:**
+This release strengthens the action's security posture with comprehensive testing and safer shell command handling, ensuring robust protection against potential injection vulnerabilities while maintaining full functionality.
+
 ## [v3.2.6] - 2025-08-02
 
 ### 🚨 **CRITICAL FIX - Telegram Entity Parsing Error**

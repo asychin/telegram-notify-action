@@ -170,18 +170,25 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           parse_mode: "Markdown"
           message: |
-            🧪 **Conditional Test: ${{ matrix.condition.name }}**
+            🧪 **Conditional Test: {{testName}}**
 
-            **🏠 Repository:** ${{ github.repository }}
-            **🌿 Branch:** ${{ github.head_ref || github.ref_name }} 
-            **👤 Actor:** ${{ github.actor }}
-            **🔄 Workflow:** ${{ github.workflow }}
-            **📝 Commit:** ${{ github.sha }}
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
+            **👤 Actor:** {{actor}}
+            **🔄 Workflow:** {{workflow}}
+            **📝 Commit:** {{shortSha}}
 
             **📊 Test Results:**
-            • Job Status: ${{ job.status }}
-            • Step Status: ${{ steps.simulate-fail.outcome }}
-            • Should send: ${{ (matrix.condition.send_on_success == 'true' && job.status == 'success') || (matrix.condition.send_on_failure == 'true' && steps.simulate-fail.outcome == 'failure') }}
+            • Job Status: {{jobStatus}}
+            • Step Status: {{stepStatus}}
+            • Should send: {{shouldSend}}
+          template_vars: |
+            {
+              "testName": "${{ matrix.condition.name }}",
+              "jobStatus": "${{ job.status }}",
+              "stepStatus": "${{ steps.simulate-fail.outcome }}",
+              "shouldSend": "${{ (matrix.condition.send_on_success == 'true' && job.status == 'success') || (matrix.condition.send_on_failure == 'true' && steps.simulate-fail.outcome == 'failure') }}"
+            }
           send_on_success: ${{ matrix.condition.send_on_success }}
           send_on_failure: ${{ matrix.condition.send_on_failure }}
           template: "info"

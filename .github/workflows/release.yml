@@ -8,7 +8,7 @@ on:
       version:
         description: "Version to release"
         required: true
-        default: "v2.0.0"
+        default: "v3.0.0"
       prerelease:
         description: "Is this a prerelease?"
         required: false
@@ -33,9 +33,13 @@ jobs:
           else
             echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
             echo "prerelease=${{ github.event.release.prerelease }}" >> $GITHUB_OUTPUT
-            # Use base64 encoding to safely handle release body with any content
-            RELEASE_BODY_B64=$(echo '${{ toJSON(github.event.release.body) }}' | jq -r '.' | base64 -w 0)
-            echo "release_notes_b64=${RELEASE_BODY_B64}" >> $GITHUB_OUTPUT
+            # Use safe base64 encoding without shell interpretation
+            {
+              echo "release_notes_b64<<'RELEASE_BODY_B64_END'"
+              printf '%s' '${{ toJSON(github.event.release.body) }}' | jq -r '.' | base64 -w 0
+              echo
+              echo "RELEASE_BODY_B64_END"
+            } >> $GITHUB_OUTPUT
             echo "release_notes=Release notes (see base64 decoded content)" >> $GITHUB_OUTPUT
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
@@ -57,7 +61,11 @@ jobs:
           echo "## Release Notes" >> RELEASE_NOTES.md
           # Safely decode base64 release notes
           if [ -n "${{ steps.release-info.outputs.release_notes_b64 }}" ]; then
-            echo "${{ steps.release-info.outputs.release_notes_b64 }}" | base64 -d >> RELEASE_NOTES.md
+            # Use printf for safer base64 handling
+            printf '%s' "${{ steps.release-info.outputs.release_notes_b64 }}" | base64 -d >> RELEASE_NOTES.md 2>/dev/null || {
+              echo "Failed to decode base64 release notes, using fallback" >&2
+              echo "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
+            }
           else
             echo "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
           fi
@@ -143,39 +151,16 @@ jobs:
         uses: ./
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_DEV_CHAT_ID }}
+          chat_id: ${{ secrets.TELEGRAM_DEV_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
           template: warning
           parse_mode: "Markdown"
           language: en
-          message: |
-            🚧 **Prerelease Published!**
-
-            **🏷️ Version:** {{releaseName}}
-            **🏠 Repository:** {{repository}}
-            **👤 Author:** {{releaseAuthor}}
-            **📅 Published:** {{releaseCreatedAt}}
-            **🔖 Tag:** {{releaseTag}}
-
-            **⚠️ Development Team Attention:**
-            A prerelease version has been published and requires team testing.
-
-            **📋 Required Actions:**
-            • 🧪 Conduct thorough testing
-            • 🔍 Check compatibility
-            • 📝 Update documentation
-            • 🐛 Fix any found bugs
-            • ✅ Confirm readiness for stable release
-
-            **📋 Release Notes:**
-            See attached release notes document for full details.
-
-            Please test thoroughly before promoting to stable release.
-
-            **🌿 Branch:** {{refName}}
-            **👤 Workflow:** {{workflow}}
           template_vars: |
             {
-              "customMessage": "Attention! New prerelease requires team testing and thorough validation"
+              "customMessage": "🚧 **Prerelease Published!**\n\n**🏷️ Version:** ${{ steps.release-info.outputs.version }}\n**🏠 Repository:** ${{ github.repository }}\n**👤 Author:** ${{ github.actor }}\n**📅 Published:** ${{ steps.timestamp.outputs.time }}\n**🔖 Tag:** ${{ steps.release-info.outputs.version }}\n\n**⚠️ Development Team Attention:**\nA prerelease version has been published and requires team testing.\n\n**📋 Required Actions:**\n• 🧪 Conduct thorough testing\n• 🔍 Check compatibility\n• 📝 Update documentation\n• 🐛 Fix any found bugs\n• ✅ Confirm readiness for stable release\n\n**📋 Release Notes:**\nSee attached release notes document for full details.\n\nPlease test thoroughly before promoting to stable release.\n\n**🌿 Branch:** ${{ github.head_ref || github.ref_name }}\n**👤 Workflow:** ${{ github.workflow }}",
+              "releaseVersion": "${{ steps.release-info.outputs.version }}",
+              "releaseAuthor": "${{ github.actor }}",
+              "prereleaseWarning": "Attention! New prerelease requires team testing and thorough validation"
             }
           inline_keyboard: |
             [

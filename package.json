@@ -1,6 +1,6 @@
 {
   "name": "telegram-notify-action",
-  "version": "3.2.6",
+  "version": "3.2.7",
   "description": "Enhanced GitHub Action for sending and editing Telegram notifications with file support, templates, and advanced features",
   "main": "telegram-notify.js",
   "scripts": {
@@ -37,7 +37,8 @@
     "eslint": "^8.57.0",
     "formdata-polyfill": "^4.0.10",
     "node-fetch": "^3.3.2",
-    "@types/node": "^20.10.0"
+    "@types/node": "^20.10.0",
+    "js-yaml": "^4.1.0"
   },
   "jest": {
     "testEnvironment": "node",
