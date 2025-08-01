@@ -432,7 +432,7 @@ jobs:
             • 🖼️ Image Tests (C2PA): ${{ needs.image-upload-tests.result }}
           template_vars: |
             {
-              "customMessage": "All tests completed for commit {{shortSha}} ({{repositoryName}})"
+              "customMessage": "All tests completed for commit ${{ github.sha }} in repository ${{ github.repository }}"
             }
           inline_keyboard: |
             [
