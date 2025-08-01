@@ -12,6 +12,7 @@
 - **🔒 Input Sanitization** - Release notes with special characters no longer break workflow execution
 
 **Technical Details:**
+
 - Replaced `cat << 'EOF'` heredoc with series of `echo` commands
 - Used `printf '%s\n'` for safe output of `${{ steps.release-info.outputs.release_notes }}`
 - Escaped `${{ }}` in YAML examples to prevent shell interpretation
