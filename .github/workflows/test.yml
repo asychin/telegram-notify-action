@@ -129,9 +129,7 @@ jobs:
               "deployStatus": "successful",
               "testStatus": "passed",
               "coverage": "95%",
-              "version": "v2.0.0",
-              "tag": "${{ github.ref_name }}",
-              "releaseNotes": "Enhanced with new features"
+              "customMessage": "Enhanced with new features"
             }
           language: en
           max_retries: 2
@@ -296,9 +294,7 @@ jobs:
               "deployStatus": "successful",
               "testStatus": "passed",
               "coverage": "95%",
-              "version": "v2.0.0",
-              "tag": "${{ github.ref_name }}",
-              "releaseNotes": "Template test for ${{ matrix.template }}"
+              "customMessage": "Template test for ${{ matrix.template }}"
             }
 
   security-tests:
