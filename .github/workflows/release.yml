@@ -81,31 +81,59 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: release
+          parse_mode: "Markdown"
+          language: ru
           template_vars: |
             {
               "version": "${{ steps.release-info.outputs.version }}",
               "tag": "${{ steps.release-info.outputs.version }}",
               "releaseNotes": "${{ steps.release-info.outputs.release_notes }}",
-              "isPrerelease": "${{ steps.release-info.outputs.prerelease }}",
-              "downloadUrl": "${{ steps.release-info.outputs.download_url }}"
+              "customMessage": "Новый релиз {{version}} для проекта {{repositoryName}} опубликован!"
             }
           message: |
-            🎉 **New Release Available!**
+            🎉 **Новый релиз доступен!**
 
-            Version ${{ steps.release-info.outputs.version }} has been published.
+            **🏷️ Версия:** {{version}}
+            **🏠 Репозиторий:** {{repository}}
+            **👤 Автор релиза:** {{releaseAuthor}}
+            **📅 Дата:** {{releaseCreatedAt}}
+            **🔖 Тег:** {{tag}}
+            **🧪 Пре-релиз:** {{isPrerelease}}
+            **📝 Черновик:** {{isDraft}}
 
-            Key improvements:
-            • Enhanced file upload capabilities
-            • Advanced message templating
-            • Improved error handling
-            • Better performance and reliability
+            **✨ Ключевые улучшения в этой версии:**
+            • 🎯 Автоматический контекст событий
+            • 🌐 Готовые URL переменные
+            • 🔄 Улучшенная логика повторов
+            • 📤 Расширенная загрузка файлов
+            • 🛡️ Дополнительные функции безопасности
+            • 🧪 Комплексное тестирование
+            • 📖 Полностью обновленная документация
+
+            **📋 Заметки к релизу:**
+            {{releaseNotes}}
+
+            **🚀 Использование:**
+            ```yaml
+            - uses: asychin/telegram-notify-action@{{version}}
+              with:
+                telegram_token: ${{ '{{' }} secrets.TELEGRAM_BOT_TOKEN {{ '}}' }}
+                chat_id: ${{ '{{' }} secrets.TELEGRAM_CHAT_ID {{ '}}' }}
+                message: "Your notification message"
+            ```
           inline_keyboard: |
             [
-              {"text": "📥 Download", "url": "${{ steps.release-info.outputs.download_url }}"},
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
-              {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"}
+              {"text": "📥 Скачать релиз", "url": "${{ steps.release-info.outputs.download_url }}"},
+              {"text": "📖 Документация", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
+            ],
+            [
+              {"text": "💬 Обсуждения", "url": "https://github.com/${{ github.repository }}/discussions"},
+              {"text": "🐛 Сообщить о проблеме", "url": "https://github.com/${{ github.repository }}/issues/new"}
+            ],
+            [
+              {"text": "🏠 Репозиторий", "url": "https://github.com/${{ github.repository }}"},
+              {"text": "📋 Все релизы", "url": "https://github.com/${{ github.repository }}/releases"}
             ]
-          language: en
 
       - name: Send release notes as document
         uses: ./
@@ -114,13 +142,24 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           file_path: RELEASE_NOTES.md
           file_type: document
+          parse_mode: "Markdown"
           caption: |
-            📋 **Release Notes**
+            📋 **Полные заметки к релизу**
 
-            Complete release notes for ${{ steps.release-info.outputs.version }}
+            **🏷️ Версия:** {{version}}
+            **🏠 Репозиторий:** {{repository}}
+            **👤 Владелец:** {{repositoryOwnerName}}
+            **📅 Опубликовано:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            **🔖 Тег:** {{tag}}
+            **👤 Автор:** {{releaseAuthor}}
 
-            Repository: ${{ github.repository }}
-            Released: $(date -u +"%Y-%m-%d %H:%M UTC")
+            **📄 Содержимое файла:**
+            • Подробное описание изменений
+            • Инструкции по установке
+            • Примеры использования
+            • Ссылки на документацию
+
+            Файл содержит исчерпывающую информацию о новом релизе {{version}}
 
       - name: Notify development team (if prerelease)
         if: steps.release-info.outputs.prerelease == 'true'
