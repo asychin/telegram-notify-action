@@ -272,7 +272,7 @@ describe("Telegram Notify - Base64 Upload Tests", () => {
       // Test payload creation
       const payload = notify.getBasePayload();
       expect(payload.chat_id).toBe("123456789");
-      expect(payload.parse_mode).toBe("HTML");
+      expect(payload.parse_mode).toBe("Markdown");
 
       console.log("✅ Complete base64 workflow validation passed");
     } finally {
