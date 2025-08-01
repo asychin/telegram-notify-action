@@ -335,7 +335,7 @@ progressive_deployment:
           <b>🌿 Branch:</b> ${{ github.ref_name }}
           <b>👤 Actor:</b> ${{ github.actor }}
           
-          📊 <b>Progress:</b> <code>[🟩⬜⬜⬜⬜] 20%</code>
+          📊 <b>Progress:</b> <code>●●○○○○○○○○ 20%</code>
           
           🔍 <b>Status:</b> Starting deployment...
 
@@ -354,7 +354,7 @@ progressive_deployment:
           <b>🌿 Branch:</b> ${{ github.ref_name }}
           <b>👤 Actor:</b> ${{ github.actor }}
           
-          📊 <b>Progress:</b> <code>[🟩🟩🟩⬜⬜] 60%</code>
+          📊 <b>Progress:</b> <code>●●●●●●○○○○ 60%</code>
           
           🔧 <b>Status:</b> Building application...
 
