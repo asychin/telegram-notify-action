@@ -368,6 +368,9 @@ class TelegramNotify {
             eventContext.assignees = Array.isArray(assignees)
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
+
+            // For PR events, use headBranch as the main branch name instead of refName
+            eventContext.branchName = eventContext.headBranch || this.githubContext.refName;
           }
           break;
 
@@ -501,6 +504,11 @@ class TelegramNotify {
       this.warning(`Error extracting event context: ${error.message}`);
     }
 
+    // Set branchName - use headBranch for PR events, otherwise use refName
+    if (!eventContext.branchName) {
+      eventContext.branchName = eventContext.headBranch || this.githubContext.refName;
+    }
+
     return eventContext;
   }
 
@@ -603,177 +611,177 @@ class TelegramNotify {
       success: {
         en: `✅ ${bold}Success${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
         ru: `✅ ${bold}Успех${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
         zh: `✅ ${bold}成功${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
+⚙️ ${bold}工作流:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
       },
       error: {
         en: `❌ ${bold}Error${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
-Job Status: {{jobStatus}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
+🚨 ${bold}Job Status:${boldEnd} {{jobStatus}}
 
 {{customMessage}}`,
         ru: `❌ ${bold}Ошибка${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
-Статус задачи: {{jobStatus}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
+🚨 ${bold}Статус задачи:${boldEnd} {{jobStatus}}
 
 {{customMessage}}`,
         zh: `❌ ${bold}错误${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
-任务状态: {{jobStatus}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
+⚙️ ${bold}工作流:${boldEnd} {{workflow}}
+🚨 ${bold}任务状态:${boldEnd} {{jobStatus}}
 
 {{customMessage}}`,
       },
       warning: {
         en: `⚠️ ${bold}Warning${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Workflow: {{workflow}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
         ru: `⚠️ ${bold}Предупреждение${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Workflow: {{workflow}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+⚙️ ${bold}Workflow:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
         zh: `⚠️ ${bold}警告${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-工作流: {{workflow}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+⚙️ ${bold}工作流:${boldEnd} {{workflow}}
 
 {{customMessage}}`,
       },
       info: {
         en: `ℹ️ ${bold}Information${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Actor: {{actor}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+👤 ${bold}Actor:${boldEnd} {{actor}}
 
 {{customMessage}}`,
         ru: `ℹ️ ${bold}Информация${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Автор: {{actor}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+👤 ${bold}Автор:${boldEnd} {{actor}}
 
 {{customMessage}}`,
         zh: `ℹ️ ${bold}信息${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-执行者: {{actor}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+👤 ${bold}执行者:${boldEnd} {{actor}}
 
 {{customMessage}}`,
       },
       deploy: {
         en: `🚀 ${bold}Deployment${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+🔢 ${bold}Run:${boldEnd} #{{runNumber}}
 
-Deployed by: {{actor}}
-Status: {{deployStatus}}
+👤 ${bold}Deployed by:${boldEnd} {{actor}}
+📊 ${bold}Status:${boldEnd} {{deployStatus}}
 
 {{customMessage}}`,
         ru: `🚀 ${bold}Развертывание${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+🔢 ${bold}Запуск:${boldEnd} #{{runNumber}}
 
-Развернул: {{actor}}
-Статус: {{deployStatus}}
+👤 ${bold}Развернул:${boldEnd} {{actor}}
+📊 ${bold}Статус:${boldEnd} {{deployStatus}}
 
 {{customMessage}}`,
         zh: `🚀 ${bold}部署${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+🔢 ${bold}运行:${boldEnd} #{{runNumber}}
 
-部署者: {{actor}}
-状态: {{deployStatus}}
+👤 ${bold}部署者:${boldEnd} {{actor}}
+📊 ${bold}状态:${boldEnd} {{deployStatus}}
 
 {{customMessage}}`,
       },
       test: {
         en: `🧪 ${bold}Test Results${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+📦 ${bold}Repository:${boldEnd} {{repository}}
+🌿 ${bold}Branch:${boldEnd} {{branchName}}
+📝 ${bold}Commit:${boldEnd} {{sha}}
+🔢 ${bold}Run:${boldEnd} #{{runNumber}}
 
-Test Status: {{testStatus}}
-Coverage: {{coverage}}
+📊 ${bold}Test Status:${boldEnd} {{testStatus}}
+📈 ${bold}Coverage:${boldEnd} {{coverage}}
 
 {{customMessage}}`,
         ru: `🧪 ${bold}Результаты тестов${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+📦 ${bold}Репозиторий:${boldEnd} {{repository}}
+🌿 ${bold}Ветка:${boldEnd} {{branchName}}
+📝 ${bold}Коммит:${boldEnd} {{sha}}
+🔢 ${bold}Запуск:${boldEnd} #{{runNumber}}
 
-Статус тестов: {{testStatus}}
-Покрытие: {{coverage}}
+📊 ${bold}Статус тестов:${boldEnd} {{testStatus}}
+📈 ${bold}Покрытие:${boldEnd} {{coverage}}
 
 {{customMessage}}`,
         zh: `🧪 ${bold}测试结果${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+📦 ${bold}仓库:${boldEnd} {{repository}}
+🌿 ${bold}分支:${boldEnd} {{branchName}}
+📝 ${bold}提交:${boldEnd} {{sha}}
+🔢 ${bold}运行:${boldEnd} #{{runNumber}}
 
-测试状态: {{testStatus}}
-覆盖率: {{coverage}}
+📊 ${bold}测试状态:${boldEnd} {{testStatus}}
+📈 ${bold}覆盖率:${boldEnd} {{coverage}}
 
 {{customMessage}}`,
       },

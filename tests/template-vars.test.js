@@ -115,4 +115,38 @@ describe("Template Variables in template_vars", () => {
 
     expect(notifier.templateVars).toEqual({});
   });
+
+  test("should use correct branch name for pull request events", () => {
+    // Mock PR event with different head and merge refs
+    const mockEventData = {
+      pull_request: {
+        number: 456,
+        title: "Feature PR",
+        state: "open",
+        user: { login: "testuser" },
+        head: { ref: "feature/awesome-feature" },
+        base: { ref: "main" }
+      }
+    };
+
+    const fs = require("fs");
+    const path = require("path");
+    const eventPath = path.join(__dirname, "pr-mock-event.json");
+    fs.writeFileSync(eventPath, JSON.stringify(mockEventData, null, 2));
+    process.env.GITHUB_EVENT_PATH = eventPath;
+    process.env.GITHUB_REF_NAME = "456/merge"; // This is the merge ref
+
+    process.env.TEMPLATE_VARS = JSON.stringify({
+      "message": "Branch: {{branchName}}, RefName: {{refName}}"
+    });
+
+    const TelegramNotify = require("../telegram-notify.js");
+    const notifier = new TelegramNotify();
+
+    // branchName should use headBranch (real branch), not refName (merge ref)
+    expect(notifier.templateVars.message).toBe("Branch: feature/awesome-feature, RefName: 456/merge");
+
+    // Clean up
+    fs.unlinkSync(eventPath);
+  });
 });
