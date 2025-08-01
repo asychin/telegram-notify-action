@@ -35,7 +35,7 @@ class TelegramNotify {
     this.message = process.env.MESSAGE;
     this.messageThreadId = process.env.MESSAGE_THREAD_ID;
     this.messageId = process.env.MESSAGE_ID;
-    this.parseMode = process.env.PARSE_MODE || "HTML";
+    this.parseMode = process.env.PARSE_MODE || "Markdown";
     this.disableWebPagePreview =
       process.env.DISABLE_WEB_PAGE_PREVIEW === "true";
     this.disableNotification = process.env.DISABLE_NOTIFICATION === "true";
@@ -973,17 +973,6 @@ class TelegramNotify {
    * Process message template
    */
   processTemplate() {
-    if (!this.template) return this.cleanHtmlContent(this.message);
-
-    const templates = this.getMessageTemplates();
-    const templateData = templates[this.template];
-
-    if (!templateData) {
-      throw new Error(`${this.messages.templateNotFound} ${this.template}`);
-    }
-
-    const templateText = templateData[this.language] || templateData.en;
-
     // Merge GitHub context with template variables
     const allVars = {
       ...this.githubContext, // Basic GitHub context (repository, sha, etc.)
@@ -1007,7 +996,24 @@ class TelegramNotify {
       }
     }
 
-    // Replace template variables
+    let templateText;
+
+    // If no template is specified, use custom message with variable substitution
+    if (!this.template) {
+      templateText = this.message || "";
+    } else {
+      // Use predefined template
+      const templates = this.getMessageTemplates();
+      const templateData = templates[this.template];
+
+      if (!templateData) {
+        throw new Error(`${this.messages.templateNotFound} ${this.template}`);
+      }
+
+      templateText = templateData[this.language] || templateData.en;
+    }
+
+    // Replace template variables in both predefined templates and custom messages
     const processedText = templateText.replace(
       /\{\{(\w+)\}\}/g,
       (match, key) => {

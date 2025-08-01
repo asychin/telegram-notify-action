@@ -801,7 +801,50 @@ message: "构建 {{buildNumber}} 完成"
 # buildNumber 未在 template_vars 中定义
 ```
 
-### 3. 不支持的 HTML 标签
+### 3. template_vars 中的 HTML 内容
+
+在 `template_vars` 中包含 HTML 内容时，务必使用正确的 JSON 转义：
+
+```yaml
+# ❌ 错误 - HTML 中的未转义引号破坏了 JSON
+template_vars: |
+  {
+    "buildReport": "<div class="status">成功</div>"
+  }
+
+# ✅ 修复 - 正确的 JSON 转义
+template_vars: |
+  {
+    "buildReport": "<div class=\"status\">成功</div>"
+  }
+
+# ✅ 最佳实践 - 在工作流中使用 JSON.stringify
+template_vars: ${{ toJson({
+  buildReport: '<div class="status">成功</div>',
+  duration: '2分30秒'
+}) }}
+```
+
+**💡 提示：** 从 GitHub Actions 传递 HTML 时，使用 `toJson()` 函数进行自动转义：
+
+```yaml
+- name: 生成构建报告
+  id: report
+  run: |
+    echo "html=<b>状态:</b> ✅ 成功<br/><b>持续时间:</b> 2分30秒" >> $GITHUB_OUTPUT
+
+- name: 发送通知
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "构建完成: {{buildReport}}"
+    template_vars: ${{ toJson({
+      buildReport: steps.report.outputs.html
+    }) }}
+```
+
+### 4. 不支持的 HTML 标签
 
 ```yaml
 # ❌ 标签将被删除

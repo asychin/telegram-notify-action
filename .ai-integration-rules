@@ -356,6 +356,8 @@ progressive_deployment:
           <b>👤 Actor:</b> ${{ github.actor }}
           
           📊 <b>Progress:</b> <code>●●●●●●○○○○ 60%</code>
+          🔄 <b>On Success:</b> <code>●●●●●●●●●● 100%</code>
+          ❌ <b>On Failure:</b> <code>●●●●✗○○○○○ Failed</code>
           
           🔧 <b>Status:</b> Building application...
 
@@ -716,57 +718,60 @@ Ask the user these REQUIRED questions:
    (If [n], AI will ask: Which language? Russian/Chinese/Other?)
 9. "✨ Do you want visual message formatting?" [ ]
    (Emojis, bold text, structured layout. If [n], plain text only)
+10. "📝 Do you prefer Markdown or HTML formatting?" [ ]
+    (If [y] = Markdown: **bold**, *italic* | If [n] = HTML: <b>bold</b>, <i>italic</i>)
+    (DEFAULT: Markdown - if user doesn't specify parse_mode, use Markdown formatting)
 
 **⚙️ Technical Setup:**
-10. "🏢 Do you want notifications for Production environment?" [ ]
-11. "🧪 Do you want notifications for Staging environment?" [ ]
-12. "💻 Do you want notifications for Development environment?" [ ]
-13. "🌿 Do you want notifications for all feature branches?" [ ]
+11. "🏢 Do you want notifications for Production environment?" [ ]
+12. "🧪 Do you want notifications for Staging environment?" [ ]
+13. "💻 Do you want notifications for Development environment?" [ ]
+14. "🌿 Do you want notifications for all feature branches?" [ ]
 
-14. "🔐 Do you already have Telegram bot TOKEN and CHAT_ID?" [ ]
+15. "🔐 Do you already have Telegram bot TOKEN and CHAT_ID?" [ ]
     (If [n], I'll provide setup instructions)
 
 **⚡ Delivery Method:**
-15. "📨 Do you want progressive updates (single message that updates)?" [ ]
+16. "📨 Do you want progressive updates (single message that updates)?" [ ]
     (If [n], will send separate messages for each event)
 
 **🔍 Repository Monitoring:**
-16. "📊 Do you want notifications for GitHub Actions workflow results?" [ ]
+17. "📊 Do you want notifications for GitHub Actions workflow results?" [ ]
     (Build, test, deploy pipeline status notifications)
-17. "🔄 Do you want notifications for Pull Request activity?" [ ]
+18. "🔄 Do you want notifications for Pull Request activity?" [ ]
     (PR opened, merged, reviewed, code changes)
-18. "🐛 Do you want notifications for GitHub Issues activity?" [ ]
+19. "🐛 Do you want notifications for GitHub Issues activity?" [ ]
     (New issues, comments, label changes, assignments)
-19. "🏷️ Do you want notifications for Releases and Tags?" [ ]
+20. "🏷️ Do you want notifications for Releases and Tags?" [ ]
     (New releases, pre-releases, tag creation)
-20. "📈 Do you want weekly/monthly repository summary reports?" [ ]
+21. "📈 Do you want weekly/monthly repository summary reports?" [ ]
     (Commit statistics, PR metrics, issue resolution stats)
 
 **🎯 Advanced Features:**
-21. "🚀 Do you want interactive action buttons in messages?" [ ]
+22. "🚀 Do you want interactive action buttons in messages?" [ ]
     (Buttons for: View PR, Approve, Merge, Rerun Workflow, Create Issue)
-22. "📊 Do you want real-time progress bars during CI/CD?" [ ]
-    (Visual progress: Build ●●●○○ → Test ●●●●○ → Deploy ●●●●●)
-23. "🌍 Do you want different notification rules per environment?" [ ]
+23. "📊 Do you want real-time progress bars during CI/CD?" [ ]
+    (Visual progress: Build ●●●○○ → Test ●●●●○ → Deploy ●●●●● | On failure: Build ●●●✗○)
+24. "🌍 Do you want different notification rules per environment?" [ ]
     (Production: all alerts, Staging: important only, Dev: minimal)
-24. "📎 Do you want file attachments?" [ ]
+25. "📎 Do you want file attachments?" [ ]
     (Attach build logs, test reports, coverage reports to messages)
 
 **⏰ Scheduled Workflows:**
-25. "⏰ Do you want any scheduled/automatic workflows?" [ ]
+26. "⏰ Do you want any scheduled/automatic workflows?" [ ]
     (Weekly reports, health checks, maintenance notifications, etc.)
 
 **📋 Message Organization:**
-26. "🧵 Do you want to send notifications to specific Telegram topics/threads?" [ ]
+27. "🧵 Do you want to send notifications to specific Telegram topics/threads?" [ ]
     (Organize messages by topics in group chats)
-27. "📊 Do you want to split different notification types into separate topics?" [ ]
+28. "📊 Do you want to split different notification types into separate topics?" [ ]
     (Build notifications in one topic, deploy in another, issues in third, etc.)
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
-### **⏰ MANDATORY: Scheduler Configuration (if question 25 = [y])**
+### **⏰ MANDATORY: Scheduler Configuration (if question 26 = [y])**
 
-**If user answered [y] to question 25, AI MUST ask about scheduling preferences:**
+**If user answered [y] to question 26, AI MUST ask about scheduling preferences:**
 
 **📅 Schedule Configuration Questions:**
 ```
@@ -823,15 +828,15 @@ Current default: None (triggered by events only)
 - cron: '0 9,11,13,15,17 * * 1-5'
 ```
 
-### **🧵 MANDATORY: Topics Configuration (if question 26 or 27 = [y])**
+### **🧵 MANDATORY: Topics Configuration (if question 27 or 28 = [y])**
 
-**If user answered [y] to question 26 or 27, AI MUST ask about topic organization:**
+**If user answered [y] to question 27 or 28, AI MUST ask about topic organization:**
 
 **📋 Topic Configuration Questions:**
 ```
 🧵 You selected Telegram topics for message organization. I need configuration details:
 
-📊 **For question 26 (specific topics):**
+📊 **For question 27 (specific topics):**
 - Do you already have topic IDs set up? [y/n]
 - If [y]: "Please list your GitHub Secrets keys for topic IDs"
   Examples: 
@@ -839,7 +844,7 @@ Current default: None (triggered by events only)
   • DEPLOY_TOPIC_ID, BUILD_TOPIC_ID, PR_TOPIC_ID
   • TOPIC_PRODUCTION, TOPIC_STAGING, TOPIC_DEVELOPMENT
 
-📋 **For question 27 (split by notification types):**
+📋 **For question 28 (split by notification types):**
 - How many different topics do you want? [number]
 - What types of notifications per topic?
   Examples:
@@ -870,6 +875,38 @@ Examples:
 3. **Include fallback mechanisms** if topic ID is not available
 4. **Provide setup instructions** for creating topics in Telegram
 5. **Add topic organization to integration plan**
+
+### **📊 MANDATORY: Progress Bars Configuration (if question 23 = [y])**
+
+**If user answered [y] to question 23, AI MUST implement progress bars correctly:**
+
+**📊 Progress Bar Rules:**
+```
+🔄 Progress Bar Symbols:
+● = Completed step (filled circle)
+○ = Pending step (empty circle)  
+✗ = Failed/interrupted step (cross mark)
+
+📈 Progress Bar Examples:
+🔄 In Progress: ●●●○○○○○○○ 30%
+✅ Success: ●●●●●●●●●● 100%
+❌ Failed: ●●●●✗○○○○○ Failed at step 5
+⚠️ Partial: ●●●●●●✗○○○ Warning at step 7
+
+🎯 Multi-Stage Progress:
+Build: ●●●●○ (80%) → Test: ●●○○○ (40%) → Deploy: ○○○○○ (0%)
+Build: ●●●●● (100%) → Test: ●●●●● (100%) → Deploy: ●●●●● (100%)
+Build: ●●●✗○ (Failed) → Test: ○○○○○ (Skipped) → Deploy: ○○○○○ (Skipped)
+```
+
+**🔧 AI Processing Rules for Progress Bars:**
+1. **Use ● for completed steps**, ○ for pending steps, ✗ for failed steps
+2. **Always show percentage or status** next to progress bar
+3. **Update same message** using message_id for real-time progress
+4. **Include stage names** for multi-step processes (Build → Test → Deploy)
+5. **Show failure point clearly** with ✗ symbol and descriptive text
+6. **Maintain consistent bar length** (usually 5-10 symbols)
+7. **Add progress to integration plan** with update strategy
 
 ### **🚫 FORBIDDEN: What AI Must NEVER Suggest**
 
@@ -1174,6 +1211,14 @@ Do you want me to:
 - Topic assignments: [which notification types go to which topics]
 - Fallback strategy: [what happens if topic ID is missing]
 
+## 📊 Progress Bars Configuration
+[If user selected progress bars (question 22 = [y])]
+- Progress bar style: [● for completed, ○ for pending, ✗ for failed]
+- Update strategy: [progressive message updates using message_id]
+- Progress stages: [Build → Test → Deploy or custom stages]
+- Failure handling: [show failure point with ✗ and descriptive status]
+- Bar length: [5-10 symbols for optimal display]
+
 ## 📂 Files to Create/Modify
 [List all workflow files, modifications, new files]
 
@@ -1222,6 +1267,8 @@ Do you want me to:
 - ✅ **Cron Validation:** All schedule expressions are valid and include explanatory comments
 - ✅ **Topics Configuration:** If user selected topics, configured message_thread_id based on user's secret keys
 - ✅ **Topic Fallbacks:** All topic configurations include fallback to main chat if topic ID is missing
+- ✅ **Progress Bars:** If user selected progress bars, implemented with correct symbols (●○✗) and message updates
+- ✅ **Progress Failure Handling:** Progress bars show failure points with ✗ and descriptive status messages
 
 ### **🎯 Example of CORRECT AI Interaction Flow**
 
@@ -1265,6 +1312,7 @@ Do you want me to:
 🎯 Advanced Features:
 21. 🚀 Do you want interactive action buttons? [ ]
 22. 📊 Do you want real-time progress bars? [ ]
+    (Visual progress: Build ●●●○○ → Test ●●●●○ → Deploy ●●●●● | On failure: Build ●●●✗○)
 23. 🌍 Do you want different rules per environment? [ ]
 24. 📎 Do you want file attachments? [ ]
 
@@ -1275,7 +1323,7 @@ Do you want me to:
 26. 🧵 Do you want to send notifications to specific Telegram topics/threads? [ ]
 27. 📊 Do you want to split different notification types into separate topics? [ ]"
 
-👤 User: "1.[y] 2.[y] 3.[y] 4.[n] 5.[y] 6.[n] 7.[y] 8.[y] 9.[y] 10.[y] 11.[n] 12.[n] 13.[n] 14.[y] 15.[y] 16.[y] 17.[y] 18.[n] 19.[n] 20.[y] 21.[y] 22.[y] 23.[n] 24.[n] 25.[y] 26.[n] 27.[y]"
+👤 User: "1.[y] 2.[y] 3.[y] 4.[n] 5.[y] 6.[n] 7.[y] 8.[y] 9.[y] 10.[y] 11.[y] 12.[n] 13.[n] 14.[n] 15.[y] 16.[y] 17.[y] 18.[y] 19.[n] 20.[n] 21.[y] 22.[y] 23.[y] 24.[n] 25.[n] 26.[y] 27.[n] 28.[y]"
 
 🤖 AI: "You selected scheduled workflows and topic organization! Let me configure:
 
@@ -1585,6 +1633,148 @@ jobs:
           Author: {{author}}
 ```
 
+#### **✅ CORRECT: Progress Bars Implementation**
+```yaml
+# ✅ CORRECT: Progressive updates with progress bars
+name: 🚀 CI/CD Pipeline with Progress
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+    # Step 1: Start notification with initial progress
+    - name: 📢 Start Pipeline
+      id: start_notification
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message: |
+          🚀 **CI/CD Pipeline Started**
+          
+          📊 **Progress:** `●○○○○ Build starting...`
+          
+          🏠 **Repository:** ${{ github.repository }}
+          🌿 **Branch:** ${{ github.ref_name }}
+
+    # Step 2: Update progress - Build complete
+    - name: 🔨 Build Complete
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        message: |
+          🚀 **CI/CD Pipeline In Progress**
+          
+          📊 **Progress:** `●●○○○ Build complete, testing...`
+          
+          🏠 **Repository:** ${{ github.repository }}
+          🌿 **Branch:** ${{ github.ref_name }}
+
+    # Step 3: Update progress - Tests complete
+    - name: 🧪 Tests Complete  
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        message: |
+          🚀 **CI/CD Pipeline In Progress**
+          
+          📊 **Progress:** `●●●○○ Tests passed, deploying...`
+          
+          🏠 **Repository:** ${{ github.repository }}
+          🌿 **Branch:** ${{ github.ref_name }}
+
+    # Step 4: Final update - Success
+    - name: ✅ Pipeline Complete
+      if: success()
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        message: |
+          ✅ **CI/CD Pipeline Completed**
+          
+          📊 **Progress:** `●●●●● Pipeline completed successfully!`
+          
+          🏠 **Repository:** ${{ github.repository }}
+          🌿 **Branch:** ${{ github.ref_name }}
+          ⏱️ **Duration:** ${{ job.duration }}
+
+    # Step 5: Final update - Failure with ✗
+    - name: ❌ Pipeline Failed
+      if: failure()
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        message: |
+          ❌ **CI/CD Pipeline Failed**
+          
+          📊 **Progress:** `●●✗○○ Failed at testing stage`
+          
+          🏠 **Repository:** ${{ github.repository }}
+          🌿 **Branch:** ${{ github.ref_name }}
+          🚨 **Error:** Check workflow logs for details
+```
+
+```yaml
+# ✅ CORRECT: Multi-stage progress with detailed status
+name: 🔄 Complex Deployment Pipeline
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📊 Update Progress - Building
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message: |
+          🚀 **Multi-Stage Deployment**
+          
+          **Build:** `●●●●○ 80%` ✅ Compiling...
+          **Test:** `○○○○○ 0%` ⏳ Waiting...
+          **Deploy:** `○○○○○ 0%` ⏳ Waiting...
+          
+          🏠 Repository: ${{ github.repository }}
+
+    - name: 📊 Update Progress - Testing
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.previous.outputs.message_id }}
+        message: |
+          🚀 **Multi-Stage Deployment**
+          
+          **Build:** `●●●●● 100%` ✅ Complete
+          **Test:** `●●●○○ 60%` 🧪 Running tests...
+          **Deploy:** `○○○○○ 0%` ⏳ Waiting...
+          
+          🏠 Repository: ${{ github.repository }}
+
+    - name: 📊 Update Progress - Failed Test
+      if: failure()
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.previous.outputs.message_id }}
+        message: |
+          ❌ **Multi-Stage Deployment Failed**
+          
+          **Build:** `●●●●● 100%` ✅ Complete
+          **Test:** `●●✗○○ Failed` ❌ Test suite failed
+          **Deploy:** `○○○○○ 0%` ⚠️ Skipped
+          
+          🏠 Repository: ${{ github.repository }}
+          🚨 **Action Required:** Fix failing tests before retry
+```
+
 #### **❌ WRONG Examples (What NOT to do)**
 ```yaml
 # ❌ WRONG: Non-existent template
@@ -1649,6 +1839,12 @@ template_vars: |
   customMessage=Value
   deployStatus=successful
 ```
+
+### **Message Formatting (v3.1.1+)**
+- 📝 **DEFAULT**: Markdown formatting (`**bold**`, `*italic*`) as of v3.1.1  
+- 🔄 **User Settings**: Respect existing `parse_mode` parameter if specified
+- 🚨 **Migration**: When updating existing integrations, ask user about format preference
+- ✅ **Templates**: All built-in templates support both HTML and Markdown automatically
 
 ### **Security First**
 - 🔐 Always use repository/organization secrets
@@ -1815,6 +2011,8 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 - [ ] **Cron Comments**: All scheduled workflows include explanatory comments about timing
 - [ ] **Topics Configuration**: If user wanted topics, configured message_thread_id using user's provided secret keys
 - [ ] **Topic Organization**: Properly assigned notification types to appropriate topics with fallbacks
+- [ ] **Progress Bars**: If user wanted progress bars, implemented with ●○✗ symbols and progressive message updates
+- [ ] **Progress Failure Handling**: Progress bars clearly show failure points and maintain consistent formatting
 - [ ] **Progressive notifications**: Used `message_id` for updates (recommended)
 - [ ] **GitHub integration**: Focused on repository events (PR, releases, workflows)
 - [ ] **NO FORBIDDEN MONITORING**: Did NOT suggest database, API, server, or infrastructure monitoring

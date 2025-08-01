@@ -804,7 +804,50 @@ message: "Сборка {{buildNumber}} завершена"
 # buildNumber не определена в template_vars
 ```
 
-### 3. Неподдерживаемые HTML теги
+### 3. HTML контент в template_vars
+
+При включении HTML контента в `template_vars` всегда используйте правильное экранирование JSON:
+
+```yaml
+# ❌ Ошибка - HTML с неэкранированными кавычками ломает JSON
+template_vars: |
+  {
+    "buildReport": "<div class="status">Успех</div>"
+  }
+
+# ✅ Исправлено - Правильное экранирование JSON
+template_vars: |
+  {
+    "buildReport": "<div class=\"status\">Успех</div>"
+  }
+
+# ✅ Лучшая практика - Используйте JSON.stringify в workflows
+template_vars: ${{ toJson({
+  buildReport: '<div class="status">Успех</div>',
+  duration: '2м 30с'
+}) }}
+```
+
+**💡 Совет:** При передаче HTML из GitHub Actions используйте функцию `toJson()` для автоматического экранирования:
+
+```yaml
+- name: Генерация отчета о сборке
+  id: report
+  run: |
+    echo "html=<b>Статус:</b> ✅ Успех<br/><b>Длительность:</b> 2м 30с" >> $GITHUB_OUTPUT
+
+- name: Отправка уведомления
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "Сборка завершена: {{buildReport}}"
+    template_vars: ${{ toJson({
+      buildReport: steps.report.outputs.html
+    }) }}
+```
+
+### 4. Неподдерживаемые HTML теги
 
 ```yaml
 # ❌ Теги будут удалены

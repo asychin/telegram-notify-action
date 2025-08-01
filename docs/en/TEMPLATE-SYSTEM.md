@@ -907,7 +907,50 @@ message: "Build {{buildNumber}} completed"
 # buildNumber not defined in template_vars
 ```
 
-### 3. Unsupported HTML Tags
+### 3. HTML Content in template_vars
+
+When including HTML content in `template_vars`, always use proper JSON escaping:
+
+```yaml
+# ❌ Error - HTML with unescaped quotes breaks JSON
+template_vars: |
+  {
+    "buildReport": "<div class="status">Success</div>"
+  }
+
+# ✅ Fixed - Proper JSON escaping
+template_vars: |
+  {
+    "buildReport": "<div class=\"status\">Success</div>"
+  }
+
+# ✅ Best practice - Use JSON.stringify in workflows
+template_vars: ${{ toJson({
+  buildReport: '<div class="status">Success</div>',
+  duration: '2m 30s'
+}) }}
+```
+
+**💡 Tip:** When passing HTML from GitHub Actions, use `toJson()` function for automatic escaping:
+
+```yaml
+- name: Generate build report
+  id: report
+  run: |
+    echo "html=<b>Status:</b> ✅ Success<br/><b>Duration:</b> 2m 30s" >> $GITHUB_OUTPUT
+
+- name: Send notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "Build completed: {{buildReport}}"
+    template_vars: ${{ toJson({
+      buildReport: steps.report.outputs.html
+    }) }}
+```
+
+### 4. Unsupported HTML Tags
 
 ```yaml
 # ❌ Tags will be removed
