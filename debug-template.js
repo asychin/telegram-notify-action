@@ -5,16 +5,17 @@
 process.env.TELEGRAM_TOKEN = "test_token";
 process.env.CHAT_ID = "test_chat_id";
 process.env.GITHUB_REPOSITORY = "asychin/telegram-notify-action";
+process.env.GITHUB_HEAD_REF = "feature/fix-formatting";
 process.env.GITHUB_REF_NAME = "7/merge";
 process.env.GITHUB_SHA = "c2ddf796d38d90d05b65fea71069d02c53e5dc2a";
 process.env.GITHUB_ACTOR = "asychin";
 process.env.GITHUB_RUN_NUMBER = "42";
 
-// Test 1: HTML mode with empty customMessage
-console.log("=== Test 1: HTML mode with empty customMessage ===");
+// Test 1: HTML mode formatting
+console.log("=== Test 1: HTML mode formatting ===");
 process.env.PARSE_MODE = "HTML";
-process.env.TEMPLATE = "deploy";
-process.env.MESSAGE = ""; // Empty message
+process.env.TEMPLATE = "success";
+process.env.MESSAGE = "Deployment completed successfully!";
 
 const originalMain = require.main;
 require.main = null;
