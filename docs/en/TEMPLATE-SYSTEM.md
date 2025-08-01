@@ -375,9 +375,9 @@ If a template is not found for the specified language, the English version is us
       Branch: {{refName}}
     inline_keyboard: |
       [
-        {"text": "🔗 View Commit", "url": "{{commitUrl}}"},
-        {"text": "📊 View Run", "url": "{{runUrl}}"},
-        {"text": "🏠 Repository", "url": "{{issuesUrl}}"}
+        {"text": "🔗 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
+        {"text": "📊 View Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+        {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
       ]
 ```
 
@@ -386,6 +386,8 @@ If a template is not found for the specified language, the English version is us
 - **Simplified syntax**: `{{runUrl}}` instead of `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
 - **Consistent formatting**: No manual URL construction
 - **Ready-to-use**: Available in all templates without additional configuration
+
+> **Note**: URL variables like `{{runUrl}}`, `{{commitUrl}}` work only in **message text**, not in `inline_keyboard`. For inline keyboards, use GitHub Actions variables or pass URLs via `template_vars`.
 
 ## 🎨 Creating Custom Messages
 

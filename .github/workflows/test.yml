@@ -415,6 +415,6 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📊 View Workflow", "url": "{{runUrl}}"},
-              {"text": "📝 View Commit", "url": "{{commitUrl}}"}
+              {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+              {"text": "📝 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}
             ]

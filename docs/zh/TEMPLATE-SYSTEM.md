@@ -372,9 +372,9 @@ language: zh  # 中文（默认如上）
       分支：{{refName}}
     inline_keyboard: |
       [
-        {"text": "🔗 查看提交", "url": "{{commitUrl}}"},
-        {"text": "📊 查看运行", "url": "{{runUrl}}"},
-        {"text": "🏠 仓库", "url": "{{issuesUrl}}"}
+        {"text": "🔗 查看提交", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
+        {"text": "📊 查看运行", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+        {"text": "🏠 仓库", "url": "${{ github.server_url }}/${{ github.repository }}"}
       ]
 ```
 
@@ -383,6 +383,8 @@ language: zh  # 中文（默认如上）
 - **简化语法**：使用 `{{runUrl}}` 而不是 `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
 - **一致格式**：无需手动构建 URL
 - **即用即得**：在所有模板中可用，无需额外配置
+
+> **注意**：URL 变量如 `{{runUrl}}`、`{{commitUrl}}` 仅在**消息文本**中有效，不适用于 `inline_keyboard`。对于内联键盘，请使用 GitHub Actions 变量或通过 `template_vars` 传递 URL。
 
 ## 🎨 创建自定义消息
 
