@@ -121,7 +121,7 @@ jobs:
             **🏷️ Version:** ${{ steps.release-info.outputs.version }}
             **🏠 Repository:** ${{ github.repository }}
             **👤 Owner:** ${{ github.repository_owner }}
-            **📅 Published:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            **📅 Published:** ${{ steps.timestamp.outputs.time }}
             **🔖 Tag:** ${{ steps.release-info.outputs.version }}
             **👤 Author:** ${{ github.actor }}
 
