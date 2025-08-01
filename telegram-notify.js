@@ -501,34 +501,34 @@ class TelegramNotify {
       }
 
       // Provide default values for deploy template variables if not set
-      if (!eventContext.hasOwnProperty("baseBranch")) {
+      if (!Object.hasOwn(eventContext, "baseBranch")) {
         eventContext.baseBranch = this.githubContext.refName || "main";
       }
-      if (!eventContext.hasOwnProperty("headBranch")) {
+      if (!Object.hasOwn(eventContext, "headBranch")) {
         eventContext.headBranch = this.githubContext.refName || "main";
       }
-      if (!eventContext.hasOwnProperty("filesChanged")) {
+      if (!Object.hasOwn(eventContext, "filesChanged")) {
         eventContext.filesChanged = 0;
       }
-      if (!eventContext.hasOwnProperty("additions")) {
+      if (!Object.hasOwn(eventContext, "additions")) {
         eventContext.additions = 0;
       }
-      if (!eventContext.hasOwnProperty("deletions")) {
+      if (!Object.hasOwn(eventContext, "deletions")) {
         eventContext.deletions = 0;
       }
-      if (!eventContext.hasOwnProperty("commitCount")) {
+      if (!Object.hasOwn(eventContext, "commitCount")) {
         eventContext.commitCount = 1;
       }
-      if (!eventContext.hasOwnProperty("author")) {
+      if (!Object.hasOwn(eventContext, "author")) {
         eventContext.author = this.githubContext.actor || "Unknown";
       }
-      if (!eventContext.hasOwnProperty("prTitle")) {
+      if (!Object.hasOwn(eventContext, "prTitle")) {
         eventContext.prTitle = "Deployment via " + this.githubContext.eventName;
       }
-      if (!eventContext.hasOwnProperty("prCreatedAt")) {
+      if (!Object.hasOwn(eventContext, "prCreatedAt")) {
         eventContext.prCreatedAt = new Date().toISOString();
       }
-      if (!eventContext.hasOwnProperty("deployStatus")) {
+      if (!Object.hasOwn(eventContext, "deployStatus")) {
         eventContext.deployStatus = "successful";
       }
     } catch (error) {
