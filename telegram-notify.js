@@ -383,7 +383,45 @@ class TelegramNotify {
             eventContext.lastCommitMessage = safeGet(lastCommit, "message");
             eventContext.lastCommitAuthor = safeGet(lastCommit, "author.name");
             eventContext.lastCommitId = safeGet(lastCommit, "id");
+            eventContext.author = safeGet(lastCommit, "author.name"); // Alias for author
           }
+
+          // For deploy template compatibility - extract branch info from ref
+          const ref = safeGet(eventData, "ref") || "";
+          const branchName = ref.replace("refs/heads/", "");
+          eventContext.baseBranch = branchName; // Use current branch as base
+          eventContext.headBranch = branchName; // Use current branch as head
+
+          // Set deployment-related variables for push events
+          eventContext.prTitle =
+            safeGet(eventData, "head_commit.message") || "Direct push";
+          eventContext.prCreatedAt =
+            safeGet(eventData, "head_commit.timestamp") || "";
+
+          // Calculate file changes from commits
+          let totalAdditions = 0;
+          let totalDeletions = 0;
+          let totalFilesChanged = 0;
+
+          if (Array.isArray(commits)) {
+            commits.forEach((commit) => {
+              const added = safeGet(commit, "added") || [];
+              const removed = safeGet(commit, "removed") || [];
+              const modified = safeGet(commit, "modified") || [];
+
+              totalFilesChanged +=
+                added.length + removed.length + modified.length;
+              // Note: GitHub push events don't include line-level stats
+              // So we use file count as approximation
+              totalAdditions += added.length + modified.length;
+              totalDeletions += removed.length;
+            });
+          }
+
+          eventContext.filesChanged = totalFilesChanged;
+          eventContext.additions = totalAdditions;
+          eventContext.deletions = totalDeletions;
+
           break;
         }
 
@@ -460,6 +498,38 @@ class TelegramNotify {
       // Add event action for all events (if available)
       if (eventData.action) {
         eventContext.action = eventData.action;
+      }
+
+      // Provide default values for deploy template variables if not set
+      if (!eventContext.hasOwnProperty("baseBranch")) {
+        eventContext.baseBranch = this.githubContext.refName || "main";
+      }
+      if (!eventContext.hasOwnProperty("headBranch")) {
+        eventContext.headBranch = this.githubContext.refName || "main";
+      }
+      if (!eventContext.hasOwnProperty("filesChanged")) {
+        eventContext.filesChanged = 0;
+      }
+      if (!eventContext.hasOwnProperty("additions")) {
+        eventContext.additions = 0;
+      }
+      if (!eventContext.hasOwnProperty("deletions")) {
+        eventContext.deletions = 0;
+      }
+      if (!eventContext.hasOwnProperty("commitCount")) {
+        eventContext.commitCount = 1;
+      }
+      if (!eventContext.hasOwnProperty("author")) {
+        eventContext.author = this.githubContext.actor || "Unknown";
+      }
+      if (!eventContext.hasOwnProperty("prTitle")) {
+        eventContext.prTitle = "Deployment via " + this.githubContext.eventName;
+      }
+      if (!eventContext.hasOwnProperty("prCreatedAt")) {
+        eventContext.prCreatedAt = new Date().toISOString();
+      }
+      if (!eventContext.hasOwnProperty("deployStatus")) {
+        eventContext.deployStatus = "successful";
       }
     } catch (error) {
       this.warning(`Error extracting event context: ${error.message}`);

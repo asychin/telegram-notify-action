@@ -10,6 +10,42 @@ process.env.GITHUB_REF_NAME = "7/merge";
 process.env.GITHUB_SHA = "c2ddf796d38d90d05b65fea71069d02c53e5dc2a";
 process.env.GITHUB_ACTOR = "asychin";
 process.env.GITHUB_RUN_NUMBER = "42";
+process.env.GITHUB_EVENT_NAME = "push";
+
+// Create mock event data file
+const fs = require("fs");
+const path = require("path");
+const eventFile = path.join(__dirname, "mock-event.json");
+
+const mockEventData = {
+  ref: "refs/heads/main",
+  pusher: {
+    name: "asychin",
+    id: 12345,
+  },
+  head_commit: {
+    message: "Fix template variables in deploy template",
+    timestamp: "2024-08-01T14:30:00Z",
+    author: {
+      name: "Sychin Andrey",
+    },
+  },
+  commits: [
+    {
+      id: "c2ddf796d38d90d05b65fea71069d02c53e5dc2a",
+      message: "Fix template variables in deploy template",
+      author: {
+        name: "Sychin Andrey",
+      },
+      added: ["new-file.js"],
+      removed: ["old-file.js"],
+      modified: ["telegram-notify.js", "README.md"],
+    },
+  ],
+};
+
+fs.writeFileSync(eventFile, JSON.stringify(mockEventData, null, 2));
+process.env.GITHUB_EVENT_PATH = eventFile;
 
 // Test 1: HTML mode formatting
 console.log("=== Test 1: HTML mode formatting ===");
@@ -51,5 +87,26 @@ const notifier3 = new TelegramNotify();
 const result3 = notifier3.processTemplate();
 console.log("Result 3:");
 console.log(result3);
+console.log();
+
+// Test 4: Russian deploy template
+console.log("=== Test 4: Russian deploy template ===");
+process.env.PARSE_MODE = "Markdown";
+process.env.TEMPLATE = "deploy";
+process.env.MESSAGE = "Тестовое сообщение деплоя";
+process.env.LANGUAGE = "ru";
+
+delete require.cache[require.resolve("./telegram-notify.js")];
+const notifier4 = new TelegramNotify();
+const result4 = notifier4.processTemplate();
+console.log("Result 4:");
+console.log(result4);
 
 require.main = originalMain;
+
+// Clean up mock event file
+try {
+  fs.unlinkSync(eventFile);
+} catch (error) {
+  // Ignore cleanup errors
+}
