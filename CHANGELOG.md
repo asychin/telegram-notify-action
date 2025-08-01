@@ -1,6 +1,6 @@
 # 📝 Changelog
 
-## [v3.2.3] - 2025-01-31
+## [v3.2.3] - 2025-08-02
 
 ### 🐛 **Bug Fixes**
 
@@ -18,7 +18,7 @@
 - Ensured all GitHub release content processing is secure
 - Eliminated final shell injection vulnerability
 
-## [v3.2.2] - 2025-01-31
+## [v3.2.2] - 2025-08-02
 
 ### 🐛 **Bug Fixes**
 
@@ -36,7 +36,7 @@
 - Escaped `${{ }}` in YAML examples to prevent shell interpretation
 - Fixed "command not found" errors in release workflow
 
-## [v3.2.1] - 2025-01-31
+## [v3.2.1] - 2025-08-02
 
 ### 🐛 **Bug Fixes**
 
