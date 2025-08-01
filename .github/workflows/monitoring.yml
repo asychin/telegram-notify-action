@@ -483,12 +483,20 @@ jobs:
           # Get latest release
           LATEST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "No releases")
 
+          # Calculate commits per contributor
+          if [ "$CONTRIBUTORS" -gt 0 ]; then
+            COMMITS_PER_CONTRIBUTOR=$(($TOTAL_COMMITS / $CONTRIBUTORS))
+          else
+            COMMITS_PER_CONTRIBUTOR=0
+          fi
+
           echo "total_commits=$TOTAL_COMMITS" >> $GITHUB_OUTPUT
           echo "commits_this_month=$COMMITS_THIS_MONTH" >> $GITHUB_OUTPUT
           echo "contributors=$CONTRIBUTORS" >> $GITHUB_OUTPUT
           echo "total_files=$TOTAL_FILES" >> $GITHUB_OUTPUT
           echo "code_lines=$CODE_LINES" >> $GITHUB_OUTPUT
           echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
+          echo "commits_per_contributor=$COMMITS_PER_CONTRIBUTOR" >> $GITHUB_OUTPUT
 
       - name: Send statistics report
         uses: ./
@@ -519,7 +527,7 @@ jobs:
             • 📊 **Project Size:** ${{ steps.stats.outputs.code_lines > 10000 && '🟢 Large' || steps.stats.outputs.code_lines > 1000 && '🟡 Medium' || '🟣 Small' }}
 
             **📈 Performance Metrics:**
-            • 🎯 **Commits per Contributor:** ~${{ steps.stats.outputs.contributors > 0 && github_action_expressions.round(steps.stats.outputs.total_commits / steps.stats.outputs.contributors) || '0' }}
+            • 🎯 **Commits per Contributor:** ~${{ steps.stats.outputs.commits_per_contributor }}
             • 🔥 **Monthly Activity:** ${{ steps.stats.outputs.commits_this_month }}/${{ steps.stats.outputs.total_commits }} commits
             • 👨‍💻 **Collaboration Level:** ${{ steps.stats.outputs.contributors > 5 && '🟢 Team Project' || steps.stats.outputs.contributors > 1 && '🟡 Small Team' || '🟣 Individual' }}
 
