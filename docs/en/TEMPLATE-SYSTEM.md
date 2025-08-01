@@ -234,6 +234,58 @@ Ready-to-use links for inline keyboards and messages:
 | `jobId`      | Current job ID      | `1234567`                        |
 | `actionPath` | Action path         | `/home/runner/work/_actions/...` |
 
+### Event Context Variables (NEW in v3)
+
+Automatically extracted variables based on the GitHub event type:
+
+#### Issues Events
+| Variable       | Description           | Example                |
+| -------------- | --------------------- | ---------------------- |
+| `author`       | Issue author          | `john-doe`             |
+| `issueNumber`  | Issue number          | `42`                   |
+| `issueTitle`   | Issue title           | `Bug in login system`  |
+| `issueState`   | Issue state           | `open`, `closed`       |
+| `issueBody`    | Issue description     | `Description text...`  |
+| `labels`       | Labels (comma-sep.)   | `bug, frontend`        |
+| `assignees`    | Assignees (comma-sep.)| `user1, user2`         |
+| `createdAt`    | Creation date         | `2024-01-15T10:30:00Z` |
+| `updatedAt`    | Last update date      | `2024-01-16T14:20:00Z` |
+
+#### Pull Request Events  
+| Variable       | Description           | Example                |
+| -------------- | --------------------- | ---------------------- |
+| `author`       | PR author             | `jane-doe`             |
+| `prNumber`     | Pull request number   | `123`                  |
+| `prTitle`      | Pull request title    | `Add new feature`      |
+| `prState`      | Pull request state    | `open`, `merged`       |
+| `prBody`       | Pull request desc.    | `This PR adds...`      |
+| `prUrl`        | Pull request URL      | `https://github.com/...` |
+| `baseBranch`   | Target branch         | `main`                 |
+| `headBranch`   | Source branch         | `feature/auth`         |
+| `isDraft`      | Is draft PR           | `true`, `false`        |
+| `mergeable`    | Is mergeable          | `true`, `false`        |
+
+#### Push Events
+| Variable             | Description           | Example                |
+| -------------------- | --------------------- | ---------------------- |
+| `pusher`             | User who pushed       | `dev-user`             |
+| `commitCount`        | Number of commits     | `3`                    |
+| `lastCommitMessage`  | Last commit message   | `Fix authentication`   |
+| `lastCommitAuthor`   | Last commit author    | `dev-user`             |
+| `lastCommitId`       | Last commit ID        | `a1b2c3d...`           |
+
+#### Release Events
+| Variable             | Description           | Example                |
+| -------------------- | --------------------- | ---------------------- |
+| `releaseAuthor`      | Release author        | `maintainer`           |
+| `releaseName`        | Release name          | `v2.1.0`               |
+| `releaseTag`         | Release tag           | `v2.1.0`               |
+| `releaseBody`        | Release notes         | `New features...`      |
+| `isPrerelease`       | Is prerelease         | `true`, `false`        |
+| `isDraft`            | Is draft release      | `true`, `false`        |
+
+> **Note**: Event context variables are automatically available based on the triggering event - no manual configuration required!
+
 ### Special Variables
 
 | Variable        | Description                    | Usage           |
@@ -388,6 +440,103 @@ If a template is not found for the specified language, the English version is us
 - **Ready-to-use**: Available in all templates without additional configuration
 
 > **Note**: URL variables like `{{runUrl}}`, `{{commitUrl}}` work only in **message text**, not in `inline_keyboard`. For inline keyboards, use GitHub Actions variables or pass URLs via `template_vars`.
+
+### Event Context Examples (NEW in v3)
+
+#### Issue Notification
+
+```yaml
+- name: Issue Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: warning
+    message: |
+      🐛 **New Issue Created**
+
+      **Title:** {{issueTitle}}
+      **Author:** {{author}}
+      **Number:** #{{issueNumber}}
+      **State:** {{issueState}}
+      **Labels:** {{labels}}
+      
+      **Description:**
+      {{issueBody}}
+
+      **Assignees:** {{assignees}}
+      **Created:** {{createdAt}}
+```
+
+#### Pull Request Notification
+
+```yaml
+- name: PR Notification  
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: info
+    message: |
+      🔄 **Pull Request {{action}}**
+
+      **Title:** {{prTitle}}
+      **Author:** {{author}}
+      **Number:** #{{prNumber}}
+      **State:** {{prState}}
+      
+      **Branches:** {{headBranch}} → {{baseBranch}}
+      **Draft:** {{isDraft}}
+      **Mergeable:** {{mergeable}}
+      
+      **Labels:** {{labels}}
+      **Assignees:** {{assignees}}
+```
+
+#### Push Notification
+
+```yaml
+- name: Push Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      📤 **New Push to {{refName}}**
+
+      **Pusher:** {{pusher}}
+      **Commits:** {{commitCount}}
+      
+      **Last Commit:**
+      • Author: {{lastCommitAuthor}}
+      • Message: {{lastCommitMessage}}
+      • ID: {{lastCommitId}}
+```
+
+#### Release Notification
+
+```yaml
+- name: Release Notification
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: release
+    message: |
+      🎉 **New Release Published**
+
+      **Version:** {{releaseName}}
+      **Tag:** {{releaseTag}}
+      **Author:** {{releaseAuthor}}
+      **Prerelease:** {{isPrerelease}}
+      **Draft:** {{isDraft}}
+      
+      **Release Notes:**
+      {{releaseBody}}
+      
+      **Created:** {{releaseCreatedAt}}
+```
 
 ## 🎨 Creating Custom Messages
 

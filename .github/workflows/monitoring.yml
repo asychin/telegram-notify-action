@@ -72,27 +72,43 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.notification-type.outputs.template }}
-          language: ru
+          language: en
           parse_mode: "Markdown"
           message: |
-            **🎯 Детали Issue:**
+            ${{ steps.notification-type.outputs.emoji }} **Issue ${{ steps.notification-type.outputs.action_text }}**
 
-            **📊 Статус:** {{action}}
-            **👤 Автор:** `{{author}}`
-            **🏷️ Метки:** {{labels}}
-            **📅 Создан:** {{createdAt}}
+            **📋 Title:** {{issueTitle}}
+            **👤 Author:** `{{author}}`
+            **🔢 Number:** #{{issueNumber}}
+            **📊 State:** `{{issueState}}`
+            **🏷️ Labels:** {{labels}}
+            **👥 Assignees:** {{assignees}}
+            **📅 Created:** {{createdAt}}
+            **🔄 Updated:** {{updatedAt}}
 
-            **📝 Номер Issue:** #{{issueNumber}}
+            **📝 Description:**
+            {{issueBody}}
+
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
           template_vars: |
             {
               "action": "${{ steps.notification-type.outputs.action_text }}",
-              "emoji": "${{ steps.notification-type.outputs.emoji }}"
+              "emoji": "${{ steps.notification-type.outputs.emoji }}",
+              "customMessage": "New activity in repository {{repositoryName}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "💬 Добавить комментарий", "url": "${{ github.event.issue.html_url }}#issuecomment-new"},
-              {"text": "✏️ Редактировать", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "💬 Add Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+            ],
+            [
+              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "🔒 Close Issue", "url": "${{ github.event.issue.html_url }}"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
             ]
 
       - name: Send comment notification
@@ -104,20 +120,37 @@ jobs:
           template: info
           parse_mode: "Markdown"
           message: |
-            💬 **Новый комментарий к Issue**
+            💬 **New Issue Comment**
 
-            **🔢 #${{ github.event.issue.number }}** - 📝 ${{ github.event.issue.title }}
+            **📋 Issue:** {{issueTitle}}
+            **🔢 Number:** #{{issueNumber}}
+            **📊 Issue State:** {{issueState}}
 
-            **👤 Комментатор:** ${{ github.event.comment.user.login }}
-            **🕐 Время:** ${{ github.event.comment.created_at }}
+            **👤 Comment Author:** {{commentAuthor}}
+            **🕐 Comment Time:** {{commentCreatedAt}}
+            **🆔 Comment ID:** {{commentId}}
 
-            **💭 Комментарий:**
-            ${{ github.event.comment.body }}
+            **💭 Comment Text:**
+            {{commentBody}}
+
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
+          template_vars: |
+            {
+              "customMessage": "Activity in repository {{repositoryName}} - new comment from {{commentAuthor}}"
+            }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть комментарий", "url": "${{ github.event.comment.html_url }}"},
-              {"text": "📝 Ответить", "url": "${{ github.event.issue.html_url }}#issuecomment-new"},
-              {"text": "🔗 Перейти к Issue", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
+              {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+            ],
+            [
+              {"text": "🔗 Go to Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
             ]
 
   pr-notifications:
@@ -165,41 +198,56 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: deploy # Используем шаблон deploy для PR как развертывания кода
-          language: ru
+          template: deploy # Use deploy template for PR as code deployment
+          language: en
           parse_mode: "Markdown"
           message: |
-            **📈 Статистика изменений:**
+            ${{ steps.pr-notification-type.outputs.emoji }} **Pull Request ${{ steps.pr-notification-type.outputs.action_text }}**
 
-            **🌿 Ветка:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
-            **📁 Файлов изменено:** ${{ github.event.pull_request.changed_files }}
-            **📝 Коммитов:** ${{ github.event.pull_request.commits }}
-            **📊 Изменения:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
-            **👤 Автор:** ${{ github.event.pull_request.user.login }}
-            **📅 Создан:** ${{ github.event.pull_request.created_at }}
+            **📋 Title:** {{prTitle}}
+            **🔢 Number:** #{{prNumber}}
+            **👤 Author:** {{author}}
+            **📊 State:** `{{prState}}`
+            **✏️ Draft:** {{isDraft}}
+            **🔀 Mergeable:** {{mergeable}}
 
-            **📝 Краткое описание:**
-            *${{ github.event.pull_request.title }}*
+            **🌿 Branches:** `{{headBranch}}` → `{{baseBranch}}`
+            **🏷️ Labels:** {{labels}}
+            **👥 Assignees:** {{assignees}}
+
+            **📈 Change Statistics:**
+            • 📁 **Files changed:** ${{ github.event.pull_request.changed_files }}
+            • 📝 **Commits:** ${{ github.event.pull_request.commits }}
+            • 📊 **Changes:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
+            • 📅 **Created:** {{prCreatedAt}}
+            • 🔄 **Updated:** {{prUpdatedAt}}
+
+            **📝 Description:**
+            {{prBody}}
+
+            **🏠 Repository:** {{repository}}
           template_vars: |
             {
-              "prNumber": "${{ github.event.pull_request.number }}",
-              "prTitle": "${{ github.event.pull_request.title }}",
-              "author": "${{ github.event.pull_request.user.login }}",
               "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
               "version": "PR#${{ github.event.pull_request.number }}",
-              "additions": "${{ github.event.pull_request.additions }}",
-              "deletions": "${{ github.event.pull_request.deletions }}",
-              "changedFiles": "${{ github.event.pull_request.changed_files }}",
-              "commits": "${{ github.event.pull_request.commits }}",
-              "headBranch": "${{ github.event.pull_request.head.ref }}",
-              "baseBranch": "${{ github.event.pull_request.base.ref }}"
+              "customMessage": "Pull Request {{prNumber}} in repository {{repositoryName}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "📝 Сделать ревью", "url": "${{ github.event.pull_request.html_url }}/files"},
-              {"text": "✅ Одобрить", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
-              {"text": "🔄 Слить", "url": "${{ github.event.pull_request.html_url }}"}
+              {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
+              {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"}
+            ],
+            [
+              {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
+              {"text": "❌ Request Changes", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
+            ],
+            [
+              {"text": "🔄 Merge PR", "url": "${{ github.event.pull_request.html_url }}"},
+              {"text": "🔒 Close PR", "url": "${{ github.event.pull_request.html_url }}"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
             ]
 
       - name: Send review notification
@@ -211,20 +259,39 @@ jobs:
           template: info
           parse_mode: "Markdown"
           message: |
-            📝 **Обзор Pull Request**
+            📝 **Pull Request Review**
 
-            **🔢 #${{ github.event.pull_request.number }}** - 📑 ${{ github.event.pull_request.title }}
+            **📋 PR:** {{prTitle}}
+            **🔢 Number:** #{{prNumber}}
+            **📊 PR State:** {{prState}}
+            **🔗 URL:** {{prUrl}}
 
-            **👤 Ревьюер:** ${{ github.event.review.user.login }}
-            **📊 Статус:** ${{ github.event.review.state == 'approved' && '✅ Одобрено' || github.event.review.state == 'changes_requested' && '❌ Требуются изменения' || '💬 Комментарий' }}
-            **🕐 Время:** ${{ github.event.review.submitted_at }}
+            **👤 Reviewer:** {{reviewAuthor}}
+            **⭐ Review Status:** {{reviewState}}
+            **🆔 Review ID:** {{reviewId}}
+            **🕐 Time:** ${{ github.event.review.submitted_at }}
 
-            ${{ github.event.review.body && format('**💭 Комментарий к обзору:**\n{0}', github.event.review.body) || '' }}
+            **💭 Review Comment:**
+            {{reviewBody}}
+
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
+          template_vars: |
+            {
+              "customMessage": "New review from {{reviewAuthor}} for PR #{{prNumber}}"
+            }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть ревью", "url": "${{ github.event.review.html_url }}"},
-              {"text": "📝 Перейти к PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "💬 Ответить на ревью", "url": "${{ github.event.pull_request.html_url }}#discussion_r"}
+              {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
+              {"text": "📝 Go to PR", "url": "${{ github.event.pull_request.html_url }}"}
+            ],
+            [
+              {"text": "💬 Reply to Review", "url": "${{ github.event.pull_request.html_url }}#discussion_r"},
+              {"text": "✏️ Edit PR", "url": "${{ github.event.pull_request.html_url }}"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
             ]
 
   discussion-notifications:
@@ -241,23 +308,39 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
           parse_mode: "Markdown"
+          language: en
           message: |
-            💬 **Новое обсуждение ${{ github.event.action == 'created' && 'создано' || github.event.action == 'answered' && 'отвечено' || github.event.action }}**
+            💬 **New Discussion ${{ github.event.action == 'created' && 'Created' || github.event.action == 'answered' && 'Answered' || github.event.action }}**
 
-            **📢 ${{ github.event.discussion.title }}**
+            **📢 Title:** ${{ github.event.discussion.title }}
+            **👤 Author:** ${{ github.event.discussion.user.login }}
+            **🏷️ Category:** ${{ github.event.discussion.category.name }}
+            **📅 Created:** ${{ github.event.discussion.created_at }}
+            **🆔 Discussion ID:** ${{ github.event.discussion.number }}
+            **💬 Answer Status:** ${{ github.event.discussion.answer_chosen_at && '✅ Has chosen answer' || '❓ Awaiting answer' }}
+            **🔒 Locked:** ${{ github.event.discussion.locked && '🔒 Yes' || '🔓 No' }}
 
-            **👤 Автор:** ${{ github.event.discussion.user.login }}
-            **🏷️ Категория:** ${{ github.event.discussion.category.name }}
-            **📅 Создано:** ${{ github.event.discussion.created_at }}
-            **💬 Ответов:** ${{ github.event.discussion.answer_chosen_at && '✅ Есть выбранный ответ' || '❓ Ждет ответа' }}
-
-            **📝 Содержание:**
+            **📝 Content:**
             ${{ github.event.discussion.body }}
+
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
+          template_vars: |
+            {
+              "customMessage": "New discussion in repository {{repositoryName}}"
+            }
           inline_keyboard: |
             [
-              {"text": "💬 Присоединиться к обсуждению", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "👍 Поставить реакцию", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "✍️ Ответить", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
+              {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
+              {"text": "✍️ Reply", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
+            ],
+            [
+              {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"},
+              {"text": "🔖 Subscribe", "url": "${{ github.event.discussion.html_url }}"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "💬 All Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
             ]
 
   health-check:
@@ -322,40 +405,54 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: test # Используем шаблон test для health check
-          language: ru
+          template: test # Use test template for health check
+          language: en
           parse_mode: "Markdown"
           message: |
-            **🏥 Детальный отчет здоровья репозитория:**
+            ${{ steps.health-check.outputs.health_emoji }} **Repository Health Report**
 
-            **📅 Дата проверки:** ${{ steps.health-check.outputs.current_date }}
-            **💾 Размер репозитория:** `${{ steps.health-check.outputs.repo_size }}`
-            **🎯 Общий статус:** ${{ steps.health-check.outputs.status == 'success' && '✅ Отличное здоровье' || '⚠️ Требует внимания' }}
-            **📊 Покрытие тестами:** ${{ steps.health-check.outputs.coverage }}%
-            **🔒 Уязвимости:** ${{ steps.health-check.outputs.vulnerabilities == '0' && '✅ Не найдено' || format('⚠️ {0} найдено', steps.health-check.outputs.vulnerabilities) }}
-            **📦 Устаревшие пакеты:** ${{ steps.health-check.outputs.outdated == '0' && '✅ Все актуальны' || format('📦 {0} требуют обновления', steps.health-check.outputs.outdated) }}
+            **🏠 Repository:** {{repository}}
+            **📅 Check Date:** ${{ steps.health-check.outputs.current_date }}
+            **🎯 Overall Status:** ${{ steps.health-check.outputs.status == 'success' && '✅ Excellent Health' || '⚠️ Needs Attention' }}
+            **🏆 Health Score:** ${{ steps.health-check.outputs.vulnerabilities == '0' && steps.health-check.outputs.outdated < '5' && '95%' || '70%' }}
 
-            **📋 Рекомендации:**
-            ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Обновить зависимости с уязвимостями' || '• ✅ Безопасность в порядке' }}
-            ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Обновить {0} устаревших пакетов', steps.health-check.outputs.outdated) || '• ✅ Все пакеты актуальны' }}
-            • 📈 Поддерживать покрытие тестами выше 80%
+            **📊 Detailed Statistics:**
+            • 💾 **Repository Size:** `${{ steps.health-check.outputs.repo_size }}`
+            • 🧪 **Test Coverage:** {{coverage}}
+            • 🔒 **Vulnerabilities:** ${{ steps.health-check.outputs.vulnerabilities == '0' && '✅ None found' || format('⚠️ {0} found', steps.health-check.outputs.vulnerabilities) }}
+            • 📦 **Outdated Packages:** ${{ steps.health-check.outputs.outdated == '0' && '✅ All up to date' || format('📦 {0} need updates', steps.health-check.outputs.outdated) }}
+
+            **🎯 Key Metrics:**
+            • ⭐ **Test Status:** {{testStatus}}
+            • 🛡️ **Security:** ${{ steps.health-check.outputs.vulnerabilities == '0' && '🟢 Excellent' || '🟡 Needs attention' }}
+            • 📈 **Freshness:** ${{ steps.health-check.outputs.outdated < '3' && '🟢 Excellent' || '🟡 Needs updates' }}
+
+            **📋 Recommendations:**
+            ${{ steps.health-check.outputs.vulnerabilities > 0 && '• ⚠️ Update dependencies with vulnerabilities' || '• ✅ Security is good' }}
+            ${{ steps.health-check.outputs.outdated > 0 && format('• 📦 Update {0} outdated packages', steps.health-check.outputs.outdated) || '• ✅ All packages up to date' }}
+            • 📈 Maintain test coverage above 80%
+            • 🔄 Regularly run security checks
+
+            **🌿 Branch:** {{refName}}
+            **👤 Check initiated by:** {{actor}}
           template_vars: |
             {
-              "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ Все проверки пройдены' || '⚠️ Есть проблемы' }}",
+              "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ All checks passed' || '⚠️ Issues found' }}",
               "coverage": "${{ steps.health-check.outputs.coverage }}%",
-              "vulnerabilities": "${{ steps.health-check.outputs.vulnerabilities }}",
-              "outdatedPackages": "${{ steps.health-check.outputs.outdated }}",
-              "repoSize": "${{ steps.health-check.outputs.repo_size }}",
-              "healthScore": "${{ steps.health-check.outputs.vulnerabilities == '0' && steps.health-check.outputs.outdated < '5' && '95%' || '70%' }}",
-              "checkDate": "${{ steps.health-check.outputs.current_date }}",
-              "totalIssues": "${{ steps.health-check.outputs.vulnerabilities }}+${{ steps.health-check.outputs.outdated }}"
+              "customMessage": "Automated health check for repository {{repositoryName}} completed"
             }
           inline_keyboard: |
             [
-              {"text": "📊 Действия", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔒 Безопасность", "url": "${{ github.server_url }}/${{ github.repository }}/security"},
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "🔧 Настройки", "url": "${{ github.server_url }}/${{ github.repository }}/settings"}
+              {"text": "📊 Actions", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
+              {"text": "🔒 Security", "url": "${{ github.server_url }}/${{ github.repository }}/security"}
+            ],
+            [
+              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
+              {"text": "📋 Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+            ],
+            [
+              {"text": "🔧 Settings", "url": "${{ github.server_url }}/${{ github.repository }}/settings"},
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
             ]
 
   repository-stats:
@@ -400,36 +497,55 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
           parse_mode: "Markdown"
+          language: en
           message: |
-            📊 **Отчет по статистике репозитория**
+            📊 **Detailed Repository Statistics**
 
-            **🏠 Репозиторий:** ${{ github.repository }}
-            **📅 Сгенерирован:** ${{ steps.stats.outputs.current_date }}
+            **🏠 Repository:** {{repository}}
+            **👤 Owner:** {{repositoryOwnerName}}
+            **📅 Report Generated:** ${{ steps.stats.outputs.current_date }}
+            **🌿 Current Branch:** {{refName}}
 
-            **🚀 Активность разработки:**
-            • 📝 Всего коммитов: **${{ steps.stats.outputs.total_commits }}**
-            • 📈 Коммитов за месяц: **${{ steps.stats.outputs.commits_this_month }}**
-            • 👥 Участников: **${{ steps.stats.outputs.contributors }}**
+            **🚀 Development Activity:**
+            • 📝 **Total Commits:** `${{ steps.stats.outputs.total_commits }}`
+            • 📈 **Commits This Month:** `${{ steps.stats.outputs.commits_this_month }}`
+            • 👥 **Unique Contributors:** `${{ steps.stats.outputs.contributors }}`
+            • ⚡ **Activity Level:** ${{ steps.stats.outputs.commits_this_month > 10 && '🟢 High' || steps.stats.outputs.commits_this_month > 5 && '🟡 Medium' || '🔴 Low' }}
 
-            **💻 Кодовая база:**
-            • 📁 Всего файлов: **${{ steps.stats.outputs.total_files }}**
-            • 📏 Строк кода: **${{ steps.stats.outputs.code_lines }}**
-            • 🏷️ Последний релиз: **${{ steps.stats.outputs.latest_release }}**
+            **💻 Codebase Composition:**
+            • 📁 **Total Files:** `${{ steps.stats.outputs.total_files }}`
+            • 📏 **Lines of Code:** `${{ steps.stats.outputs.code_lines }}`
+            • 🏷️ **Latest Release:** `${{ steps.stats.outputs.latest_release }}`
+            • 📊 **Project Size:** ${{ steps.stats.outputs.code_lines > 10000 && '🟢 Large' || steps.stats.outputs.code_lines > 1000 && '🟡 Medium' || '🟣 Small' }}
 
-            **🔗 Полезные ссылки:**
-            • 👥 [Участники](https://github.com/${{ github.repository }}/graphs/contributors)
-            • 📈 [Активность коммитов](https://github.com/${{ github.repository }}/graphs/commit-activity)
-            • 📊 [Частота кода](https://github.com/${{ github.repository }}/graphs/code-frequency)
+            **📈 Performance Metrics:**
+            • 🎯 **Commits per Contributor:** ~${{ steps.stats.outputs.contributors > 0 && github_action_expressions.round(steps.stats.outputs.total_commits / steps.stats.outputs.contributors) || '0' }}
+            • 🔥 **Monthly Activity:** ${{ steps.stats.outputs.commits_this_month }}/${{ steps.stats.outputs.total_commits }} commits
+            • 👨‍💻 **Collaboration Level:** ${{ steps.stats.outputs.contributors > 5 && '🟢 Team Project' || steps.stats.outputs.contributors > 1 && '🟡 Small Team' || '🟣 Individual' }}
+
+            **🔗 Useful Resources:**
+            • 👥 [Contributors](https://github.com/${{ github.repository }}/graphs/contributors)
+            • 📈 [Commit Activity](https://github.com/${{ github.repository }}/graphs/commit-activity)
+            • 📊 [Code Frequency](https://github.com/${{ github.repository }}/graphs/code-frequency)
+            • 🌐 [Network Graph](https://github.com/${{ github.repository }}/network)
           template_vars: |
             {
-              "totalCommits": "${{ steps.stats.outputs.total_commits }}",
-              "monthlyCommits": "${{ steps.stats.outputs.commits_this_month }}",
-              "contributors": "${{ steps.stats.outputs.contributors }}"
+              "customMessage": "Comprehensive statistics for repository {{repositoryName}} - all time"
             }
           inline_keyboard: |
             [
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "👥 Участники", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
-              {"text": "📊 Статистика", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
-              {"text": "🏷️ Релизы", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
+              {"text": "📈 Insights", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
+              {"text": "👥 Contributors", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"}
+            ],
+            [
+              {"text": "📊 Traffic", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
+              {"text": "🏷️ Releases", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
+            ],
+            [
+              {"text": "🌐 Network Graph", "url": "${{ github.server_url }}/${{ github.repository }}/network"},
+              {"text": "📋 All Commits", "url": "${{ github.server_url }}/${{ github.repository }}/commits"}
+            ],
+            [
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "⚙️ New Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitoring.yml"}
             ]

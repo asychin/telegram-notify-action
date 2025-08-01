@@ -1,6 +1,6 @@
 # 📱 Telegram Notify Action - 增强版
 
-[![版本](https://img.shields.io/badge/version-2.0.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-3.0.0-blue.svg)](#)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](#)
 [![许可证](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![测试](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
@@ -212,10 +212,11 @@
 
 ### 重试配置
 
-| 参数          | 描述               | 默认值 | 示例 |
-| ------------- | ------------------ | ------ | ---- |
-| `max_retries` | 最大重试次数       | `3`    | `5`  |
-| `retry_delay` | 初始重试延迟（秒） | `1`    | `2`  |
+| 参数                     | 描述                       | 默认值 | 示例  |
+| ------------------------ | -------------------------- | ------ | ----- |
+| `max_retries`            | 常规错误最大重试次数       | `5`    | `5`   |
+| `retry_delay`            | 初始重试延迟（秒）         | `1`    | `2`   |
+| `max_rate_limit_retries` | 速率限制错误最大重试次数   | `8`    | `10`  |
 
 ### 条件发送
 
@@ -322,19 +323,88 @@ template_vars: |
   }
 ```
 
-### GitHub 上下文变量
+### 自动变量
 
-以下 GitHub 上下文变量会自动可用：
+Action 提供三种类型的自动变量：
 
-- `repository` - 仓库名称
-- `refName` - 分支/标签名称
-- `sha` - 提交 SHA
+#### GitHub 上下文变量
+基本的 GitHub 工作流信息自动可用：
+- `repository` - 仓库名称 (`user/repo`)
+- `refName` - 分支/标签名称 (`main`, `develop`)
+- `sha` - 完整提交 SHA
+- `shortSha` - 短提交 SHA（7个字符）
 - `actor` - 触发工作流的用户
 - `workflow` - 工作流名称
 - `job` - 作业名称
 - `runId` - 工作流运行 ID
-- `runNumber` - 工作流运行编号
+- `runNumber` - 工作流运行编号  
 - `eventName` - 触发工作流的事件
+- `repositoryName` - 仅仓库名称（不含所有者）
+- `repositoryOwnerName` - 仅仓库所有者名称
+
+#### 事件上下文变量（v3 新功能）
+基于 GitHub 事件类型自动提取的特定事件变量：
+
+**对于 `issues` 事件：**
+- `author` - Issue 作者
+- `issueNumber` - Issue 编号
+- `issueTitle` - Issue 标题
+- `issueState` - Issue 状态
+- `issueBody` - Issue 描述
+- `labels` - 逗号分隔的标签列表
+- `assignees` - 逗号分隔的受理人列表
+- `createdAt` - Issue 创建日期
+- `updatedAt` - Issue 最后更新日期
+
+**对于 `pull_request` 事件：**
+- `author` - PR 作者
+- `prNumber` - Pull Request 编号
+- `prTitle` - Pull Request 标题
+- `prState` - Pull Request 状态
+- `prBody` - Pull Request 描述
+- `prUrl` - Pull Request URL
+- `baseBranch` - 目标分支
+- `headBranch` - 源分支
+- `isDraft` - 是否为草稿
+- `mergeable` - 是否可合并
+- `labels` - 逗号分隔的标签列表
+- `assignees` - 逗号分隔的受理人列表
+
+**对于 `push` 事件：**
+- `pusher` - 推送用户
+- `commitCount` - 提交数量
+- `lastCommitMessage` - 最后一次提交消息
+- `lastCommitAuthor` - 最后一次提交作者
+- `lastCommitId` - 最后一次提交 ID
+
+**对于 `release` 事件：**
+- `releaseAuthor` - 发布作者
+- `releaseName` - 发布名称
+- `releaseTag` - 发布标签
+- `releaseBody` - 发布说明
+- `isPrerelease` - 是否为预发布
+- `isDraft` - 是否为草稿
+- `releaseCreatedAt` - 发布创建日期
+
+**对于 `workflow_run` 事件：**
+- `workflowName` - 工作流名称
+- `workflowStatus` - 工作流状态
+- `workflowConclusion` - 工作流结论
+- `workflowId` - 工作流 ID
+- `workflowRunNumber` - 工作流运行编号
+- `workflowActor` - 工作流执行者
+
+#### URL 变量（v3 新功能）
+现成可用的 GitHub URL：
+- `runUrl` - 当前工作流运行 URL
+- `commitUrl` - 当前提交 URL
+- `workflowUrl` - 工作流定义 URL
+- `compareUrl` - 与基础分支的比较 URL
+- `issuesUrl` - 仓库 Issues 页面 URL
+- `pullRequestsUrl` - 仓库 Pull Requests 页面 URL
+- `releasesUrl` - 仓库发布页面 URL
+
+> **注意**：所有这些变量在模板中自动可用，无需手动配置！
 
 ## 📁 文件上传支持
 
@@ -700,28 +770,58 @@ npm run lint
 
 通过在您的仓库中将 `ACTIONS_STEP_DEBUG` 密钥设置为 `true` 来启用调试日志记录。
 
-## 🆕 v2.0.0 新功能
+## 🆕 v3.0.0 新功能
 
-### 增强的文件上传
+### 🎯 自动事件上下文（新功能！）
+
+- **智能事件检测** - 根据 GitHub 事件类型自动提取相关变量
+- **Issue 变量** - 对于 `issues` 事件自动提供作者、标题、标签、受理人
+- **PR 变量** - 对于 `pull_request` 事件提供 PR 详情、分支、草稿状态
+- **Push 变量** - 对于 `push` 事件提供提交数量、最后提交信息
+- **Release 变量** - 对于 `release` 事件提供发布详情、说明、标签
+- **无需配置** - 所有变量无需手动设置即可使用
+
+### 🌐 现成可用的 URL 变量（新功能！）
+
+- **预构建 URL** - `{{runUrl}}`、`{{commitUrl}}`、`{{workflowUrl}}` 等
+- **简化模板** - 无需手动构建 URL
+- **一致格式** - 所有 URL 遵循相同模式
+- **GitHub 企业版支持** - 与自定义 GitHub 服务器兼容
+
+### 🔄 增强的重试逻辑
+
+- **分离速率限制** - 速率限制错误的独立重试计数器
+- **智能退避** - 针对不同错误类型的不同策略
+- **可配置限制** - `max_rate_limit_retries` 参数
+- **更好的错误消息** - 更丰富的重试日志
+
+### 📤 增强的文件上传
 
 - 📤 **Base64 上传支持** - 直接从 base64 编码数据发送文件
 - 🖼️ **智能图像处理** - 自动 C2PA 元数据检测
 - 🎛️ **强制照片模式** - 使用 `force_as_photo` 覆盖自动文件类型转换
 - 🔍 **智能处理** - 优化文件处理以更好地兼容 Telegram
 
-### 技术改进
+### 🛡️ 高级安全和功能
 
-- ✅ **16 个全面测试** 覆盖所有新功能
-- 🧪 **完整测试覆盖** base64 和 force_as_photo 功能
-- 🛡️ **健壮的错误处理** 用于无效的 base64 数据
-- 📊 **增强的验证** 用于文件参数
+- 🔒 **业务连接** - 支持 Telegram Business API
+- ✨ **消息效果** - 支持消息效果（星星、心形等）
+- 📊 **扩展的 GitHub 上下文** - 20+ 额外的 GitHub 变量可用
+- 🏃 **Runner 信息** - 操作系统、架构、环境详情
 
-### 开发者体验
+### 🧪 测试和质量
 
-- 📖 **更新的文档** 包含大量示例
-- 🎯 **清晰的使用指南** 用于 C2PA 元数据处理
-- ⚠️ **有用的警告** 关于潜在的处理问题
-- 🔧 **更好的调试** 信息
+- ✅ **全面的测试套件** 覆盖所有功能
+- 🛡️ **健壮的错误处理** 用于所有边缘情况
+- 📊 **增强的验证** 用于所有参数
+- 🔧 **更好的调试** 包含详细日志
+
+### 📖 文档
+
+- 📚 **完全重写** - 所有文档为 v3 更新
+- 🌍 **多语言** - 英文、俄文、中文文档
+- 📋 **更多示例** - 所有功能的广泛使用示例
+- 🎯 **清晰的迁移指南** - 从 v2 轻松升级
 
 ## 📞 支持
 

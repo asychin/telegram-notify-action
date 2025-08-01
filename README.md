@@ -8,8 +8,6 @@
 
 **Enhanced GitHub Action for sending Telegram notifications with advanced features**
 
-![Telegram Bot](test-image.png)
-
 </div>
 
 ## 🌐 Documentation
@@ -40,20 +38,32 @@ Choose your preferred language:
 
 ## 🔧 Features
 
-- ✅ **Message Templates** - Predefined templates for different scenarios
+### Core Features
+- ✅ **Message Templates** - Predefined templates for different scenarios  
 - ✅ **File Support** - Send photos, documents, videos, and more
-- ✅ **Auto Context Variables** - Automatic GitHub context extraction
+- ✅ **Base64 Upload** - Send files directly from base64 encoded data
+- ✅ **Smart Image Processing** - Automatic C2PA metadata detection
+- ✅ **Auto Context Variables** - Automatic GitHub and event context extraction
 - ✅ **Inline Keyboards** - Interactive buttons in messages
-- ✅ **Thread Support** - Send to specific message threads
+- ✅ **Thread Support** - Send to specific message threads/topics
+- ✅ **Message Editing** - Edit existing messages with new content
 - ✅ **Retry Logic** - Robust error handling with exponential backoff
 - ✅ **Multi-language** - Support for English, Russian, and Chinese
 
+### Advanced Features  
+- 🎯 **Conditional Sending** - Send notifications based on workflow status
+- 🔒 **Content Protection** - Prevent message forwarding and saving
+- 📊 **Event Context** - Automatic extraction of event-specific variables
+- 🎛️ **Rate Limiting** - Smart handling of Telegram API limits
+- 🌍 **URL Variables** - Ready-to-use GitHub URLs (commitUrl, runUrl, etc.)
+- 📈 **Comprehensive Testing** - Full test suite with high coverage
+
 ## 📚 Additional Resources
 
-- **[Template System](TEMPLATE-SYSTEM.md)** - Learn about message templates and variables
-- **[Auto Context Variables](docs/AUTO-CONTEXT-VARIABLES.md)** - Automatic variable extraction
-- **[Examples](examples/)** - Ready-to-use workflow examples
-- **[Changelog](CHANGELOG.md)** - Version history and updates
+- **[📖 Complete Documentation](docs/en/README.md)** - Full documentation with all features
+- **[🎨 Template System](docs/en/TEMPLATE-SYSTEM.md)** - Learn about message templates and variables
+- **[📋 Examples](examples/)** - Ready-to-use workflow examples
+- **[📝 Changelog](CHANGELOG.md)** - Version history and updates
 
 ## 🤝 Contributing
 
