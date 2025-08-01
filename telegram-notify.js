@@ -358,20 +358,28 @@ class TelegramNotify {
             );
             eventContext.releaseName = safeGet(eventData, "release.name");
             eventContext.releaseTag = safeGet(eventData, "release.tag_name");
-            
+
             // Handle release body - check if it's base64 encoded for security
             let releaseBody = safeGet(eventData, "release.body");
-            
+
             // Try to decode base64 if it looks like base64 (from secure workflows)
-            if (releaseBody && typeof releaseBody === 'string' && releaseBody.match(/^[A-Za-z0-9+/]+=*$/)) {
+            if (
+              releaseBody &&
+              typeof releaseBody === "string" &&
+              releaseBody.match(/^[A-Za-z0-9+/]+=*$/)
+            ) {
               try {
-                releaseBody = Buffer.from(releaseBody, 'base64').toString('utf8');
+                releaseBody = Buffer.from(releaseBody, "base64").toString(
+                  "utf8"
+                );
                 this.info("Decoded base64 release body for security");
               } catch (error) {
-                this.warning("Failed to decode base64 release body, using as-is");
+                this.warning(
+                  "Failed to decode base64 release body, using as-is"
+                );
               }
             }
-            
+
             eventContext.releaseBody = releaseBody;
             eventContext.isPrerelease = safeGet(
               eventData,
@@ -1040,10 +1048,13 @@ class TelegramNotify {
     // Clean content based on parse mode
     if (this.parseMode === "HTML") {
       return this.cleanHtmlContent(processedText);
-    } else if (this.parseMode === "Markdown" || this.parseMode === "MarkdownV2") {
+    } else if (
+      this.parseMode === "Markdown" ||
+      this.parseMode === "MarkdownV2"
+    ) {
       return this.cleanMarkdownContent(processedText);
     }
-    
+
     return processedText;
   }
 
@@ -1071,8 +1082,8 @@ class TelegramNotify {
     }
 
     // Fix malformed links - remove incomplete [] or () patterns
-    cleanContent = cleanContent.replace(/\[([^\]]*?)(?:\n|\r|$)/g, '$1'); // Unclosed [
-    cleanContent = cleanContent.replace(/\(([^)]*?)(?:\n|\r|$)/g, '$1'); // Unclosed (
+    cleanContent = cleanContent.replace(/\[([^\]]*?)(?:\n|\r|$)/g, "$1"); // Unclosed [
+    cleanContent = cleanContent.replace(/\(([^)]*?)(?:\n|\r|$)/g, "$1"); // Unclosed (
 
     // Fix malformed code blocks - ensure ``` are balanced
     const codeBlockMatches = (cleanContent.match(/```/g) || []).length;
@@ -1089,10 +1100,10 @@ class TelegramNotify {
     }
 
     // Remove potentially problematic characters that can break parsing
-    cleanContent = cleanContent.replace(/[\u200B-\u200D\uFEFF]/g, ''); // Zero-width characters
-    
+    cleanContent = cleanContent.replace(/[\u200B-\u200D\uFEFF]/g, ""); // Zero-width characters
+
     // Escape special characters that might be misinterpreted
-    cleanContent = cleanContent.replace(/([_~])/g, '\\$1'); // Escape underscores and tildes
+    cleanContent = cleanContent.replace(/([_~])/g, "\\$1"); // Escape underscores and tildes
 
     return cleanContent;
   }
