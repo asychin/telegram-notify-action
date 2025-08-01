@@ -7,13 +7,14 @@
 #### 🔧 **Critical JSON Parsing Fix**
 
 - **🚨 Fixed Inline Keyboard JSON Format** - Corrected invalid JSON format in `inline_keyboard` parameter across all workflow files
-- **✅ Telegram API Compliance** - Fixed format from `[{...}],[{...}]` to proper `[[{...}],[{...}]]` array structure  
+- **✅ Telegram API Compliance** - Fixed format from `[{...}],[{...}]` to proper `[[{...}],[{...}]]` array structure
 - **📋 Updated Examples** - Fixed JSON format in `.github/workflows/release.yml`, `test.yml`, and all example files
 - **🔄 Rate Limiting Behavior** - Confirmed rate limiting retry logic works correctly (expected behavior)
 
 **Files Fixed:**
+
 - `.github/workflows/release.yml` (2 locations)
-- `.github/workflows/test.yml` (1 location)  
+- `.github/workflows/test.yml` (1 location)
 - `examples/github-variables.yml` (1 location)
 - `examples/usage-examples.yml` (6 locations)
 
