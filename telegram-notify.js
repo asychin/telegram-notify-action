@@ -57,24 +57,7 @@ class TelegramNotify {
     this.forceAsPhoto = process.env.FORCE_AS_PHOTO === "true";
     this.caption = process.env.CAPTION;
 
-    // Template support
-    this.template = process.env.TEMPLATE;
-    this.templateVars = this.parseJSON(process.env.TEMPLATE_VARS) || {};
-
-    // Inline keyboard support
-    this.inlineKeyboard = this.parseJSON(process.env.INLINE_KEYBOARD);
-
-    // Retry configuration
-    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 5;
-    this.retryDelay = parseInt(process.env.RETRY_DELAY) || 1;
-    this.maxRateLimitRetries =
-      parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
-
-    // Conditional sending
-    this.sendOnFailure = process.env.SEND_ON_FAILURE === "true";
-    this.sendOnSuccess = process.env.SEND_ON_SUCCESS === "true";
-
-    // GitHub context
+    // GitHub context (moved before template support for parseTemplateVars)
     this.githubContext = {
       repository: process.env.GITHUB_REPOSITORY,
       refName: process.env.GITHUB_REF_NAME,
@@ -175,6 +158,23 @@ class TelegramNotify {
       ci: process.env.CI,
     };
 
+    // Template support
+    this.template = process.env.TEMPLATE;
+    this.templateVars = this.parseTemplateVars(process.env.TEMPLATE_VARS) || {};
+
+    // Inline keyboard support
+    this.inlineKeyboard = this.parseJSON(process.env.INLINE_KEYBOARD);
+
+    // Retry configuration
+    this.maxRetries = parseInt(process.env.MAX_RETRIES) || 5;
+    this.retryDelay = parseInt(process.env.RETRY_DELAY) || 1;
+    this.maxRateLimitRetries =
+      parseInt(process.env.MAX_RATE_LIMIT_RETRIES) || 8;
+
+    // Conditional sending
+    this.sendOnFailure = process.env.SEND_ON_FAILURE === "true";
+    this.sendOnSuccess = process.env.SEND_ON_SUCCESS === "true";
+
     this.baseUrl = `https://api.telegram.org/bot${this.token}`;
     this.messages = this.getLocalizedMessages();
     this.retryCount = 0;
@@ -190,6 +190,52 @@ class TelegramNotify {
     } catch (error) {
       this.warning(
         `Failed to parse JSON: ${jsonString}. Error: ${error.message}`
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Parse template variables with template processing before JSON parsing
+   */
+  parseTemplateVars(templateVarsString) {
+    if (!templateVarsString) return null;
+    
+    try {
+      // First, create basic context for template processing
+      const basicContext = {
+        ...this.githubContext,
+        // Add repositoryName if not already present
+        repositoryName: this.githubContext.repositoryName || 
+          (process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split("/")[1] : ""),
+      };
+      
+      // Try to get event context for prNumber and other event-specific variables
+      let eventContext = {};
+      try {
+        eventContext = this.getEventContext();
+      } catch (error) {
+        // If event context fails, continue with basic context
+        this.warning(`Failed to get event context for template_vars: ${error.message}`);
+      }
+      
+      const allContext = { ...basicContext, ...eventContext };
+      
+      // Process template variables in the JSON string
+      const processedTemplateVars = templateVarsString.replace(
+        /\{\{(\w+)\}\}/g,
+        (match, key) => {
+          return Object.prototype.hasOwnProperty.call(allContext, key)
+            ? allContext[key]
+            : match;
+        }
+      );
+      
+      // Then parse as JSON
+      return JSON.parse(processedTemplateVars);
+    } catch (error) {
+      this.warning(
+        `Failed to parse template variables: ${templateVarsString}. Error: ${error.message}`
       );
       return null;
     }
