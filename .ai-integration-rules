@@ -189,23 +189,39 @@ smart_detection:
 template_selection:
   basic_project:
     triggers: [simple workflow, < 3 jobs]
-    template: success/error with basic info
-    variables: [repository, branch, commit, actor]
+    recommended_templates: [success, error, warning, info]
+    approach: "Use simple success/error templates with custom messages"
+    example: "template: success + customMessage in template_vars"
   
-  standard_project:  
-    triggers: [build + deploy jobs, testing]
-    template: deploy template with statistics
-    variables: [all basic + duration, test results]
+  deployment_project:  
+    triggers: [build + deploy jobs, CI/CD pipeline]
+    recommended_templates: [deploy, success, error]
+    approach: "Use deploy template for main deployments, success/error for steps"
+    example: "template: deploy with deployStatus, customMessage variables"
   
-  enterprise_project:
-    triggers: [complex matrix, multi-env, > 5 jobs]
-    template: comprehensive with dynamic updates
-    variables: [all + progress tracking, stage timings]
+  testing_project:
+    triggers: [test suites, coverage reports]
+    recommended_templates: [test, success, error]
+    approach: "Use test template for test results, success/error for completion"
+    example: "template: test with testStatus, coverage variables"
   
-  microservices_project:
-    triggers: [multiple services, docker matrix]
-    template: service-specific notifications
-    variables: [service names, deployment matrix]
+  release_project:
+    triggers: [release workflows, tagging]
+    recommended_templates: [release, success, error]
+    approach: "Use release template for releases, success/error for build steps"
+    example: "template: release (automatic variables from release events)"
+
+  monitoring_project:
+    triggers: [health checks, alerts, reporting]
+    recommended_templates: [warning, error, info]
+    approach: "Use warning for alerts, error for critical issues, info for reports"
+    example: "Custom messages with detailed monitoring data"
+    
+  complex_progressive:
+    triggers: [matrix builds, multi-stage deployments]
+    recommended_templates: [info, deploy, success, error]
+    approach: "Progressive notifications with message updates (message_id)"
+    example: "Start with info, update with deploy/success/error, use message_id"
 ```
 
 ## 🛠️ Implementation Strategies
@@ -495,6 +511,15 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 - Generate test cases for notification validation
 - Include troubleshooting guidance
 
+#### **Step 5: MANDATORY Self-Check Before Delivery**
+- ✅ **Template Validation:** Only use `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+- ✅ **Parameter Check:** No `message_thread_id` or other deprecated parameters
+- ✅ **JSON Format:** All `template_vars` must be valid JSON format
+- ✅ **No Conflicts:** Never use `template:` and `message:` together
+- ✅ **Version Check:** Always use `@v3.1.0` or newer specific version
+- ✅ **GitHub Variables:** Use `${{ github.* }}` in `template_vars`, `inline_keyboard`, `run:` commands
+- ✅ **Template Variables:** Use `{{var}}` ONLY in `message:`/`caption:` WITH `template:`
+
 ### 📝 **Integration Examples Reference**
 
 #### **Quick Commands for AI**
@@ -507,6 +532,85 @@ curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/do
 
 # View examples
 curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/examples/
+```
+
+### **🚨 CRITICAL: Correct Integration Examples**
+
+#### **✅ CORRECT: Using Built-in Templates**
+```yaml
+# Deployment success with built-in template
+- name: 📢 Notify Deployment Success
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: deploy  # ✅ Built-in template
+    template_vars: |  # ✅ JSON format
+      {
+        "customMessage": "Deployed to ${{ github.ref_name }}!",
+        "deployStatus": "successful"
+      }
+```
+
+#### **✅ CORRECT: Custom Message (No Template)**
+```yaml
+# Custom message without template
+- name: 📢 Send Custom Notification  
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: |  # ✅ Custom message, no template
+      🚀 <b>Custom Deployment Started</b>
+      
+      <b>Repository:</b> ${{ github.repository }}
+      <b>Branch:</b> ${{ github.ref_name }}
+      <b>Commit:</b> ${{ github.sha }}
+```
+
+#### **✅ CORRECT: Progressive Notifications**
+```yaml
+# 1. Start notification with message_id capture
+- name: 📢 Start Notification
+  id: start_notification
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: "🚀 Deployment started..."
+
+# 2. Update same message
+- name: 📢 Update Notification  
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message_id: ${{ steps.start_notification.outputs.message_id }}
+    message: "✅ Deployment completed!"
+```
+
+#### **❌ WRONG Examples (What NOT to do)**
+```yaml
+# ❌ WRONG: Non-existent template
+template: deployment_start  # Does not exist!
+
+# ❌ WRONG: Both template and message
+template: deploy
+message: "Custom message"  # Conflicts with template
+
+# ❌ WRONG: Deprecated parameter
+message_thread_id: ${{ vars.THREAD_ID }}  # Removed in v3
+
+# ❌ WRONG: Bash-style template_vars
+template_vars: |
+  customMessage=Hello
+  status=success
+
+# ❌ WRONG: Handlebars syntax
+message: |
+  {{#if success}}
+  ✅ Success
+  {{/if}}
 ```
 
 ---
@@ -523,6 +627,33 @@ curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/ex
 - ⚙️ GitHub Actions variables (`${{var}}`) work in `template_vars:`, `inline_keyboard:`, `run:` commands
 - 🚫 Never mix template and GitHub Actions variable types
 
+### **Available Templates (v3.1.0)**
+- ✅ **ONLY these templates exist:** `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+- 🚫 **DO NOT create custom templates** - they don't exist in the action
+- 📋 **For custom messages:** Use `message:` field WITHOUT `template:` parameter
+- 🔄 **Template OR Message:** Never use both `template:` and `message:` together
+
+### **Deprecated Parameters (v3.1.0)**
+- ❌ **REMOVED:** `message_thread_id` parameter (no longer supported)
+- ❌ **REMOVED:** Custom template support (only built-in templates work)
+- ❌ **NOT SUPPORTED:** Handlebars syntax (`{{#if}}`, `{{#each}}`, etc.)
+
+### **Template Variables JSON Format**
+```yaml
+# ✅ CORRECT JSON format
+template_vars: |
+  {
+    "customMessage": "Value with ${{ github.repository }}",
+    "deployStatus": "successful",
+    "version": "${{ github.ref_name }}"
+  }
+
+# ❌ WRONG bash-style assignment  
+template_vars: |
+  customMessage=Value
+  deployStatus=successful
+```
+
 ### **Security First**
 - 🔐 Always use repository/organization secrets
 - 🚫 Never expose tokens in code or logs  
@@ -532,6 +663,82 @@ curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/ex
 ---
 
 **Remember: This is an intelligent integration system. Always prioritize user experience, security, and non-disruptive implementation. The goal is to enhance existing workflows, not replace them.**
+
+---
+
+## 🚨 **COMMON AI INTEGRATION MISTAKES & SOLUTIONS**
+
+### **❌ Mistake 1: Using Custom Templates**
+```yaml
+# WRONG
+template: deployment_start
+template: monitoring_report
+template: custom_alert
+```
+**✅ Solution:** Use ONLY built-in templates: `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+
+### **❌ Mistake 2: Wrong template_vars Format**
+```yaml
+# WRONG - bash style
+template_vars: |
+  status=success
+  message=Hello
+```
+**✅ Solution:** Always use JSON format:
+```yaml
+template_vars: |
+  {
+    "status": "success", 
+    "message": "Hello"
+  }
+```
+
+### **❌ Mistake 3: Using Deprecated Parameters**
+```yaml
+# WRONG - removed in v3
+message_thread_id: ${{ vars.THREAD_ID }}
+```
+**✅ Solution:** Remove deprecated parameters completely
+
+### **❌ Mistake 4: Template + Message Conflict**
+```yaml
+# WRONG - conflicts
+template: deploy
+message: "Custom message"
+```
+**✅ Solution:** Use EITHER template OR message, never both:
+```yaml
+# Option A: Template only
+template: deploy
+template_vars: |
+  {"customMessage": "Details"}
+
+# Option B: Message only  
+message: "Custom message text"
+```
+
+### **❌ Mistake 5: Handlebars/Mustache Syntax**
+```yaml
+# WRONG - not supported
+message: |
+  {{#if success}}
+  ✅ Success
+  {{/if}}
+```
+**✅ Solution:** Use plain text with GitHub variables:
+```yaml
+message: |
+  ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+```
+
+### **🔧 Quick Validation Checklist for AI:**
+- [ ] Templates: Only `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+- [ ] No `message_thread_id` parameter
+- [ ] `template_vars` in JSON format
+- [ ] Not mixing `template:` and `message:`
+- [ ] Version `@v3.1.0` or newer
+- [ ] GitHub variables `${{}}` in JSON/shell contexts
+- [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
 
 ---
 
