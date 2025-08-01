@@ -44,7 +44,7 @@ jobs:
 
       - name: 🕐 Get current timestamp
         id: timestamp
-        run: echo "time=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+        run: echo "time=$(date -u +\"%Y-%m-%d %H:%M:%S UTC\")" >> $GITHUB_OUTPUT
 
       - name: Create release asset (changelog)
         run: |

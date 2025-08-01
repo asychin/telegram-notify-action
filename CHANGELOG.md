@@ -1,5 +1,21 @@
 # 📝 Changelog
 
+## [v3.2.4] - 2025-08-02
+
+### 🐛 **Bug Fixes**
+
+#### 🔧 **Quote Escaping Fix**
+
+- **🚨 Fixed Unescaped Quote in Date Format** - Fixed `unexpected EOF while looking for matching quote` error in release workflow
+- **🛠️ Shell Syntax Fix** - Properly escaped quotes in timestamp generation command 
+- **✅ Complete Workflow Fix** - All shell syntax errors now resolved in release.yml
+- **🔒 Final Syntax Patch** - No remaining shell parsing errors in workflow
+
+**Technical Details:**
+- Fixed `date -u +'%Y-%m-%d %H:%M:%S UTC'` to `date -u +\"%Y-%m-%d %H:%M:%S UTC\"`
+- Properly escaped quotes inside double-quoted strings
+- Eliminated shell parsing error causing workflow failure
+
 ## [v3.2.3] - 2025-08-02
 
 ### 🐛 **Bug Fixes**
