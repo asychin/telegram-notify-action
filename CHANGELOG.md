@@ -1,5 +1,22 @@
 # 📝 Changelog
 
+## [v3.2.2] - 2025-01-31
+
+### 🐛 **Bug Fixes**
+
+#### 🔧 **Critical Shell Injection Fix**
+
+- **🚨 Fixed Release Workflow Shell Injection** - Replaced unsafe heredoc with secure echo commands in release.yml
+- **🛡️ Security Enhancement** - Prevented shell interpretation of release notes content as commands
+- **✅ Safe Release Notes Generation** - Used `printf '%s\n'` for safe handling of multiline content
+- **🔒 Input Sanitization** - Release notes with special characters no longer break workflow execution
+
+**Technical Details:**
+- Replaced `cat << 'EOF'` heredoc with series of `echo` commands
+- Used `printf '%s\n'` for safe output of `${{ steps.release-info.outputs.release_notes }}`
+- Escaped `${{ }}` in YAML examples to prevent shell interpretation
+- Fixed "command not found" errors in release workflow
+
 ## [v3.2.1] - 2025-01-31
 
 ### 🐛 **Bug Fixes**

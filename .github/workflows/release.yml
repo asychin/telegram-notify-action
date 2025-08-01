@@ -47,39 +47,38 @@ jobs:
 
       - name: Create release asset (changelog)
         run: |
-          cat > RELEASE_NOTES.md << 'EOF'
-          # Release ${{ steps.release-info.outputs.version }}
-
-          **Repository:** ${{ github.repository }}
-          **Released by:** ${{ github.actor }}
-          **Date:** ${{ steps.timestamp.outputs.time }}
-          **Prerelease:** ${{ steps.release-info.outputs.prerelease }}
-
-          ## Release Notes
-          ${{ steps.release-info.outputs.release_notes }}
-
-          ## What's Changed
-          - Enhanced Telegram notifications with file support
-          - Added message templates for different scenarios
-          - Implemented retry logic with exponential backoff
-          - Added inline keyboard support
-          - Comprehensive testing suite
-          - Improved error handling and logging
-
-          ## Installation
-          ```yaml
-          - uses: asychin/telegram-notify-action@${{ steps.release-info.outputs.version }}
-            with:
-              telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-              chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-              message: "Your notification message"
-          ```
-
-          ## Links
-          - [Download](${{ steps.release-info.outputs.download_url }})
-          - [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)
-          - [Examples](https://github.com/${{ github.repository }}/tree/main/examples)
-          EOF
+          # Create release notes safely without heredoc to avoid shell injection
+          echo "# Release ${{ steps.release-info.outputs.version }}" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "**Repository:** ${{ github.repository }}" >> RELEASE_NOTES.md
+          echo "**Released by:** ${{ github.actor }}" >> RELEASE_NOTES.md
+          echo "**Date:** ${{ steps.timestamp.outputs.time }}" >> RELEASE_NOTES.md
+          echo "**Prerelease:** ${{ steps.release-info.outputs.prerelease }}" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "## Release Notes" >> RELEASE_NOTES.md
+          printf '%s\n' "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "## What's Changed" >> RELEASE_NOTES.md
+          echo "- Enhanced Telegram notifications with file support" >> RELEASE_NOTES.md
+          echo "- Added message templates for different scenarios" >> RELEASE_NOTES.md
+          echo "- Implemented retry logic with exponential backoff" >> RELEASE_NOTES.md
+          echo "- Added inline keyboard support" >> RELEASE_NOTES.md
+          echo "- Comprehensive testing suite" >> RELEASE_NOTES.md
+          echo "- Improved error handling and logging" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "## Installation" >> RELEASE_NOTES.md
+          echo '```yaml' >> RELEASE_NOTES.md
+          echo "- uses: asychin/telegram-notify-action@${{ steps.release-info.outputs.version }}" >> RELEASE_NOTES.md
+          echo "  with:" >> RELEASE_NOTES.md
+          echo "    telegram_token: \${{ secrets.TELEGRAM_BOT_TOKEN }}" >> RELEASE_NOTES.md
+          echo "    chat_id: \${{ secrets.TELEGRAM_CHAT_ID }}" >> RELEASE_NOTES.md
+          echo '    message: "Your notification message"' >> RELEASE_NOTES.md
+          echo '```' >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "## Links" >> RELEASE_NOTES.md
+          echo "- [Download](${{ steps.release-info.outputs.download_url }})" >> RELEASE_NOTES.md
+          echo "- [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)" >> RELEASE_NOTES.md
+          echo "- [Examples](https://github.com/${{ github.repository }}/tree/main/examples)" >> RELEASE_NOTES.md
 
       - name: Send release notification to Telegram
         uses: ./
