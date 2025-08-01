@@ -1,6 +1,6 @@
 {
   "name": "telegram-notify-action",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "description": "Enhanced GitHub Action for sending and editing Telegram notifications with file support, templates, and advanced features",
   "main": "telegram-notify.js",
   "scripts": {

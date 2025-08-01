@@ -358,7 +358,21 @@ class TelegramNotify {
             );
             eventContext.releaseName = safeGet(eventData, "release.name");
             eventContext.releaseTag = safeGet(eventData, "release.tag_name");
-            eventContext.releaseBody = safeGet(eventData, "release.body");
+            
+            // Handle release body - check if it's base64 encoded for security
+            let releaseBody = safeGet(eventData, "release.body");
+            
+            // Try to decode base64 if it looks like base64 (from secure workflows)
+            if (releaseBody && typeof releaseBody === 'string' && releaseBody.match(/^[A-Za-z0-9+/]+=*$/)) {
+              try {
+                releaseBody = Buffer.from(releaseBody, 'base64').toString('utf8');
+                this.info("Decoded base64 release body for security");
+              } catch (error) {
+                this.warning("Failed to decode base64 release body, using as-is");
+              }
+            }
+            
+            eventContext.releaseBody = releaseBody;
             eventContext.isPrerelease = safeGet(
               eventData,
               "release.prerelease"
@@ -1023,7 +1037,64 @@ class TelegramNotify {
       }
     );
 
-    return this.cleanHtmlContent(processedText);
+    // Clean content based on parse mode
+    if (this.parseMode === "HTML") {
+      return this.cleanHtmlContent(processedText);
+    } else if (this.parseMode === "Markdown" || this.parseMode === "MarkdownV2") {
+      return this.cleanMarkdownContent(processedText);
+    }
+    
+    return processedText;
+  }
+
+  /**
+   * Clean Markdown content to prevent entity parsing errors
+   */
+  cleanMarkdownContent(content) {
+    if (!content) return content;
+
+    let cleanContent = content;
+
+    // Fix unbalanced bold/italic markers
+    // Count ** markers and close unmatched ones
+    const boldMatches = (cleanContent.match(/\*\*/g) || []).length;
+    if (boldMatches % 2 !== 0) {
+      cleanContent += "**"; // Close unmatched bold
+    }
+
+    // Count * markers (but not **) and close unmatched ones - compatible with older Node.js
+    const allStars = (cleanContent.match(/\*/g) || []).length;
+    const doubleBoldStars = boldMatches * 2; // Each ** pair = 2 stars
+    const italicMatches = allStars - doubleBoldStars;
+    if (italicMatches % 2 !== 0) {
+      cleanContent += "*"; // Close unmatched italic
+    }
+
+    // Fix malformed links - remove incomplete [] or () patterns
+    cleanContent = cleanContent.replace(/\[([^\]]*?)(?:\n|\r|$)/g, '$1'); // Unclosed [
+    cleanContent = cleanContent.replace(/\(([^)]*?)(?:\n|\r|$)/g, '$1'); // Unclosed (
+
+    // Fix malformed code blocks - ensure ``` are balanced
+    const codeBlockMatches = (cleanContent.match(/```/g) || []).length;
+    if (codeBlockMatches % 2 !== 0) {
+      cleanContent += "\n```"; // Close unmatched code block
+    }
+
+    // Fix malformed inline code - ensure ` are balanced - compatible with older Node.js
+    const allBackticks = (cleanContent.match(/`/g) || []).length;
+    const codeBlockBackticks = codeBlockMatches * 3; // Each ``` = 3 backticks
+    const inlineCodeBackticks = allBackticks - codeBlockBackticks;
+    if (inlineCodeBackticks % 2 !== 0) {
+      cleanContent += "`"; // Close unmatched inline code
+    }
+
+    // Remove potentially problematic characters that can break parsing
+    cleanContent = cleanContent.replace(/[\u200B-\u200D\uFEFF]/g, ''); // Zero-width characters
+    
+    // Escape special characters that might be misinterpreted
+    cleanContent = cleanContent.replace(/([_~])/g, '\\$1'); // Escape underscores and tildes
+
+    return cleanContent;
   }
 
   /**

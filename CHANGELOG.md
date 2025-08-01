@@ -1,5 +1,42 @@
 # 📝 Changelog
 
+## [v3.2.6] - 2025-08-02
+
+### 🚨 **CRITICAL FIX - Telegram Entity Parsing Error**
+
+#### 🔧 **"Can't parse entities" Error Fixed**
+
+- **🚨 FIXED:** `Can't find end of the entity starting at byte offset XXXX` error in Telegram API
+- **🛡️ Markdown Cleaning:** Added comprehensive Markdown content sanitization for release notes
+- **✅ Entity Safety:** Fixed unbalanced bold/italic markers, code blocks, and links in dynamic content
+- **🔧 Base64 Support:** Enhanced release body processing to handle base64-encoded content safely
+
+**Technical Details:**
+
+- **🧹 cleanMarkdownContent() Function Added:**
+  - Automatically balances unmatched `**` bold markers
+  - Fixes unclosed `*` italic markers 
+  - Closes incomplete `\`\`\`` code blocks
+  - Balances single backtick inline code
+  - Removes incomplete `[]` and `()` link patterns
+  - Escapes problematic characters (`_`, `~`)
+  - Removes zero-width characters that break parsing
+
+- **🔄 Enhanced Release Body Processing:**
+  - Detects and decodes base64-encoded release notes for security
+  - Applies format-specific cleaning (HTML vs Markdown)
+  - Prevents shell injection while maintaining readability
+
+- **⚡ Node.js Compatibility:**
+  - Fixed regex lookbehind/lookahead for older Node.js versions
+  - Compatible with Node.js 16+ environment
+
+**🎯 FIXES THE EXACT ERROR:**
+```
+❌ Before: "can't parse entities: Can't find end of the entity starting at byte offset 2697"
+✅ After: Clean, properly formatted messages that parse correctly
+```
+
 ## [v3.2.5] - 2025-08-02
 
 ### 🚨 **COMPLETE SECURITY FIX - ALL VULNERABILITIES ELIMINATED**
