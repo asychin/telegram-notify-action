@@ -1,27 +1,71 @@
 # 📝 Changelog
 
+## [v3.2.0] - 2025-08-02
+
+### ✨ **New Features**
+
+#### 🤖 **AI Integration Rules**
+
+- **🆕 Comprehensive AI Integration System** - Added complete `.ai-integration-rules` file (2736 lines) for automatic integration by AI assistants
+- **📋 Mandatory User Questionnaire** - Implemented structured questionnaire process for optimal configuration
+- **🔍 Existing Integration Audit** - Added comprehensive audit process for existing telegram-notify-action implementations
+- **🌍 Multi-language Support** - AI integration supports English, Russian, Chinese and auto-detection
+
+#### 🚀 **Enhanced User Experience**
+
+- **👤 User Identification System** - Enhanced user profiling and preference detection
+- **⏰ Scheduling Configuration** - Advanced scheduling and timing configuration options
+- **🔧 Progressive Deployment Patterns** - New deployment and monitoring system patterns
+- **📈 Repository Analysis** - Automatic project structure analysis for optimal integration
+
+#### 🔐 **GitHub API Enhancements**
+
+- **🔑 GitHub API Permissions** - Improved documentation and handling of GitHub API permissions
+- **⚙️ Workflow Integration** - Enhanced integration with GitHub Actions workflows
+- **📊 Event Context Processing** - Better extraction and processing of GitHub event data
+
+### 📚 **Documentation & Integration**
+
+- **📄 AI Integration Documentation** - Complete integration guides for AI assistants
+- **🔗 Marketplace Integration** - Enhanced GitHub Actions Marketplace presence
+- **🧪 Validation Rules** - Critical validation rules for preventing common integration errors
+- **📋 Migration Support** - Support for auditing and upgrading existing implementations
+
+### 🔧 **Technical Improvements**
+
+- **🎯 Smart Configuration** - Intelligent configuration based on project type and structure
+- **🛡️ Error Prevention** - Advanced validation to prevent "dry data" and configuration errors
+- **⚡ Performance Optimization** - Improved processing and validation performance
+- **🔍 Debug Enhancement** - Better debugging and testing capabilities
+
+---
+
 ## [v3.1.0] - 2025-08-01
 
 ### 🐛 **Bug Fixes**
 
 #### ✅ **Deploy Template Variable Substitution**
+
 - **🔧 Fixed "Dry Data" Issue** - All template variables now properly substitute in `deploy` template
 - **📊 Enhanced Push Event Support** - Added `filesChanged`, `additions`, `deletions`, `commitCount` extraction for push events
 - **🎯 Universal Deploy Template** - Now works correctly for all GitHub event types (push, workflow_run, deployment, release)
 - **🛡️ Default Value Fallbacks** - Provides sensible defaults when specific event data is unavailable
 
 #### 🔧 **Event Context Improvements**
+
 - **⚡ Push Event Variables** - Extract branch info from `refs/heads/` format
 - **📈 File Change Statistics** - Calculate file changes from commit data for push events
 - **👤 Author Information** - Consistent author extraction across event types
 - **📅 Timestamp Handling** - Proper date formatting for all event types
 
 #### 🧪 **Debug and Testing**
+
 - **🐛 Enhanced Debug Script** - Updated `debug-template.js` with mock event data support
 - **✨ Multi-language Testing** - Comprehensive testing for EN/RU/ZH templates
 - **🔍 Template Validation** - Better testing coverage for variable substitution
 
 ### 📝 **Technical Details**
+
 - Fixed template variables `{{baseBranch}}`, `{{headBranch}}`, `{{filesChanged}}`, `{{additions}}`, `{{deletions}}`, `{{author}}`, `{{prTitle}}`, `{{prCreatedAt}}`, `{{deployStatus}}` not substituting in non-PR events
 - Enhanced `getEventContext()` function with comprehensive push event support
 - Added universal fallback values for all deploy template variables
@@ -34,6 +78,7 @@
 ### 🎯 **Major Features - v3.0.0 Release**
 
 #### ✨ **Automatic Event Context Extraction (NEW!)**
+
 - **🚀 Smart Event Detection** - Automatically extracts relevant variables based on GitHub event type
 - **🔍 Issue Events** - `author`, `issueNumber`, `issueTitle`, `issueState`, `issueBody`, `labels`, `assignees`, `createdAt`, `updatedAt`
 - **🔄 Pull Request Events** - `author`, `prNumber`, `prTitle`, `prState`, `prBody`, `prUrl`, `baseBranch`, `headBranch`, `isDraft`, `mergeable`, `labels`, `assignees`
@@ -43,12 +88,14 @@
 - **🧪 No Configuration Required** - All variables available without manual setup
 
 #### 🌐 **Ready-to-Use URL Variables (NEW!)**
+
 - **🔗 Pre-built URLs** - `{{runUrl}}`, `{{commitUrl}}`, `{{workflowUrl}}`, `{{compareUrl}}`
 - **📋 Repository URLs** - `{{issuesUrl}}`, `{{pullRequestsUrl}}`, `{{releasesUrl}}`
 - **🏗️ GitHub Enterprise Support** - Works with custom GitHub servers
 - **💡 Simplified Templates** - No need to construct URLs manually
 
 #### 🔄 **Enhanced Retry Logic**
+
 - **⚡ Improved Rate Limiting** - Separate `max_rate_limit_retries` parameter (default: 8)
 - **🛡️ Smart Backoff** - Different strategies for different error types
 - **📈 Better Defaults** - Increased `max_retries` from 3 to 5
@@ -56,20 +103,23 @@
 - **🎯 Handles Long Delays** - Supports 'retry after X seconds' from Telegram API
 
 #### 📤 **Enhanced File Upload**
+
 - **🖼️ Smart Image Processing** - Automatic C2PA metadata detection
-- **📱 Base64 Upload Support** - Send files directly from base64 encoded data  
+- **📱 Base64 Upload Support** - Send files directly from base64 encoded data
 - **🎛️ Force Photo Mode** - Override automatic file type conversion with `force_as_photo`
 - **🔍 Intelligent Processing** - Optimized file handling for better Telegram compatibility
 
 ### 🎨 **Template System Improvements**
 
 #### 🚀 **Unified Template System**
+
 - **📝 Markdown Support** - Full migration from HTML to Markdown formatting
 - **🌍 Multi-language** - Enhanced templates for English, Russian, and Chinese
 - **🔧 Template Fixes** - Fixed all `<b>text</b>` → `**text**` conversions
 - **📋 Better Variables** - Improved template variable handling and validation
 
 #### 💡 **Advanced Template Features**
+
 - **🎯 Dynamic Template Selection** - Based on GitHub events and conditions
 - **🚀 Creative Template Usage** - Deploy template for PRs, test template for health checks
 - **⚠️ Context-Aware Messages** - Templates adapt to event context automatically
@@ -78,12 +128,14 @@
 ### 🛡️ **Security & Advanced Features**
 
 #### 🔒 **Enhanced Security**
+
 - **🏢 Business Connections** - Support for Telegram Business API
 - **✨ Message Effects** - Support for message effects (stars, hearts, etc.)
 - **🔐 Content Protection** - Prevent message forwarding and saving
 - **📊 Extended GitHub Context** - 20+ additional GitHub variables available
 
 #### 🏃 **System Improvements**
+
 - **📊 Runner Information** - OS, architecture, environment details
 - **🛠️ Additional Variables** - `{{jobId}}`, `{{actionPath}}`, `{{stepSummary}}`
 - **🔧 Better Error Handling** - Improved validation for all parameters
@@ -92,6 +144,7 @@
 ### 🧪 **Testing & Quality**
 
 #### ✅ **Comprehensive Test Suite**
+
 - **🧪 Event Context Tests** - Full coverage for automatic variable extraction
 - **📝 Template Tests** - All templates tested across multiple languages
 - **🔄 Retry Logic Tests** - Rate limiting and error handling validation
@@ -99,6 +152,7 @@
 - **🛡️ Security Tests** - Input validation and error handling
 
 #### 📖 **Documentation Overhaul**
+
 - **📚 Complete Rewrite** - All documentation updated for v3
 - **🌍 Multi-language Docs** - English, Russian, Chinese documentation
 - **📋 More Examples** - Extensive usage examples for all features
@@ -106,13 +160,15 @@
 
 ### 🔧 **Workflow & Examples**
 
-#### 📊 **Enhanced Monitoring Workflows**  
+#### 📊 **Enhanced Monitoring Workflows**
+
 - **🔍 Advanced Monitoring** - Comprehensive example with all event types
 - **🎨 Rich Formatting** - Better emoji usage and visual appeal
 - **📱 Improved Keyboards** - Multi-row inline keyboards with more actions
 - **🌐 URL Simplification** - Using new URL variables instead of manual construction
 
 #### 🎯 **Practical Examples**
+
 - **📁 New Examples** - `github-variables.yml`, `advanced-monitoring.yml`
 - **🔧 Updated Workflows** - All examples updated to use v3 features
 - **💡 Best Practices** - Demonstrated proper usage patterns
@@ -121,12 +177,14 @@
 ### 🚀 **Migration & Compatibility**
 
 #### 📈 **Breaking Changes**
+
 - **⬆️ Version Bump** - Updated from v2.x to v3.0.0
 - **📝 Template Format** - HTML → Markdown migration required
 - **🔧 New Parameters** - Additional optional parameters available
 - **📊 Enhanced Defaults** - Better default values for production use
 
 #### 🛠️ **Backwards Compatibility**
+
 - **✅ Existing Workflows** - Most v2 workflows work without changes
 - **📋 Parameter Names** - All existing parameters maintained
 - **🔄 Gradual Migration** - Can adopt new features incrementally

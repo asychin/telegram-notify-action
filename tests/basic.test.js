@@ -28,7 +28,7 @@ describe("Telegram Notify Action - Basic Tests", () => {
 
     const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"));
     expect(packageJson.name).toBe("telegram-notify-action");
-    expect(packageJson.version).toBe("3.1.0");
+    expect(packageJson.version).toBe("3.2.0");
     expect(packageJson.main).toBe("telegram-notify.js");
   });
 
