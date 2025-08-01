@@ -5,6 +5,7 @@
 ### 🐛 **Bug Fixes**
 
 #### 🔧 **Release Workflow Fix**
+
 - **🚨 Fixed Critical Pipeline Error** - Fixed heredoc syntax in release workflow preventing shell command interpretation
 - **🛡️ Security Improvement** - Template variables from release notes no longer executed as shell commands
 - **⚡ Workflow Stability** - Release workflow now handles complex CHANGELOG content safely
@@ -37,6 +38,7 @@
 - **🔗 Marketplace Integration** - Enhanced GitHub Actions Marketplace presence
 - **🧪 Validation Rules** - Critical validation rules for preventing common integration errors
 - **📋 Migration Support** - Support for auditing and upgrading existing implementations
+- **🚨 Critical Workflow Fix** - Added heredoc syntax warning to prevent shell command interpretation in release workflows
 
 ### 🔧 **Technical Improvements**
 
