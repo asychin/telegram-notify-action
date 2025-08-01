@@ -152,6 +152,117 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
     caption: "🖼️ Forced as photo (may have processing issues)"
 ```
 
+## 🤖 AI-Powered Auto-Integration
+
+**NEW IN v3!** Let AI automatically integrate `telegram-notify-action` into your repository with optimal configuration.
+
+### 🧠 Intelligent Analysis
+
+The AI integration system automatically analyzes your repository to:
+
+- 🔍 **Detect Project Type** - Node.js, Python, Go, Docker, Kubernetes, etc.
+- 📋 **Analyze Existing Workflows** - Understand your current CI/CD pipeline
+- 🎯 **Identify Deployment Patterns** - Simple, complex, or enterprise-level deployments
+- 🔒 **Check Security Setup** - Scan for existing Telegram secrets and configurations
+
+### 💬 Interactive Configuration
+
+The system will intelligently ask you:
+
+#### Notification Preferences
+
+- **Basic** - Simple success/failure notifications
+- **Detailed** - Include commit info, branch, duration
+- **Dynamic** - Real-time updates with progress tracking
+- **Comprehensive** - Full pipeline with statistics
+
+#### Visual Formatting
+
+- **Minimal** - Text-only notifications
+- **Standard** - Basic emojis for status
+- **Rich** - Enhanced emojis and formatting
+- **Animated** - Progress bars and dynamic indicators
+
+#### Delivery Style
+
+- **Separate** - Individual messages for each stage
+- **Update** - Single message with progress updates
+- **Thread** - Threaded messages in topics
+- **Hybrid** - Combined updates with final summary
+
+### 🎯 Smart Template Selection
+
+Based on your project structure, the AI automatically selects optimal templates:
+
+| Project Type          | Recommended Template | Features                           |
+| --------------------- | -------------------- | ---------------------------------- |
+| **Basic Projects**    | `success`/`error`    | Simple status notifications        |
+| **Standard Projects** | `deploy`             | Build + deploy with statistics     |
+| **Enterprise**        | `comprehensive`      | Multi-stage with progress tracking |
+| **Microservices**     | `service-specific`   | Per-service notifications          |
+
+### 🛠️ Integration Strategies
+
+#### Non-Disruptive Integration
+
+- ✅ Preserves existing workflow structure
+- ✅ Adds notifications without breaking changes
+- ✅ Conditional notifications (success/failure only)
+
+#### Enhanced Integration
+
+- 🔄 Real-time progress tracking between jobs
+- 📊 Dynamic message updates with statistics
+- ⏱️ Deployment timing and performance metrics
+
+#### Enterprise Integration
+
+- 🌍 Multi-environment notifications
+- 🎯 Service-specific progress tracking
+- 🛡️ Advanced failure analysis and debugging
+- 🔄 Rollback notifications and health checks
+
+### 📋 Automatic PR Generation
+
+The AI system creates a comprehensive Pull Request with:
+
+```markdown
+🔔 Add Telegram Notifications with telegram-notify-action@v3
+
+## 📋 What's Added:
+
+- [x] Intelligent deployment notifications
+- [x] Real-time progress updates
+- [x] Rich formatting with emojis
+- [x] Secure secrets configuration
+
+## ⚙️ Setup Required:
+
+1. Add `TELEGRAM_BOT_TOKEN` to repository secrets
+2. Add `TELEGRAM_CHAT_ID` to repository secrets
+3. Review and customize notification preferences
+
+## 🧪 Testing:
+
+- Test notifications will be sent to specified chat
+- Use staging deployments to verify configuration
+```
+
+### 🔒 Security & Best Practices
+
+The AI integration ensures:
+
+- 🛡️ **Never exposes tokens** in code or logs
+- 🔐 **Uses repository secrets** for all sensitive data
+- 📊 **Sanitizes error messages** to prevent data leaks
+- ⚡ **Minimal performance impact** on existing workflows
+
+### 🚀 Getting Started with AI Integration
+
+> **Coming Soon:** AI-powered integration will be available through GitHub Marketplace and as a standalone tool. Stay tuned for updates!
+
+For now, use the comprehensive manual integration examples above or contact us for enterprise AI integration services.
+
 ## 📖 Input Parameters
 
 ### Required Parameters
@@ -211,11 +322,11 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ### Retry Configuration
 
-| Parameter                 | Description                                     | Default | Example |
-| ------------------------- | ----------------------------------------------- | ------- | ------- |
-| `max_retries`             | Maximum retry attempts for regular errors      | `5`     | `5`     |
-| `retry_delay`             | Initial retry delay (seconds)                   | `1`     | `2`     |
-| `max_rate_limit_retries`  | Maximum retry attempts for rate limit errors   | `8`     | `10`    |
+| Parameter                | Description                                  | Default | Example |
+| ------------------------ | -------------------------------------------- | ------- | ------- |
+| `max_retries`            | Maximum retry attempts for regular errors    | `5`     | `5`     |
+| `retry_delay`            | Initial retry delay (seconds)                | `1`     | `2`     |
+| `max_rate_limit_retries` | Maximum retry attempts for rate limit errors | `8`     | `10`    |
 
 ### Conditional Sending
 
@@ -327,7 +438,9 @@ template_vars: |
 The action provides three types of automatic variables:
 
 #### GitHub Context Variables
+
 Basic GitHub workflow information automatically available:
+
 - `repository` - Repository name (`user/repo`)
 - `refName` - Branch/tag name (`main`, `develop`)
 - `sha` - Full commit SHA
@@ -342,9 +455,11 @@ Basic GitHub workflow information automatically available:
 - `repositoryOwnerName` - Repository owner name only
 
 #### Event Context Variables (NEW in v3)
+
 Event-specific variables automatically extracted based on the GitHub event:
 
 **For `issues` events:**
+
 - `author` - Issue author
 - `issueNumber` - Issue number
 - `issueTitle` - Issue title
@@ -356,6 +471,7 @@ Event-specific variables automatically extracted based on the GitHub event:
 - `updatedAt` - Issue last update date
 
 **For `pull_request` events:**
+
 - `author` - PR author
 - `prNumber` - Pull request number
 - `prTitle` - Pull request title
@@ -370,6 +486,7 @@ Event-specific variables automatically extracted based on the GitHub event:
 - `assignees` - Comma-separated list of assignees
 
 **For `push` events:**
+
 - `pusher` - User who pushed
 - `commitCount` - Number of commits
 - `lastCommitMessage` - Last commit message
@@ -377,6 +494,7 @@ Event-specific variables automatically extracted based on the GitHub event:
 - `lastCommitId` - Last commit ID
 
 **For `release` events:**
+
 - `releaseAuthor` - Release author
 - `releaseName` - Release name
 - `releaseTag` - Release tag
@@ -386,6 +504,7 @@ Event-specific variables automatically extracted based on the GitHub event:
 - `releaseCreatedAt` - Release creation date
 
 **For `workflow_run` events:**
+
 - `workflowName` - Workflow name
 - `workflowStatus` - Workflow status
 - `workflowConclusion` - Workflow conclusion
@@ -394,7 +513,9 @@ Event-specific variables automatically extracted based on the GitHub event:
 - `workflowActor` - Workflow actor
 
 #### URL Variables (NEW in v3)
+
 Ready-to-use GitHub URLs:
+
 - `runUrl` - Current workflow run URL
 - `commitUrl` - Current commit URL
 - `workflowUrl` - Workflow definition URL
@@ -771,7 +892,7 @@ Enable debug logging by setting the `ACTIONS_STEP_DEBUG` secret to `true` in you
 
 - **Smart Event Detection** - Automatically extracts relevant variables based on GitHub event type
 - **Issue Variables** - Author, title, labels, assignees automatically available for `issues` events
-- **PR Variables** - PR details, branches, draft status for `pull_request` events  
+- **PR Variables** - PR details, branches, draft status for `pull_request` events
 - **Push Variables** - Commit count, last commit info for `push` events
 - **Release Variables** - Release details, notes, tags for `release` events
 - **No Configuration Required** - All variables available without manual setup

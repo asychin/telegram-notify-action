@@ -1,0 +1,398 @@
+# 🤖 AI Integration Rules for telegram-notify-action
+
+## 📋 Mission Statement
+Automatically analyze user repositories and intelligently integrate `telegram-notify-action@v3` with optimal configuration based on project structure, existing workflows, and user preferences.
+
+## 🔍 Repository Analysis Phase
+
+### 1. Repository Structure Analysis
+```yaml
+analyze_repository:
+  project_type:
+    - detect: package.json → Node.js project
+    - detect: requirements.txt/pyproject.toml → Python project  
+    - detect: pom.xml/build.gradle → Java project
+    - detect: go.mod → Go project
+    - detect: Cargo.toml → Rust project
+    - detect: composer.json → PHP project
+    - detect: Dockerfile → Containerized project
+  
+  deployment_indicators:
+    - check: .github/workflows/*.yml → existing CI/CD
+    - check: docker-compose.yml → local/staging deployment
+    - check: k8s/*.yml → Kubernetes deployment
+    - check: terraform/*.tf → Infrastructure as Code
+    - check: ansible/*.yml → Configuration management
+```
+
+### 2. Existing Workflow Analysis
+```yaml
+workflow_analysis:
+  scan_workflows:  
+    - path: .github/workflows/
+    - identify_jobs: [build, test, deploy, release]
+    - detect_triggers: [push, pull_request, release, workflow_dispatch]
+    - find_secrets: [TELEGRAM_*, *_TOKEN, *_CHAT_ID]
+    - analyze_steps: [checkout, build, docker, deploy]
+  
+  deployment_patterns:
+    simple_deploy: 
+      - single job deployment
+      - basic build → deploy flow
+    complex_deploy:
+      - multi-stage deployment (build → test → deploy)
+      - matrix deployments
+      - environment-specific deployments
+    advanced_deploy:
+      - progressive deployments
+      - rollback capabilities
+      - health checks
+```
+
+## 💬 User Interaction Questionnaire
+
+### 1. Core Integration Questions
+```yaml
+user_questions:
+  notification_preference:
+    question: "🔔 How detailed should your Telegram notifications be?"
+    options:
+      - basic: "Simple success/failure notifications"
+      - detailed: "Include commit info, branch, and duration"
+      - dynamic: "Real-time updates with progress tracking"
+      - comprehensive: "Full deployment pipeline with statistics"
+  
+  visual_preference:
+    question: "🎨 Do you want emojis and visual formatting?"
+    options:
+      - minimal: "Text-only notifications"
+      - standard: "Basic emojis for status"
+      - rich: "Rich emojis and formatting"
+      - animated: "Progress bars and dynamic indicators"
+  
+  update_style:
+    question: "📱 How should notifications be delivered?"
+    options:
+      - separate: "Send separate messages for each stage"
+      - update: "Update single message with progress"
+      - thread: "Use threaded messages in topics"
+      - hybrid: "Combine updates with final summary"
+```
+
+### 2. Technical Configuration Questions
+```yaml
+technical_questions:
+  deployment_environments:
+    question: "🌍 Which environments do you deploy to?"
+    detect_from: [workflow branches, environment secrets]
+    options: [development, staging, production, feature-branches]
+  
+  notification_triggers:
+    question: "⚡ When should notifications be sent?"
+    options:
+      - all_events: "Every push, PR, and deployment"
+      - deployments_only: "Only deployment workflows"  
+      - failures_only: "Only failures and errors"
+      - custom: "Specific events and conditions"
+  
+  file_attachments:
+    question: "📎 Should notifications include file attachments?"  
+    detect_artifacts: [build logs, test reports, coverage reports]
+    options:
+      - none: "No file attachments"
+      - logs: "Include build/deployment logs"
+      - reports: "Include test and coverage reports"
+      - screenshots: "Include UI test screenshots"
+```
+
+## 🧠 Intelligence Rules
+
+### 1. Smart Configuration Detection
+```yaml
+smart_detection:
+  secrets_analysis:
+    existing_telegram:
+      - scan: repository secrets for TELEGRAM_*
+      - detect: organization-level telegram configs
+      - identify: multi-environment setups
+    
+    missing_secrets:
+      - generate: setup instructions
+      - suggest: naming conventions (TELEGRAM_BOT_TOKEN_{ENV})
+      - create: environment-specific variables
+  
+  workflow_optimization:
+    job_placement:
+      - start_notifications: first job with needs: []
+      - progress_notifications: after critical jobs
+      - final_notifications: always() condition jobs
+    
+    conditional_logic:
+      - success_path: when all jobs succeed  
+      - failure_path: when any job fails
+      - partial_success: when some matrix jobs fail
+```
+
+### 2. Template Selection Algorithm
+```yaml
+template_selection:
+  basic_project:
+    triggers: [simple workflow, < 3 jobs]
+    template: success/error with basic info
+    variables: [repository, branch, commit, actor]
+  
+  standard_project:  
+    triggers: [build + deploy jobs, testing]
+    template: deploy template with statistics
+    variables: [all basic + duration, test results]
+  
+  enterprise_project:
+    triggers: [complex matrix, multi-env, > 5 jobs]
+    template: comprehensive with dynamic updates
+    variables: [all + progress tracking, stage timings]
+  
+  microservices_project:
+    triggers: [multiple services, docker matrix]
+    template: service-specific notifications
+    variables: [service names, deployment matrix]
+```
+
+## 🛠️ Implementation Strategies
+
+### 1. Non-Disruptive Integration
+```yaml
+integration_approach:
+  minimal_changes:
+    - add notification steps without modifying existing logic
+    - use conditional notifications (success/failure only)
+    - preserve existing workflow structure
+  
+  enhanced_integration:
+    - add progress tracking between existing jobs
+    - implement dynamic message updates
+    - include deployment statistics and timing
+  
+  comprehensive_overhaul:
+    - restructure workflows for optimal notification flow
+    - implement advanced features (file uploads, keyboards)
+    - add monitoring and alerting capabilities
+```
+
+### 2. Configuration Templates
+
+#### A. Simple Integration (Basic Projects)
+```yaml
+simple_integration:
+  add_to_existing_job:
+    - name: 📢 Notify Deployment Status
+      if: always()
+      uses: asychin/telegram-notify-action@v3
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        template: ${{ job.status == 'success' && 'success' || 'error' }}
+        message: ${{ job.status == 'success' && 'Deployment completed!' || 'Deployment failed!' }}
+```
+
+#### B. Dynamic Integration (Advanced Projects)  
+```yaml
+dynamic_integration:
+  start_notification:
+    job: notify-start
+    capture: message_id, start_time
+    template: deployment start with progress bar
+  
+  progress_updates:
+    jobs: [build, test, deploy]  
+    action: update existing message
+    template: progress with stage completion
+  
+  final_notification:
+    job: notify-complete
+    condition: always()
+    template: comprehensive summary with timings
+```
+
+#### C. Enterprise Integration (Complex Projects)
+```yaml
+enterprise_integration:
+  features:
+    - multi-environment notifications
+    - service-specific progress tracking  
+    - failure analysis and debugging info
+    - rollback notifications
+    - health check integration
+    - custom keyboards for manual actions
+```
+
+## 📚 Documentation Integration
+
+### 1. Auto-Documentation Analysis
+```yaml
+documentation_check:
+  read_current_docs:
+    - fetch: latest README.md from telegram-notify-action
+    - parse: available templates and variables
+    - extract: latest features and breaking changes
+    - verify: example compatibility with user's setup
+  
+  version_compatibility:
+    - check: action.yml for current version (v3)
+    - validate: deprecated features in user's existing setup
+    - suggest: migration paths for older versions
+    - warn: about breaking changes
+```
+
+### 2. Context-Aware Examples
+```yaml
+example_generation:
+  based_on_project_type:
+    node_js:
+      - npm install/build examples
+      - package.json version in notifications
+      - test coverage integration
+    
+    docker:
+      - container build notifications
+      - image size and layer information
+      - registry push confirmations
+    
+    kubernetes:
+      - deployment status tracking
+      - pod health notifications  
+      - rollout progress updates
+```
+
+## 🔒 Security and Best Practices
+
+### 1. Secrets Management Rules
+```yaml
+security_rules:
+  token_setup:
+    - never: expose tokens in code or logs
+    - always: use repository/organization secrets
+    - suggest: environment-specific token naming
+    - validate: token permissions and chat access
+  
+  data_privacy:
+    - avoid: sensitive data in notifications (passwords, keys)
+    - sanitize: error messages and logs
+    - limit: information exposure in public repositories
+```
+
+### 2. Workflow Security
+```yaml
+workflow_security:
+  permissions:
+    - minimal: only required permissions for each job
+    - secure: use specific action versions (@v3, not @main)
+    - validate: third-party action usage
+  
+  error_handling:
+    - graceful: failure handling without breaking pipelines
+    - informative: error messages without sensitive data
+    - recoverable: continue-on-error for non-critical notifications
+```
+
+## 🧪 Testing and Validation
+
+### 1. Integration Testing Strategy
+```yaml
+testing_approach:
+  dry_run:
+    - simulate: notification sending without actual Telegram calls
+    - validate: message formatting and variable substitution
+    - check: conditional logic and job dependencies
+  
+  staging_test:
+    - test: with actual Telegram bot in test environment
+    - verify: message delivery and formatting
+    - validate: file attachments and special features
+  
+  production_validation:
+    - gradual: rollout with limited notifications
+    - monitor: delivery success and error rates
+    - feedback: user experience and preferences
+```
+
+### 2. Quality Assurance Rules
+```yaml
+quality_rules:
+  message_quality:
+    - readable: clear and informative messages
+    - actionable: include relevant links and context
+    - timely: sent at appropriate workflow stages
+  
+  performance_impact:
+    - minimal: workflow execution time increase
+    - reliable: handle Telegram API rate limits
+    - resilient: graceful degradation on service issues
+```
+
+## 🎯 Success Metrics and Monitoring
+
+### 1. Integration Success Criteria
+```yaml
+success_metrics:
+  technical:
+    - workflow_completion: no broken pipelines
+    - notification_delivery: > 95% success rate
+    - user_satisfaction: positive feedback on usefulness
+  
+  adoption:
+    - feature_usage: utilization of advanced features
+    - customization: user-specific template modifications
+    - retention: continued usage over time
+```
+
+### 2. Continuous Improvement
+```yaml
+improvement_cycle:
+  feedback_collection:
+    - monitor: common configuration patterns
+    - analyze: frequent customization requests  
+    - identify: missing features or templates
+  
+  template_evolution:
+    - update: templates based on usage patterns
+    - add: new variables for common use cases
+    - optimize: message formatting for different project types
+```
+
+## 🚀 Deployment Automation
+
+### 1. Auto-PR Generation
+```yaml
+automated_integration:
+  pr_creation:
+    title: "🔔 Add Telegram Notifications with telegram-notify-action"
+    description: |
+      This PR adds intelligent Telegram notifications to your workflows using telegram-notify-action@v3.
+      
+      ## 📋 What's Added:
+      - [x] Deployment success/failure notifications
+      - [x] Real-time progress updates  
+      - [x] Rich formatting with emojis
+      - [x] Secure secrets configuration
+      
+      ## ⚙️ Configuration Required:
+      1. Add `TELEGRAM_BOT_TOKEN` to repository secrets
+      2. Add `TELEGRAM_CHAT_ID` to repository secrets
+      3. Review and customize notification preferences
+      
+      ## 🧪 Testing:
+      - Notifications will be sent to specified chat
+      - Use test deployments to verify configuration
+    
+    files_modified:
+      - .github/workflows/*.yml
+      - README.md (optional documentation update)
+    
+    review_checklist:
+      - [ ] Secrets are properly configured
+      - [ ] Notification timing is appropriate  
+      - [ ] Message content is relevant
+      - [ ] No sensitive data in notifications
+```
+
+Remember: This is an intelligent integration system. Always prioritize user experience, security, and non-disruptive implementation. The goal is to enhance existing workflows, not replace them.

@@ -39,7 +39,8 @@ Choose your preferred language:
 ## 🔧 Features
 
 ### Core Features
-- ✅ **Message Templates** - Predefined templates for different scenarios  
+
+- ✅ **Message Templates** - Predefined templates for different scenarios
 - ✅ **File Support** - Send photos, documents, videos, and more
 - ✅ **Base64 Upload** - Send files directly from base64 encoded data
 - ✅ **Smart Image Processing** - Automatic C2PA metadata detection
@@ -48,9 +49,18 @@ Choose your preferred language:
 - ✅ **Thread Support** - Send to specific message threads/topics
 - ✅ **Message Editing** - Edit existing messages with new content
 - ✅ **Retry Logic** - Robust error handling with exponential backoff
+
+### 🤖 AI-Powered Integration
+
+- 🔮 **Auto-Integration** - AI-powered automatic integration into any repository
+- 🧠 **Smart Analysis** - Intelligent project structure analysis and workflow detection
+- 💬 **Interactive Setup** - Guided configuration with user preference questions
+- 🎯 **Optimal Configuration** - Automatically selects best templates and settings
+- 📋 **Pull Request Generation** - Creates complete integration PR with documentation
 - ✅ **Multi-language** - Support for English, Russian, and Chinese
 
-### Advanced Features  
+### Advanced Features
+
 - 🎯 **Conditional Sending** - Send notifications based on workflow status
 - 🔒 **Content Protection** - Prevent message forwarding and saving
 - 📊 **Event Context** - Automatic extraction of event-specific variables
