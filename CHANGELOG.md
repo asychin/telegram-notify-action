@@ -1,5 +1,22 @@
 # 📝 Changelog
 
+## [v3.2.3] - 2025-01-31
+
+### 🐛 **Bug Fixes**
+
+#### 🔧 **Complete Shell Injection Fix**
+
+- **🚨 Fixed Remaining Heredoc in Release Info** - Replaced unsafe heredoc in `release-info` step processing `github.event.release.body`
+- **🛡️ Security Enhancement** - Used `printf '%s\n'` for safe multiline content handling in release notes extraction
+- **✅ Complete Fix** - All heredoc usage in release workflow now secure with quoted delimiters
+- **🔒 Final Security Patch** - No remaining shell command interpretation vectors in workflow
+
+**Technical Details:**
+- Fixed `release_notes<<'EOF'` heredoc in release-info step (lines 36-40)
+- Replaced with safe `release_notes<<'RELEASE_BODY_END'` and `printf '%s\n'`
+- Ensured all GitHub release content processing is secure
+- Eliminated final shell injection vulnerability
+
 ## [v3.2.2] - 2025-01-31
 
 ### 🐛 **Bug Fixes**

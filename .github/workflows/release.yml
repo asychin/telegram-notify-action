@@ -33,10 +33,11 @@ jobs:
           else
             echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
             echo "prerelease=${{ github.event.release.prerelease }}" >> $GITHUB_OUTPUT
+            # Use safe output for release notes without heredoc
             {
-              echo "release_notes<<'EOF'"
-              echo "${{ github.event.release.body }}"
-              echo "EOF"
+              echo "release_notes<<'RELEASE_BODY_END'"
+              printf '%s\n' "${{ github.event.release.body }}"
+              echo "RELEASE_BODY_END"
             } >> $GITHUB_OUTPUT
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
