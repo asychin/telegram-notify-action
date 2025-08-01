@@ -8,8 +8,6 @@
 
 **Enhanced GitHub Action for sending Telegram notifications with advanced features**
 
-![Telegram Bot](test-image.png)
-
 </div>
 
 ## 🌐 Documentation
