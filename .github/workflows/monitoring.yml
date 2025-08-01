@@ -95,7 +95,7 @@ jobs:
             {
               "action": "${{ steps.notification-type.outputs.action_text }}",
               "emoji": "${{ steps.notification-type.outputs.emoji }}",
-              "customMessage": "New activity in repository {{repositoryName}}"
+              "customMessage": "New activity in repository ${{ github.event.repository.name }}"
             }
           inline_keyboard: |
             [
@@ -139,7 +139,7 @@ jobs:
             **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "Activity in repository {{repositoryName}} - new comment from {{commentAuthor}}"
+              "customMessage": "Activity in repository ${{ github.event.repository.name }} - new comment from ${{ github.event.comment.user.login }}"
             }
           inline_keyboard: |
             [
@@ -234,7 +234,7 @@ jobs:
             {
               "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
               "version": "PR#${{ github.event.pull_request.number }}",
-              "customMessage": "Pull Request {{prNumber}} in repository {{repositoryName}}"
+              "customMessage": "Pull Request #${{ github.event.pull_request.number }} in repository ${{ github.event.repository.name }}"
             }
           inline_keyboard: |
             [
@@ -284,7 +284,7 @@ jobs:
             **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "New review from {{reviewAuthor}} for PR #{{prNumber}}"
+              "customMessage": "New review from ${{ github.event.review.user.login }} for PR #${{ github.event.pull_request.number }}"
             }
           inline_keyboard: |
             [
@@ -453,7 +453,7 @@ jobs:
             {
               "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ All checks passed' || '⚠️ Issues found' }}",
               "coverage": "${{ steps.health-check.outputs.coverage }}%",
-              "customMessage": "Automated health check for repository {{repositoryName}} completed"
+              "customMessage": "Automated health check for repository ${{ github.event.repository.name }} completed"
             }
           inline_keyboard: |
             [
@@ -556,7 +556,7 @@ jobs:
             • 🌐 [Network Graph]({{repositoryUrl}}/network)
           template_vars: |
             {
-              "customMessage": "Comprehensive statistics for repository {{repositoryName}} - all time"
+              "customMessage": "Comprehensive statistics for repository ${{ github.event.repository.name }} - all time"
             }
           inline_keyboard: |
             [
