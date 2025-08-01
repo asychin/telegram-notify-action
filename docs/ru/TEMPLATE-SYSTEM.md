@@ -188,6 +188,8 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 
 ### GitHub Context (автоматически доступны)
 
+#### Базовые GitHub переменные
+
 | Переменная   | Описание            | Пример                 |
 | ------------ | ------------------- | ---------------------- |
 | `repository` | Имя репозитория     | `user/awesome-project` |
@@ -200,6 +202,22 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 | `runNumber`  | Номер запуска       | `42`                   |
 | `eventName`  | Событие-триггер     | `push`, `pull_request` |
 | `jobStatus`  | Статус задачи       | `success`, `failure`   |
+
+#### Расширенные GitHub переменные
+
+| Переменная          | Описание                 | Пример               |
+| ------------------- | ------------------------ | -------------------- |
+| `repositoryOwner`   | Владелец репозитория     | `asychin`            |
+| `repositoryId`      | ID репозитория           | `123456789`          |
+| `repositoryOwnerId` | ID владельца репозитория | `987654321`          |
+| `ref`               | Полная ссылка            | `refs/heads/main`    |
+| `refType`           | Тип ссылки               | `branch`, `tag`      |
+| `refProtected`      | Защищена ли ссылка       | `true`, `false`      |
+| `baseRef`           | Базовая ссылка           | `refs/heads/main`    |
+| `headRef`           | Head ссылка              | `refs/heads/feature` |
+| `triggeredBy`       | Инициатор запуска        | `john-doe`           |
+| `actorId`           | ID актера                | `123456`             |
+| `runAttempt`        | Номер попытки запуска    | `1`, `2`             |
 
 ### URL переменные (автоматически доступны)
 
@@ -225,14 +243,165 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 
 ### Системные переменные (автоматически доступны)
 
-| Переменная   | Описание             | Пример                           |
-| ------------ | -------------------- | -------------------------------- |
-| `serverUrl`  | URL GitHub сервера   | `https://github.com`             |
-| `workspace`  | Путь к workspace     | `/home/runner/work/repo`         |
-| `runnerOs`   | ОС runner'а          | `Linux`                          |
-| `runnerArch` | Архитектура runner'а | `X64`                            |
-| `jobId`      | ID текущей задачи    | `1234567`                        |
-| `actionPath` | Путь к action        | `/home/runner/work/_actions/...` |
+#### GitHub API и окружение
+
+| Переменная         | Описание                       | Пример                           |
+| ------------------ | ------------------------------ | -------------------------------- |
+| `serverUrl`        | URL GitHub сервера             | `https://github.com`             |
+| `apiUrl`           | URL GitHub API                 | `https://api.github.com`         |
+| `graphqlUrl`       | URL GitHub GraphQL             | `https://api.github.com/graphql` |
+| `workspace`        | Путь к workspace               | `/home/runner/work/repo`         |
+| `eventPath`        | Путь к файлу с данными события | `/github/workflow/event.json`    |
+| `jobId`            | ID текущей задачи              | `1234567`                        |
+| `actionRef`        | Ссылка на action               | `main`                           |
+| `actionRepository` | Репозиторий action             | `actions/checkout`               |
+| `workflowRef`      | Ссылка на workflow             | `refs/heads/main`                |
+| `workflowSha`      | SHA workflow                   | `abc123...`                      |
+| `retentionDays`    | Дни хранения артефактов        | `90`                             |
+| `secretSource`     | Источник секретов              | `Actions`                        |
+| `actionPath`       | Путь к action                  | `/home/runner/work/_actions/...` |
+| `stepSummary`      | Путь к файлу сводки шага       | `/github/step_summary`           |
+| `envPath`          | Путь к файлу окружения         | `/github/env`                    |
+| `path`             | Переменная окружения PATH      | `/usr/bin:/bin`                  |
+
+#### Окружение runner'а
+
+| Переменная          | Описание                      | Пример                         |
+| ------------------- | ----------------------------- | ------------------------------ |
+| `runnerOs`          | ОС runner'а                   | `Linux`, `Windows`, `macOS`    |
+| `runnerArch`        | Архитектура runner'а          | `X64`, `ARM64`                 |
+| `runnerName`        | Имя машины runner'а           | `GitHub Actions 2`             |
+| `runnerEnvironment` | Тип окружения runner'а        | `github-hosted`, `self-hosted` |
+| `runnerTemp`        | Временная директория runner'а | `/tmp`                         |
+| `runnerToolCache`   | Директория кеша инструментов  | `/opt/hostedtoolcache`         |
+| `runnerDebug`       | Включен ли режим отладки      | `1`, `0`                       |
+| `ci`                | Индикатор CI окружения        | `true`                         |
+
+### Переменные контекста событий (НОВОЕ в v3)
+
+Автоматически извлекаемые переменные на основе типа GitHub события:
+
+#### Общие переменные событий (все события)
+
+| Переменная      | Описание               | Пример             |
+| --------------- | ---------------------- | ------------------ |
+| `triggerUser`   | Пользователь-инициатор | `john-doe`         |
+| `triggerUserId` | ID пользователя        | `123456`           |
+| `action`        | Действие события       | `opened`, `closed` |
+
+#### События Issues
+
+| Переменная    | Описание                    | Пример                 |
+| ------------- | --------------------------- | ---------------------- |
+| `author`      | Автор issue                 | `john-doe`             |
+| `issueNumber` | Номер issue                 | `42`                   |
+| `issueTitle`  | Заголовок issue             | `Ошибка в авторизации` |
+| `issueState`  | Состояние issue             | `open`, `closed`       |
+| `issueBody`   | Описание issue              | `Описание текст...`    |
+| `labels`      | Метки (через запятую)       | `bug, frontend`        |
+| `assignees`   | Назначенные (через запятую) | `user1, user2`         |
+| `createdAt`   | Дата создания               | `2024-01-15T10:30:00Z` |
+| `updatedAt`   | Дата последнего обновления  | `2024-01-16T14:20:00Z` |
+
+#### События комментариев к Issues
+
+| Переменная         | Описание                  | Пример                 |
+| ------------------ | ------------------------- | ---------------------- |
+| `author`           | Автор issue               | `john-doe`             |
+| `issueNumber`      | Номер issue               | `42`                   |
+| `issueTitle`       | Заголовок issue           | `Ошибка в авторизации` |
+| `issueState`       | Состояние issue           | `open`, `closed`       |
+| `commentAuthor`    | Автор комментария         | `jane-doe`             |
+| `commentBody`      | Текст комментария         | `Отлично выглядит!`    |
+| `commentId`        | ID комментария            | `987654321`            |
+| `commentCreatedAt` | Дата создания комментария | `2024-01-15T11:30:00Z` |
+
+#### События Pull Request
+
+| Переменная    | Описание                      | Пример                   |
+| ------------- | ----------------------------- | ------------------------ |
+| `author`      | Автор PR                      | `jane-doe`               |
+| `prNumber`    | Номер pull request            | `123`                    |
+| `prTitle`     | Заголовок pull request        | `Добавить новую функцию` |
+| `prState`     | Состояние pull request        | `open`, `merged`         |
+| `prBody`      | Описание pull request         | `Этот PR добавляет...`   |
+| `prUrl`       | URL pull request              | `https://github.com/...` |
+| `baseBranch`  | Целевая ветка                 | `main`                   |
+| `headBranch`  | Исходная ветка                | `feature/auth`           |
+| `prCreatedAt` | Дата создания PR              | `2024-01-15T10:30:00Z`   |
+| `prUpdatedAt` | Дата последнего обновления PR | `2024-01-16T14:20:00Z`   |
+| `isDraft`     | Является ли PR черновиком     | `true`, `false`          |
+| `mergeable`   | Можно ли слить                | `true`, `false`          |
+| `labels`      | Метки (через запятую)         | `enhancement, frontend`  |
+| `assignees`   | Назначенные (через запятую)   | `user1, user2`           |
+
+#### События обзора Pull Request
+
+| Переменная     | Описание               | Пример                          |
+| -------------- | ---------------------- | ------------------------------- |
+| `author`       | Автор PR               | `jane-doe`                      |
+| `prNumber`     | Номер pull request     | `123`                           |
+| `prTitle`      | Заголовок pull request | `Добавить новую функцию`        |
+| `prUrl`        | URL pull request       | `https://github.com/...`        |
+| `reviewAuthor` | Автор обзора           | `maintainer`                    |
+| `reviewState`  | Состояние обзора       | `approved`, `changes_requested` |
+| `reviewBody`   | Комментарий обзора     | `Выглядит хорошо!`              |
+| `reviewId`     | ID обзора              | `987654321`                     |
+
+#### События Push
+
+| Переменная          | Описание                     | Пример                  |
+| ------------------- | ---------------------------- | ----------------------- |
+| `pusher`            | Пользователь push            | `dev-user`              |
+| `pusherId`          | ID пользователя push         | `123456`                |
+| `commitCount`       | Количество коммитов          | `3`                     |
+| `lastCommitMessage` | Сообщение последнего коммита | `Исправить авторизацию` |
+| `lastCommitAuthor`  | Автор последнего коммита     | `dev-user`              |
+| `lastCommitId`      | ID последнего коммита        | `a1b2c3d...`            |
+
+#### События Release
+
+| Переменная         | Описание                | Пример                 |
+| ------------------ | ----------------------- | ---------------------- |
+| `releaseAuthor`    | Автор релиза            | `maintainer`           |
+| `releaseName`      | Имя релиза              | `v2.1.0`               |
+| `releaseTag`       | Тег релиза              | `v2.1.0`               |
+| `releaseBody`      | Описание релиза         | `Новые функции...`     |
+| `releaseCreatedAt` | Дата создания           | `2024-01-15T10:30:00Z` |
+| `isPrerelease`     | Является ли пре-релизом | `true`, `false`        |
+| `isDraft`          | Является ли черновиком  | `true`, `false`        |
+
+#### События Workflow Run
+
+| Переменная           | Описание               | Пример                     |
+| -------------------- | ---------------------- | -------------------------- |
+| `workflowName`       | Имя workflow           | `CI Pipeline`              |
+| `workflowStatus`     | Статус workflow        | `completed`, `in_progress` |
+| `workflowConclusion` | Заключение workflow    | `success`, `failure`       |
+| `workflowId`         | ID workflow            | `123456789`                |
+| `workflowRunNumber`  | Номер запуска workflow | `42`                       |
+| `workflowActor`      | Актер workflow         | `john-doe`                 |
+
+#### События Deployment
+
+| Переменная              | Описание                | Пример                  |
+| ----------------------- | ----------------------- | ----------------------- |
+| `deploymentId`          | ID развертывания        | `123456789`             |
+| `deploymentEnvironment` | Окружение развертывания | `production`, `staging` |
+| `deploymentRef`         | Ссылка развертывания    | `refs/heads/main`       |
+| `deploymentSha`         | SHA развертывания       | `abc123...`             |
+| `deploymentCreator`     | Создатель развертывания | `deploy-bot`            |
+
+#### События статуса Deployment
+
+| Переменная                 | Описание                | Пример                    |
+| -------------------------- | ----------------------- | ------------------------- |
+| `deploymentState`          | Состояние развертывания | `success`, `failure`      |
+| `deploymentDescription`    | Описание развертывания  | `Развернуто успешно`      |
+| `deploymentEnvironmentUrl` | URL окружения           | `https://staging.app.com` |
+| `deploymentEnvironment`    | Окружение развертывания | `production`, `staging`   |
+
+> **Примечание**: Переменные контекста событий автоматически доступны на основе инициирующего события - ручная настройка не требуется!
 
 ### Специальные переменные
 

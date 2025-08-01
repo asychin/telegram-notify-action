@@ -664,37 +664,73 @@ Actor: {{actor}}
       deploy: {
         en: `🚀 ${bold}Deployment${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+📦 Repository: {{repository}}
+🌿 Branch: {{refName}}
+📝 Commit: {{shortSha}}
+🔢 Run: #{{runNumber}}
 
-Deployed by: {{actor}}
-Status: {{deployStatus}}
+👤 Deployed by: {{actor}}
+📊 Status: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 Change Statistics:
+
+🌿 Branch: {{baseBranch}} → {{headBranch}}
+📁 Files changed: {{filesChanged}}
+📝 Commits: {{commitCount}}
+📊 Changes: {{additions}} ➕ {{deletions}} ➖
+👤 Author: {{author}}
+📅 Created: {{prCreatedAt}}
+
+📝 Description:
+{{prTitle}}`,
         ru: `🚀 ${bold}Развертывание${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+📦 Репозиторий: {{repository}}
+🌿 Ветка: {{refName}}
+📝 Коммит: {{shortSha}}
+🔢 Запуск: #{{runNumber}}
 
-Развернул: {{actor}}
-Статус: {{deployStatus}}
+👤 Развернул: {{actor}}
+📊 Статус: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 Статистика изменений:
+
+🌿 Ветка: {{baseBranch}} → {{headBranch}}
+📁 Файлов изменено: {{filesChanged}}
+📝 Коммитов: {{commitCount}}
+📊 Изменения: {{additions}} ➕ {{deletions}} ➖
+👤 Автор: {{author}}
+📅 Создан: {{prCreatedAt}}
+
+📝 Описание:
+{{prTitle}}`,
         zh: `🚀 ${bold}部署${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+📦 仓库: {{repository}}
+🌿 分支: {{refName}}
+📝 提交: {{shortSha}}
+🔢 运行: #{{runNumber}}
 
-部署者: {{actor}}
-状态: {{deployStatus}}
+👤 部署者: {{actor}}
+📊 状态: {{deployStatus}}
 
-{{customMessage}}`,
+{{customMessage}}
+
+📈 变更统计:
+
+🌿 分支: {{baseBranch}} → {{headBranch}}
+📁 文件变更: {{filesChanged}}
+📝 提交数: {{commitCount}}
+📊 变更: {{additions}} ➕ {{deletions}} ➖
+👤 作者: {{author}}
+📅 创建时间: {{prCreatedAt}}
+
+📝 描述:
+{{prTitle}}`,
       },
       test: {
         en: `🧪 ${bold}Test Results${boldEnd}

@@ -220,9 +220,9 @@ jobs:
             **👥 Assignees:** {{assignees}}
 
             **📈 Change Statistics:**
-            • 📁 **Files changed:** ${{ github.event.pull_request.changed_files }}
-            • 📝 **Commits:** ${{ github.event.pull_request.commits }}
-            • 📊 **Changes:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
+            • 📁 **Files changed:** {{filesChanged}}
+            • 📝 **Commits:** {{commitCount}}
+            • 📊 **Changes:** `{{additions}} ➕ {{deletions}} ➖`
             • 📅 **Created:** {{prCreatedAt}}
             • 🔄 **Updated:** {{prUpdatedAt}}
 
@@ -425,6 +425,9 @@ jobs:
             **📅 Check Date:** ${{ steps.health-check.outputs.current_date }}
             **🎯 Overall Status:** ${{ steps.health-check.outputs.status == 'success' && '✅ Excellent Health' || '⚠️ Needs Attention' }}
             **🏆 Health Score:** ${{ steps.health-check.outputs.vulnerabilities == '0' && steps.health-check.outputs.outdated < '5' && '95%' || '70%' }}
+            **🌿 Branch:** {{refName}}
+            **👤 Actor:** {{actor}}
+            **🔄 Workflow:** {{workflow}}
 
             **📊 Detailed Statistics:**
             • 💾 **Repository Size:** `${{ steps.health-check.outputs.repo_size }}`
@@ -443,8 +446,9 @@ jobs:
             • 📈 Maintain test coverage above 80%
             • 🔄 Regularly run security checks
 
-            **🌿 Branch:** {{refName}}
+            **🌿 Current Branch:** {{refName}}
             **👤 Check initiated by:** {{actor}}
+            **📝 Commit:** {{shortSha}}
           template_vars: |
             {
               "testStatus": "${{ steps.health-check.outputs.status == 'success' && '✅ All checks passed' || '⚠️ Issues found' }}",
@@ -525,6 +529,8 @@ jobs:
             **👤 Owner:** {{repositoryOwnerName}}
             **📅 Report Generated:** ${{ steps.stats.outputs.current_date }}
             **🌿 Current Branch:** {{refName}}
+            **👤 Actor:** {{actor}}
+            **🔄 Workflow:** {{workflow}}
 
             **🚀 Development Activity:**
             • 📝 **Total Commits:** `${{ steps.stats.outputs.total_commits }}`
@@ -544,10 +550,10 @@ jobs:
             • 👨‍💻 **Collaboration Level:** ${{ steps.stats.outputs.contributors > 5 && '🟢 Team Project' || steps.stats.outputs.contributors > 1 && '🟡 Small Team' || '🟣 Individual' }}
 
             **🔗 Useful Resources:**
-            • 👥 [Contributors](https://github.com/${{ github.repository }}/graphs/contributors)
-            • 📈 [Commit Activity](https://github.com/${{ github.repository }}/graphs/commit-activity)
-            • 📊 [Code Frequency](https://github.com/${{ github.repository }}/graphs/code-frequency)
-            • 🌐 [Network Graph](https://github.com/${{ github.repository }}/network)
+            • 👥 [Contributors]({{repositoryUrl}}/graphs/contributors)
+            • 📈 [Commit Activity]({{repositoryUrl}}/graphs/commit-activity)
+            • 📊 [Code Frequency]({{repositoryUrl}}/graphs/code-frequency)
+            • 🌐 [Network Graph]({{repositoryUrl}}/network)
           template_vars: |
             {
               "customMessage": "Comprehensive statistics for repository {{repositoryName}} - all time"

@@ -185,6 +185,8 @@ graph TD
 
 ### GitHub 上下文（自动可用）
 
+#### 基础 GitHub 变量
+
 | 变量         | 描述          | 示例                   |
 | ------------ | ------------- | ---------------------- |
 | `repository` | 仓库名称      | `user/awesome-project` |
@@ -197,6 +199,22 @@ graph TD
 | `runNumber`  | 运行编号      | `42`                   |
 | `eventName`  | 触发事件      | `push`, `pull_request` |
 | `jobStatus`  | 作业状态      | `success`, `failure`   |
+
+#### 扩展 GitHub 变量
+
+| 变量                | 描述           | 示例                 |
+| ------------------- | -------------- | -------------------- |
+| `repositoryOwner`   | 仓库所有者     | `asychin`            |
+| `repositoryId`      | 仓库 ID        | `123456789`          |
+| `repositoryOwnerId` | 仓库所有者 ID  | `987654321`          |
+| `ref`               | 完整引用       | `refs/heads/main`    |
+| `refType`           | 引用类型       | `branch`, `tag`      |
+| `refProtected`      | 引用是否受保护 | `true`, `false`      |
+| `baseRef`           | 基础引用       | `refs/heads/main`    |
+| `headRef`           | Head 引用      | `refs/heads/feature` |
+| `triggeredBy`       | 触发者         | `john-doe`           |
+| `actorId`           | 执行者 ID      | `123456`             |
+| `runAttempt`        | 运行尝试次数   | `1`, `2`             |
 
 ### URL 变量（自动可用）
 
@@ -222,14 +240,165 @@ graph TD
 
 ### 系统变量（自动可用）
 
-| 变量         | 描述              | 示例                             |
-| ------------ | ----------------- | -------------------------------- |
-| `serverUrl`  | GitHub 服务器 URL | `https://github.com`             |
-| `workspace`  | 工作空间路径      | `/home/runner/work/repo`         |
-| `runnerOs`   | 运行器操作系统    | `Linux`                          |
-| `runnerArch` | 运行器架构        | `X64`                            |
-| `jobId`      | 当前作业 ID       | `1234567`                        |
-| `actionPath` | Action 路径       | `/home/runner/work/_actions/...` |
+#### GitHub API 和环境
+
+| 变量               | 描述               | 示例                             |
+| ------------------ | ------------------ | -------------------------------- |
+| `serverUrl`        | GitHub 服务器 URL  | `https://github.com`             |
+| `apiUrl`           | GitHub API URL     | `https://api.github.com`         |
+| `graphqlUrl`       | GitHub GraphQL URL | `https://api.github.com/graphql` |
+| `workspace`        | 工作空间路径       | `/home/runner/work/repo`         |
+| `eventPath`        | 事件数据文件路径   | `/github/workflow/event.json`    |
+| `jobId`            | 当前作业 ID        | `1234567`                        |
+| `actionRef`        | Action 引用        | `main`                           |
+| `actionRepository` | Action 仓库        | `actions/checkout`               |
+| `workflowRef`      | 工作流引用         | `refs/heads/main`                |
+| `workflowSha`      | 工作流 SHA         | `abc123...`                      |
+| `retentionDays`    | 构件保留天数       | `90`                             |
+| `secretSource`     | 密钥源             | `Actions`                        |
+| `actionPath`       | Action 路径        | `/home/runner/work/_actions/...` |
+| `stepSummary`      | 步骤摘要文件路径   | `/github/step_summary`           |
+| `envPath`          | 环境文件路径       | `/github/env`                    |
+| `path`             | PATH 环境变量      | `/usr/bin:/bin`                  |
+
+#### 运行器环境
+
+| 变量                | 描述               | 示例                           |
+| ------------------- | ------------------ | ------------------------------ |
+| `runnerOs`          | 运行器操作系统     | `Linux`, `Windows`, `macOS`    |
+| `runnerArch`        | 运行器架构         | `X64`, `ARM64`                 |
+| `runnerName`        | 运行器机器名称     | `GitHub Actions 2`             |
+| `runnerEnvironment` | 运行器环境类型     | `github-hosted`, `self-hosted` |
+| `runnerTemp`        | 运行器临时目录     | `/tmp`                         |
+| `runnerToolCache`   | 运行器工具缓存目录 | `/opt/hostedtoolcache`         |
+| `runnerDebug`       | 是否启用调试模式   | `1`, `0`                       |
+| `ci`                | CI 环境指示器      | `true`                         |
+
+### 事件上下文变量（v3 新增）
+
+基于 GitHub 事件类型自动提取的变量：
+
+#### 通用事件变量（所有事件）
+
+| 变量            | 描述        | 示例               |
+| --------------- | ----------- | ------------------ |
+| `triggerUser`   | 触发用户    | `john-doe`         |
+| `triggerUserId` | 触发用户 ID | `123456`           |
+| `action`        | 事件动作    | `opened`, `closed` |
+
+#### Issues 事件
+
+| 变量          | 描述               | 示例                   |
+| ------------- | ------------------ | ---------------------- |
+| `author`      | Issue 作者         | `john-doe`             |
+| `issueNumber` | Issue 编号         | `42`                   |
+| `issueTitle`  | Issue 标题         | `登录系统中的错误`     |
+| `issueState`  | Issue 状态         | `open`, `closed`       |
+| `issueBody`   | Issue 描述         | `描述文本...`          |
+| `labels`      | 标签（逗号分隔）   | `bug, frontend`        |
+| `assignees`   | 指派者（逗号分隔） | `user1, user2`         |
+| `createdAt`   | 创建日期           | `2024-01-15T10:30:00Z` |
+| `updatedAt`   | 最后更新日期       | `2024-01-16T14:20:00Z` |
+
+#### Issue 评论事件
+
+| 变量               | 描述         | 示例                   |
+| ------------------ | ------------ | ---------------------- |
+| `author`           | Issue 作者   | `john-doe`             |
+| `issueNumber`      | Issue 编号   | `42`                   |
+| `issueTitle`       | Issue 标题   | `登录系统中的错误`     |
+| `issueState`       | Issue 状态   | `open`, `closed`       |
+| `commentAuthor`    | 评论作者     | `jane-doe`             |
+| `commentBody`      | 评论文本     | `看起来不错！`         |
+| `commentId`        | 评论 ID      | `987654321`            |
+| `commentCreatedAt` | 评论创建日期 | `2024-01-15T11:30:00Z` |
+
+#### Pull Request 事件
+
+| 变量          | 描述               | 示例                     |
+| ------------- | ------------------ | ------------------------ |
+| `author`      | PR 作者            | `jane-doe`               |
+| `prNumber`    | Pull Request 编号  | `123`                    |
+| `prTitle`     | Pull Request 标题  | `添加新功能`             |
+| `prState`     | Pull Request 状态  | `open`, `merged`         |
+| `prBody`      | Pull Request 描述  | `此 PR 添加...`          |
+| `prUrl`       | Pull Request URL   | `https://github.com/...` |
+| `baseBranch`  | 目标分支           | `main`                   |
+| `headBranch`  | 源分支             | `feature/auth`           |
+| `prCreatedAt` | PR 创建日期        | `2024-01-15T10:30:00Z`   |
+| `prUpdatedAt` | PR 最后更新日期    | `2024-01-16T14:20:00Z`   |
+| `isDraft`     | 是否为草稿 PR      | `true`, `false`          |
+| `mergeable`   | 是否可合并         | `true`, `false`          |
+| `labels`      | 标签（逗号分隔）   | `enhancement, frontend`  |
+| `assignees`   | 指派者（逗号分隔） | `user1, user2`           |
+
+#### Pull Request 审查事件
+
+| 变量           | 描述              | 示例                            |
+| -------------- | ----------------- | ------------------------------- |
+| `author`       | PR 作者           | `jane-doe`                      |
+| `prNumber`     | Pull Request 编号 | `123`                           |
+| `prTitle`      | Pull Request 标题 | `添加新功能`                    |
+| `prUrl`        | Pull Request URL  | `https://github.com/...`        |
+| `reviewAuthor` | 审查作者          | `maintainer`                    |
+| `reviewState`  | 审查状态          | `approved`, `changes_requested` |
+| `reviewBody`   | 审查评论          | `看起来不错！`                  |
+| `reviewId`     | 审查 ID           | `987654321`                     |
+
+#### Push 事件
+
+| 变量                | 描述         | 示例           |
+| ------------------- | ------------ | -------------- |
+| `pusher`            | 推送用户     | `dev-user`     |
+| `pusherId`          | 推送用户 ID  | `123456`       |
+| `commitCount`       | 提交数量     | `3`            |
+| `lastCommitMessage` | 最后提交消息 | `修复身份验证` |
+| `lastCommitAuthor`  | 最后提交作者 | `dev-user`     |
+| `lastCommitId`      | 最后提交 ID  | `a1b2c3d...`   |
+
+#### Release 事件
+
+| 变量               | 描述         | 示例                   |
+| ------------------ | ------------ | ---------------------- |
+| `releaseAuthor`    | 发布作者     | `maintainer`           |
+| `releaseName`      | 发布名称     | `v2.1.0`               |
+| `releaseTag`       | 发布标签     | `v2.1.0`               |
+| `releaseBody`      | 发布说明     | `新功能...`            |
+| `releaseCreatedAt` | 创建日期     | `2024-01-15T10:30:00Z` |
+| `isPrerelease`     | 是否为预发布 | `true`, `false`        |
+| `isDraft`          | 是否为草稿   | `true`, `false`        |
+
+#### Workflow Run 事件
+
+| 变量                 | 描述           | 示例                       |
+| -------------------- | -------------- | -------------------------- |
+| `workflowName`       | 工作流名称     | `CI Pipeline`              |
+| `workflowStatus`     | 工作流状态     | `completed`, `in_progress` |
+| `workflowConclusion` | 工作流结论     | `success`, `failure`       |
+| `workflowId`         | 工作流 ID      | `123456789`                |
+| `workflowRunNumber`  | 工作流运行编号 | `42`                       |
+| `workflowActor`      | 工作流执行者   | `john-doe`                 |
+
+#### Deployment 事件
+
+| 变量                    | 描述       | 示例                    |
+| ----------------------- | ---------- | ----------------------- |
+| `deploymentId`          | 部署 ID    | `123456789`             |
+| `deploymentEnvironment` | 部署环境   | `production`, `staging` |
+| `deploymentRef`         | 部署引用   | `refs/heads/main`       |
+| `deploymentSha`         | 部署 SHA   | `abc123...`             |
+| `deploymentCreator`     | 部署创建者 | `deploy-bot`            |
+
+#### Deployment Status 事件
+
+| 变量                       | 描述     | 示例                      |
+| -------------------------- | -------- | ------------------------- |
+| `deploymentState`          | 部署状态 | `success`, `failure`      |
+| `deploymentDescription`    | 部署描述 | `部署成功`                |
+| `deploymentEnvironmentUrl` | 环境 URL | `https://staging.app.com` |
+| `deploymentEnvironment`    | 部署环境 | `production`, `staging`   |
+
+> **注意**：事件上下文变量基于触发事件自动可用 - 无需手动配置！
 
 ### 特殊变量
 

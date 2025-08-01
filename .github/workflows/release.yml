@@ -44,8 +44,8 @@ jobs:
           cat > RELEASE_NOTES.md << 'EOF'
           # Release ${{ steps.release-info.outputs.version }}
 
-          **Repository:** ${{ github.repository }}
-          **Released by:** ${{ github.actor }}
+          **Repository:** {{repository}}
+          **Released by:** {{actor}}
           **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           **Prerelease:** ${{ steps.release-info.outputs.prerelease }}
 
@@ -71,8 +71,8 @@ jobs:
 
           ## Links
           - [Download](${{ steps.release-info.outputs.download_url }})
-          - [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)
-          - [Examples](https://github.com/${{ github.repository }}/tree/main/examples)
+          - [Documentation]({{repositoryUrl}}/blob/main/README.md)
+          - [Examples]({{repositoryUrl}}/tree/main/examples)
           EOF
 
       - name: Send release notification to Telegram
@@ -88,16 +88,16 @@ jobs:
               "version": "${{ steps.release-info.outputs.version }}",
               "tag": "${{ steps.release-info.outputs.version }}",
               "releaseNotes": "${{ steps.release-info.outputs.release_notes }}",
-              "customMessage": "New release {{version}} for project {{repositoryName}} published!"
+              "customMessage": "New release {{releaseName}} for project {{repositoryName}} published!"
             }
           message: |
             🎉 **New Release Available!**
 
-            **🏷️ Version:** {{version}}
+            **🏷️ Version:** {{releaseName}}
             **🏠 Repository:** {{repository}}
             **👤 Release Author:** {{releaseAuthor}}
             **📅 Date:** {{releaseCreatedAt}}
-            **🔖 Tag:** {{tag}}
+            **🔖 Tag:** {{releaseTag}}
             **🧪 Prerelease:** {{isPrerelease}}
             **📝 Draft:** {{isDraft}}
 
@@ -111,11 +111,11 @@ jobs:
             • 📖 Completely Updated Documentation
 
             **📋 Release Notes:**
-            {{releaseNotes}}
+            {{releaseBody}}
 
             **🚀 Usage:**
             ```yaml
-            - uses: asychin/telegram-notify-action@{{version}}
+            - uses: asychin/telegram-notify-action@{{releaseTag}}
               with:
                 telegram_token: ${{ '{{' }} secrets.TELEGRAM_BOT_TOKEN {{ '}}' }}
                 chat_id: ${{ '{{' }} secrets.TELEGRAM_CHAT_ID {{ '}}' }}
@@ -146,11 +146,11 @@ jobs:
           caption: |
             📋 **Complete Release Notes**
 
-            **🏷️ Version:** {{version}}
+            **🏷️ Version:** {{releaseName}}
             **🏠 Repository:** {{repository}}
             **👤 Owner:** {{repositoryOwnerName}}
-            **📅 Published:** $(date -u +"%Y-%m-%d %H:%M UTC")
-            **🔖 Tag:** {{tag}}
+            **📅 Published:** {{releaseCreatedAt}}
+            **🔖 Tag:** {{releaseTag}}
             **👤 Author:** {{releaseAuthor}}
 
             **📄 File Contents:**
@@ -159,7 +159,7 @@ jobs:
             • Usage examples
             • Documentation links
 
-            File contains comprehensive information about the new release {{version}}
+            File contains comprehensive information about the new release {{releaseName}}
 
       - name: Notify development team (if prerelease)
         if: steps.release-info.outputs.prerelease == 'true'
@@ -173,11 +173,11 @@ jobs:
           message: |
             🚧 **Prerelease Published!**
 
-            **🏷️ Version:** {{version}}
+            **🏷️ Version:** {{releaseName}}
             **🏠 Repository:** {{repository}}
             **👤 Author:** {{releaseAuthor}}
             **📅 Published:** {{releaseCreatedAt}}
-            **🔖 Tag:** {{tag}}
+            **🔖 Tag:** {{releaseTag}}
 
             **⚠️ Development Team Attention:**
             A prerelease version ${{ steps.release-info.outputs.version }} has been published.
@@ -193,6 +193,9 @@ jobs:
             {{releaseBody}}
 
             Please test thoroughly before promoting to stable release.
+
+            **🌿 Branch:** {{refName}}
+            **👤 Workflow:** {{workflow}}
           template_vars: |
             {
               "customMessage": "Attention! New prerelease {{version}} requires team testing"

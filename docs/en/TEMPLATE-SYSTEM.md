@@ -188,6 +188,8 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 
 ### GitHub Context (automatically available)
 
+#### Basic GitHub Variables
+
 | Variable     | Description     | Example                |
 | ------------ | --------------- | ---------------------- |
 | `repository` | Repository name | `user/awesome-project` |
@@ -200,6 +202,22 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 | `runNumber`  | Run number      | `42`                   |
 | `eventName`  | Trigger event   | `push`, `pull_request` |
 | `jobStatus`  | Job status      | `success`, `failure`   |
+
+#### Extended GitHub Variables
+
+| Variable            | Description            | Example              |
+| ------------------- | ---------------------- | -------------------- |
+| `repositoryOwner`   | Repository owner       | `asychin`            |
+| `repositoryId`      | Repository ID          | `123456789`          |
+| `repositoryOwnerId` | Repository owner ID    | `987654321`          |
+| `ref`               | Full reference         | `refs/heads/main`    |
+| `refType`           | Reference type         | `branch`, `tag`      |
+| `refProtected`      | Is reference protected | `true`, `false`      |
+| `baseRef`           | Base reference         | `refs/heads/main`    |
+| `headRef`           | Head reference         | `refs/heads/feature` |
+| `triggeredBy`       | Triggering actor       | `john-doe`           |
+| `actorId`           | Actor ID               | `123456`             |
+| `runAttempt`        | Run attempt number     | `1`, `2`             |
 
 ### URL Variables (automatically available)
 
@@ -225,64 +243,169 @@ Ready-to-use links for inline keyboards and messages:
 
 ### System Variables (automatically available)
 
-| Variable     | Description         | Example                          |
-| ------------ | ------------------- | -------------------------------- |
-| `serverUrl`  | GitHub server URL   | `https://github.com`             |
-| `workspace`  | Workspace path      | `/home/runner/work/repo`         |
-| `runnerOs`   | Runner OS           | `Linux`                          |
-| `runnerArch` | Runner architecture | `X64`                            |
-| `jobId`      | Current job ID      | `1234567`                        |
-| `actionPath` | Action path         | `/home/runner/work/_actions/...` |
+#### GitHub API and Environment
+
+| Variable           | Description               | Example                          |
+| ------------------ | ------------------------- | -------------------------------- |
+| `serverUrl`        | GitHub server URL         | `https://github.com`             |
+| `apiUrl`           | GitHub API URL            | `https://api.github.com`         |
+| `graphqlUrl`       | GitHub GraphQL URL        | `https://api.github.com/graphql` |
+| `workspace`        | Workspace path            | `/home/runner/work/repo`         |
+| `eventPath`        | Event data file path      | `/github/workflow/event.json`    |
+| `jobId`            | Current job ID            | `1234567`                        |
+| `actionRef`        | Action reference          | `main`                           |
+| `actionRepository` | Action repository         | `actions/checkout`               |
+| `workflowRef`      | Workflow reference        | `refs/heads/main`                |
+| `workflowSha`      | Workflow SHA              | `abc123...`                      |
+| `retentionDays`    | Artifact retention days   | `90`                             |
+| `secretSource`     | Secret source             | `Actions`                        |
+| `actionPath`       | Action path               | `/home/runner/work/_actions/...` |
+| `stepSummary`      | Step summary file path    | `/github/step_summary`           |
+| `envPath`          | Environment file path     | `/github/env`                    |
+| `path`             | Path environment variable | `/usr/bin:/bin`                  |
+
+#### Runner Environment
+
+| Variable            | Description                 | Example                        |
+| ------------------- | --------------------------- | ------------------------------ |
+| `runnerOs`          | Runner operating system     | `Linux`, `Windows`, `macOS`    |
+| `runnerArch`        | Runner architecture         | `X64`, `ARM64`                 |
+| `runnerName`        | Runner machine name         | `GitHub Actions 2`             |
+| `runnerEnvironment` | Runner environment type     | `github-hosted`, `self-hosted` |
+| `runnerTemp`        | Runner temp directory       | `/tmp`                         |
+| `runnerToolCache`   | Runner tool cache directory | `/opt/hostedtoolcache`         |
+| `runnerDebug`       | Debug mode enabled          | `1`, `0`                       |
+| `ci`                | CI environment indicator    | `true`                         |
 
 ### Event Context Variables (NEW in v3)
 
 Automatically extracted variables based on the GitHub event type:
 
-#### Issues Events
-| Variable       | Description           | Example                |
-| -------------- | --------------------- | ---------------------- |
-| `author`       | Issue author          | `john-doe`             |
-| `issueNumber`  | Issue number          | `42`                   |
-| `issueTitle`   | Issue title           | `Bug in login system`  |
-| `issueState`   | Issue state           | `open`, `closed`       |
-| `issueBody`    | Issue description     | `Description text...`  |
-| `labels`       | Labels (comma-sep.)   | `bug, frontend`        |
-| `assignees`    | Assignees (comma-sep.)| `user1, user2`         |
-| `createdAt`    | Creation date         | `2024-01-15T10:30:00Z` |
-| `updatedAt`    | Last update date      | `2024-01-16T14:20:00Z` |
+#### Common Event Variables (All Events)
 
-#### Pull Request Events  
-| Variable       | Description           | Example                |
-| -------------- | --------------------- | ---------------------- |
-| `author`       | PR author             | `jane-doe`             |
-| `prNumber`     | Pull request number   | `123`                  |
-| `prTitle`      | Pull request title    | `Add new feature`      |
-| `prState`      | Pull request state    | `open`, `merged`       |
-| `prBody`       | Pull request desc.    | `This PR adds...`      |
-| `prUrl`        | Pull request URL      | `https://github.com/...` |
-| `baseBranch`   | Target branch         | `main`                 |
-| `headBranch`   | Source branch         | `feature/auth`         |
-| `isDraft`      | Is draft PR           | `true`, `false`        |
-| `mergeable`    | Is mergeable          | `true`, `false`        |
+| Variable        | Description        | Example            |
+| --------------- | ------------------ | ------------------ |
+| `triggerUser`   | User who triggered | `john-doe`         |
+| `triggerUserId` | Trigger user ID    | `123456`           |
+| `action`        | Event action       | `opened`, `closed` |
+
+#### Issues Events
+
+| Variable      | Description            | Example                |
+| ------------- | ---------------------- | ---------------------- |
+| `author`      | Issue author           | `john-doe`             |
+| `issueNumber` | Issue number           | `42`                   |
+| `issueTitle`  | Issue title            | `Bug in login system`  |
+| `issueState`  | Issue state            | `open`, `closed`       |
+| `issueBody`   | Issue description      | `Description text...`  |
+| `labels`      | Labels (comma-sep.)    | `bug, frontend`        |
+| `assignees`   | Assignees (comma-sep.) | `user1, user2`         |
+| `createdAt`   | Creation date          | `2024-01-15T10:30:00Z` |
+| `updatedAt`   | Last update date       | `2024-01-16T14:20:00Z` |
+
+#### Pull Request Events
+
+| Variable      | Description            | Example                  |
+| ------------- | ---------------------- | ------------------------ |
+| `author`      | PR author              | `jane-doe`               |
+| `prNumber`    | Pull request number    | `123`                    |
+| `prTitle`     | Pull request title     | `Add new feature`        |
+| `prState`     | Pull request state     | `open`, `merged`         |
+| `prBody`      | Pull request desc.     | `This PR adds...`        |
+| `prUrl`       | Pull request URL       | `https://github.com/...` |
+| `baseBranch`  | Target branch          | `main`                   |
+| `headBranch`  | Source branch          | `feature/auth`           |
+| `prCreatedAt` | PR creation date       | `2024-01-15T10:30:00Z`   |
+| `prUpdatedAt` | PR last update         | `2024-01-16T14:20:00Z`   |
+| `isDraft`     | Is draft PR            | `true`, `false`          |
+| `mergeable`   | Is mergeable           | `true`, `false`          |
+| `labels`      | Labels (comma-sep.)    | `enhancement, frontend`  |
+| `assignees`   | Assignees (comma-sep.) | `user1, user2`           |
 
 #### Push Events
-| Variable             | Description           | Example                |
-| -------------------- | --------------------- | ---------------------- |
-| `pusher`             | User who pushed       | `dev-user`             |
-| `commitCount`        | Number of commits     | `3`                    |
-| `lastCommitMessage`  | Last commit message   | `Fix authentication`   |
-| `lastCommitAuthor`   | Last commit author    | `dev-user`             |
-| `lastCommitId`       | Last commit ID        | `a1b2c3d...`           |
+
+| Variable            | Description         | Example              |
+| ------------------- | ------------------- | -------------------- |
+| `pusher`            | User who pushed     | `dev-user`           |
+| `commitCount`       | Number of commits   | `3`                  |
+| `lastCommitMessage` | Last commit message | `Fix authentication` |
+| `lastCommitAuthor`  | Last commit author  | `dev-user`           |
+| `lastCommitId`      | Last commit ID      | `a1b2c3d...`         |
 
 #### Release Events
-| Variable             | Description           | Example                |
-| -------------------- | --------------------- | ---------------------- |
-| `releaseAuthor`      | Release author        | `maintainer`           |
-| `releaseName`        | Release name          | `v2.1.0`               |
-| `releaseTag`         | Release tag           | `v2.1.0`               |
-| `releaseBody`        | Release notes         | `New features...`      |
-| `isPrerelease`       | Is prerelease         | `true`, `false`        |
-| `isDraft`            | Is draft release      | `true`, `false`        |
+
+| Variable           | Description      | Example                |
+| ------------------ | ---------------- | ---------------------- |
+| `releaseAuthor`    | Release author   | `maintainer`           |
+| `releaseName`      | Release name     | `v2.1.0`               |
+| `releaseTag`       | Release tag      | `v2.1.0`               |
+| `releaseBody`      | Release notes    | `New features...`      |
+| `releaseCreatedAt` | Release created  | `2024-01-15T10:30:00Z` |
+| `isPrerelease`     | Is prerelease    | `true`, `false`        |
+| `isDraft`          | Is draft release | `true`, `false`        |
+
+#### Issue Comment Events
+
+| Variable           | Description           | Example                |
+| ------------------ | --------------------- | ---------------------- |
+| `author`           | Issue author          | `john-doe`             |
+| `issueNumber`      | Issue number          | `42`                   |
+| `issueTitle`       | Issue title           | `Bug in login system`  |
+| `issueState`       | Issue state           | `open`, `closed`       |
+| `commentAuthor`    | Comment author        | `jane-doe`             |
+| `commentBody`      | Comment text          | `This looks good!`     |
+| `commentId`        | Comment ID            | `987654321`            |
+| `commentCreatedAt` | Comment creation date | `2024-01-15T11:30:00Z` |
+
+#### Pull Request Review Events
+
+| Variable       | Description         | Example                         |
+| -------------- | ------------------- | ------------------------------- |
+| `author`       | PR author           | `jane-doe`                      |
+| `prNumber`     | Pull request number | `123`                           |
+| `prTitle`      | Pull request title  | `Add new feature`               |
+| `prUrl`        | Pull request URL    | `https://github.com/...`        |
+| `reviewAuthor` | Review author       | `maintainer`                    |
+| `reviewState`  | Review state        | `approved`, `changes_requested` |
+| `reviewBody`   | Review comment      | `Looks good to me!`             |
+| `reviewId`     | Review ID           | `987654321`                     |
+
+#### Workflow Run Events
+
+| Variable             | Description         | Example                    |
+| -------------------- | ------------------- | -------------------------- |
+| `workflowName`       | Workflow name       | `CI Pipeline`              |
+| `workflowStatus`     | Workflow status     | `completed`, `in_progress` |
+| `workflowConclusion` | Workflow conclusion | `success`, `failure`       |
+| `workflowId`         | Workflow ID         | `123456789`                |
+| `workflowRunNumber`  | Workflow run number | `42`                       |
+| `workflowActor`      | Workflow actor      | `john-doe`                 |
+
+#### Deployment Events
+
+| Variable                | Description          | Example                 |
+| ----------------------- | -------------------- | ----------------------- |
+| `deploymentId`          | Deployment ID        | `123456789`             |
+| `deploymentEnvironment` | Deployment env       | `production`, `staging` |
+| `deploymentRef`         | Deployment reference | `refs/heads/main`       |
+| `deploymentSha`         | Deployment SHA       | `abc123...`             |
+| `deploymentCreator`     | Deployment creator   | `deploy-bot`            |
+
+#### Deployment Status Events
+
+| Variable                   | Description            | Example                   |
+| -------------------------- | ---------------------- | ------------------------- |
+| `deploymentState`          | Deployment state       | `success`, `failure`      |
+| `deploymentDescription`    | Deployment description | `Deployed successfully`   |
+| `deploymentEnvironmentUrl` | Environment URL        | `https://staging.app.com` |
+| `deploymentEnvironment`    | Deployment environment | `production`, `staging`   |
+
+#### Push Events (Additional Details)
+
+| Variable   | Description  | Example    |
+| ---------- | ------------ | ---------- |
+| `pusher`   | Push user    | `dev-user` |
+| `pusherId` | Push user ID | `123456`   |
 
 > **Note**: Event context variables are automatically available based on the triggering event - no manual configuration required!
 
@@ -460,7 +583,7 @@ If a template is not found for the specified language, the English version is us
       **Number:** #{{issueNumber}}
       **State:** {{issueState}}
       **Labels:** {{labels}}
-      
+
       **Description:**
       {{issueBody}}
 
@@ -471,7 +594,7 @@ If a template is not found for the specified language, the English version is us
 #### Pull Request Notification
 
 ```yaml
-- name: PR Notification  
+- name: PR Notification
   uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -484,11 +607,11 @@ If a template is not found for the specified language, the English version is us
       **Author:** {{author}}
       **Number:** #{{prNumber}}
       **State:** {{prState}}
-      
+
       **Branches:** {{headBranch}} → {{baseBranch}}
       **Draft:** {{isDraft}}
       **Mergeable:** {{mergeable}}
-      
+
       **Labels:** {{labels}}
       **Assignees:** {{assignees}}
 ```
@@ -507,7 +630,7 @@ If a template is not found for the specified language, the English version is us
 
       **Pusher:** {{pusher}}
       **Commits:** {{commitCount}}
-      
+
       **Last Commit:**
       • Author: {{lastCommitAuthor}}
       • Message: {{lastCommitMessage}}
@@ -531,10 +654,10 @@ If a template is not found for the specified language, the English version is us
       **Author:** {{releaseAuthor}}
       **Prerelease:** {{isPrerelease}}
       **Draft:** {{isDraft}}
-      
+
       **Release Notes:**
       {{releaseBody}}
-      
+
       **Created:** {{releaseCreatedAt}}
 ```
 
