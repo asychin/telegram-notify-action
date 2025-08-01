@@ -688,6 +688,11 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 
 **🔴 STOP HERE - DO NOT PROCEED WITHOUT USER ANSWERS!**
 
+**🤖 FIRST: AI Model Self-Identification**
+Before asking questions, AI MUST identify itself:
+- If AI is Claude Sonnet 3.x or 4.x: Continue normally
+- If AI is NOT Sonnet 3.x/4.x: Display warning: "⚠️ These rules are optimized for Claude Sonnet 3.x/4.x. Other AI models may have different capabilities. Recommended to use Sonnet for best results, but proceeding anyway..."
+
 **📝 Answer Format:** User must respond with [y] for YES or [n] for NO in brackets for each question.
 **Example:** "1. [y]  2. [n]  3. [y]  4. [n]..." or on separate lines with numbers.
 
@@ -705,43 +710,166 @@ Ask the user these REQUIRED questions:
    (If [n], will use standard format with basic status + commit info)
 7. "🎭 Do you want rich formatting with lots of emojis?" [ ]
    (If [n], will use minimal text-only format)
+   
+**🌍 Language & Format:**
+8. "🗣️ Do you want notifications in English?" [ ]
+   (If [n], AI will ask: Which language? Russian/Chinese/Other?)
+9. "✨ Do you want visual message formatting?" [ ]
+   (Emojis, bold text, structured layout. If [n], plain text only)
 
 **⚙️ Technical Setup:**
-8. "🏢 Do you want notifications for Production environment?" [ ]
-9. "🧪 Do you want notifications for Staging environment?" [ ]
-10. "💻 Do you want notifications for Development environment?" [ ]
-11. "🌿 Do you want notifications for all feature branches?" [ ]
+10. "🏢 Do you want notifications for Production environment?" [ ]
+11. "🧪 Do you want notifications for Staging environment?" [ ]
+12. "💻 Do you want notifications for Development environment?" [ ]
+13. "🌿 Do you want notifications for all feature branches?" [ ]
 
-12. "🔐 Do you already have Telegram bot TOKEN and CHAT_ID?" [ ]
+14. "🔐 Do you already have Telegram bot TOKEN and CHAT_ID?" [ ]
     (If [n], I'll provide setup instructions)
 
 **⚡ Delivery Method:**
-13. "📨 Do you want progressive updates (single message that updates)?" [ ]
+15. "📨 Do you want progressive updates (single message that updates)?" [ ]
     (If [n], will send separate messages for each event)
 
 **🔍 Repository Monitoring:**
-14. "📊 Do you want notifications for GitHub Actions workflow results?" [ ]
+16. "📊 Do you want notifications for GitHub Actions workflow results?" [ ]
     (Build, test, deploy pipeline status notifications)
-15. "🔄 Do you want notifications for Pull Request activity?" [ ]
+17. "🔄 Do you want notifications for Pull Request activity?" [ ]
     (PR opened, merged, reviewed, code changes)
-16. "🐛 Do you want notifications for GitHub Issues activity?" [ ]
+18. "🐛 Do you want notifications for GitHub Issues activity?" [ ]
     (New issues, comments, label changes, assignments)
-17. "🏷️ Do you want notifications for Releases and Tags?" [ ]
+19. "🏷️ Do you want notifications for Releases and Tags?" [ ]
     (New releases, pre-releases, tag creation)
-18. "📈 Do you want weekly/monthly repository summary reports?" [ ]
+20. "📈 Do you want weekly/monthly repository summary reports?" [ ]
     (Commit statistics, PR metrics, issue resolution stats)
 
 **🎯 Advanced Features:**
-19. "🚀 Do you want interactive action buttons in messages?" [ ]
+21. "🚀 Do you want interactive action buttons in messages?" [ ]
     (Buttons for: View PR, Approve, Merge, Rerun Workflow, Create Issue)
-20. "📊 Do you want real-time progress bars during CI/CD?" [ ]
+22. "📊 Do you want real-time progress bars during CI/CD?" [ ]
     (Visual progress: Build ●●●○○ → Test ●●●●○ → Deploy ●●●●●)
-21. "🌍 Do you want different notification rules per environment?" [ ]
+23. "🌍 Do you want different notification rules per environment?" [ ]
     (Production: all alerts, Staging: important only, Dev: minimal)
-22. "📎 Do you want file attachments?" [ ]
+24. "📎 Do you want file attachments?" [ ]
     (Attach build logs, test reports, coverage reports to messages)
 
+**⏰ Scheduled Workflows:**
+25. "⏰ Do you want any scheduled/automatic workflows?" [ ]
+    (Weekly reports, health checks, maintenance notifications, etc.)
+
+**📋 Message Organization:**
+26. "🧵 Do you want to send notifications to specific Telegram topics/threads?" [ ]
+    (Organize messages by topics in group chats)
+27. "📊 Do you want to split different notification types into separate topics?" [ ]
+    (Build notifications in one topic, deploy in another, issues in third, etc.)
+
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
+
+### **⏰ MANDATORY: Scheduler Configuration (if question 25 = [y])**
+
+**If user answered [y] to question 25, AI MUST ask about scheduling preferences:**
+
+**📅 Schedule Configuration Questions:**
+```
+🕐 You selected scheduled workflows. I need to configure the timing:
+
+📊 **For repository summary reports:**
+Current default: Weekly on Monday at 9:00 AM UTC
+- Do you want to keep this schedule? [y/n]
+- If [n]: "Please describe your preferred schedule in your own words"
+  Examples: 
+  • "Every day at 12:00 except Friday and Saturday"
+  • "Every 6 hours during weekdays only"  
+  • "First Monday of each month at 9 AM"
+  • "Every Tuesday and Thursday at 8:30 AM"
+
+🔍 **For health checks/monitoring:**
+Current default: None (triggered by events only)
+- Do you want periodic health checks? [y/n]
+- If [y]: "How often should I check system health?"
+  Examples:
+  • "Every 30 minutes during business hours"
+  • "Every 2 hours, but not at night"
+  • "Once per hour from 9 AM to 6 PM on weekdays"
+  • "Every 4 hours, pause on weekends"
+
+💡 **AI Recommendations:**
+- For reports: Weekly/daily is usually optimal
+- For health checks: 30min-4hours depending on criticality  
+- Avoid: Every few minutes (too noisy), very complex schedules
+```
+
+**🔧 AI Processing Rules:**
+1. **Parse user's free-form schedule descriptions**
+2. **Convert to valid cron expressions**
+3. **Suggest optimizations** if user's schedule seems problematic
+4. **Provide timezone clarification** (default to UTC, ask if unclear)
+5. **Include schedule explanation** in generated workflow comments
+
+**📝 Common Schedule Patterns:**
+```yaml
+# Every day at 12:00 UTC except weekends
+- cron: '0 12 * * 1-5'
+
+# Every 6 hours during weekdays (6AM, 12PM, 6PM, 12AM)
+- cron: '0 6,12,18,0 * * 1-5'
+
+# First Monday of each month at 9 AM UTC  
+- cron: '0 9 1-7 * 1'
+
+# Every Tuesday and Thursday at 8:30 AM UTC
+- cron: '30 8 * * 2,4'
+
+# Every 2 hours from 9 AM to 6 PM on weekdays
+- cron: '0 9,11,13,15,17 * * 1-5'
+```
+
+### **🧵 MANDATORY: Topics Configuration (if question 26 or 27 = [y])**
+
+**If user answered [y] to question 26 or 27, AI MUST ask about topic organization:**
+
+**📋 Topic Configuration Questions:**
+```
+🧵 You selected Telegram topics for message organization. I need configuration details:
+
+📊 **For question 26 (specific topics):**
+- Do you already have topic IDs set up? [y/n]
+- If [y]: "Please list your GitHub Secrets keys for topic IDs"
+  Examples: 
+  • TELEGRAM_TOPIC_DEPLOY, TELEGRAM_TOPIC_BUILD, TELEGRAM_TOPIC_ISSUES
+  • DEPLOY_TOPIC_ID, BUILD_TOPIC_ID, PR_TOPIC_ID
+  • TOPIC_PRODUCTION, TOPIC_STAGING, TOPIC_DEVELOPMENT
+
+📋 **For question 27 (split by notification types):**
+- How many different topics do you want? [number]
+- What types of notifications per topic?
+  Examples:
+  • Topic 1: Build/Test results
+  • Topic 2: Deployment notifications  
+  • Topic 3: PR/Issues activity
+  • Topic 4: Security/Error alerts
+  • Topic 5: Scheduled reports
+  
+🔑 **GitHub Secrets Configuration:**
+"Please provide the SECRET KEYS (not values) you'll use for topic IDs:"
+Examples:
+• TELEGRAM_BUILD_TOPIC_ID
+• TELEGRAM_DEPLOY_TOPIC_ID  
+• TELEGRAM_ISSUES_TOPIC_ID
+• TELEGRAM_REPORTS_TOPIC_ID
+
+💡 **AI Recommendations:**
+- Use descriptive secret names for clarity
+- Group related notification types in same topic
+- Limit to 3-5 topics maximum (avoid over-organization)
+- Always include fallback to main chat if topic fails
+```
+
+**🔧 AI Processing Rules for Topics:**
+1. **Validate secret key naming** (should be clear and consistent)
+2. **Generate topic-specific configurations** for each workflow type
+3. **Include fallback mechanisms** if topic ID is not available
+4. **Provide setup instructions** for creating topics in Telegram
+5. **Add topic organization to integration plan**
 
 ### **🚫 FORBIDDEN: What AI Must NEVER Suggest**
 
@@ -1012,9 +1140,64 @@ Do you want me to:
 - Adding more informative messages
 - Optimization of notification frequency
 
-#### **Step 3: Generate Integration (ONLY after complete questionnaire)**
+#### **Step 3: Create Integration Plan (MANDATORY BEFORE CODE)**
+
+**🚨 CRITICAL: AI MUST create integration plan BEFORE any code generation!**
+
+**📋 Integration Plan Requirements:**
+1. **Check for existing plan:** Look for `noty4u-integration-plan.md` in project root
+2. **If plan exists:** ❌ **STOP! Display error:** "⚠️ Integration plan file `noty4u-integration-plan.md` already exists! Please delete the old file before proceeding. This prevents conflicts and ensures clean integration."
+3. **If no plan exists:** ✅ Create new plan file
+
+**📝 Plan File Structure (`noty4u-integration-plan.md`):**
+```markdown
+# Telegram Notify Integration Plan
+
+## 📊 User Requirements Summary
+[Parse and list all [y]/[n] answers with explanations]
+
+## 🎯 Integration Scope  
+[What will be implemented based on user answers]
+
+## ⏰ Scheduled Workflows Configuration
+[If user selected scheduled workflows (question 25 = [y])]
+- Summary reports schedule: [user's preference converted to cron]
+- Health checks schedule: [user's preference converted to cron] 
+- Timezone: [UTC or user-specified]
+- Schedule reasoning: [why this schedule was chosen]
+
+## 🧵 Telegram Topics Configuration
+[If user selected topics (question 26 or 27 = [y])]
+- Topic organization type: [specific topics vs split by notification types]
+- Number of topics: [user-specified number]
+- Secret keys mapping: [list of GitHub Secrets keys for topic IDs]
+- Topic assignments: [which notification types go to which topics]
+- Fallback strategy: [what happens if topic ID is missing]
+
+## 📂 Files to Create/Modify
+[List all workflow files, modifications, new files]
+
+## 🔧 Technical Implementation
+[Templates to use, variables needed, configurations]
+
+## 🔐 Required Secrets
+[List GitHub Secrets needed: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, etc.]
+
+## 📋 Testing Plan
+[How to test the integration, including scheduled workflow testing]
+
+## 🚨 Potential Issues & Solutions
+[Common problems and troubleshooting, including cron schedule issues]
+```
+
+**📁 .gitignore Update:**
+- **ALWAYS** add `noty4u-integration-plan.md` to `.gitignore`
+- This keeps integration plans out of version control
+- Add line: `# Telegram integration plans` and `noty4u-integration-plan.md`
+
+#### **Step 4: Generate Integration (ONLY after plan creation)**
 - **Parse user [y]/[n] answers:** Interpret each [y] as "YES, include this feature" and [n] as "NO, skip this"
-- Apply appropriate template based on user answers  
+- Apply appropriate template based on user answers and created plan
 - Create workflow files based on user responses
 - Use ONLY built-in templates (success, error, warning, info, deploy, test, release)
 - Generate workflow modifications with proper variable usage
@@ -1023,7 +1206,9 @@ Do you want me to:
 - Generate test cases for notification validation
 - Include troubleshooting guidance
 
-#### **Step 4: MANDATORY Self-Check Before Delivery**
+#### **Step 5: MANDATORY Self-Check Before Delivery**
+- ✅ **Integration Plan:** Created `noty4u-integration-plan.md` with complete analysis
+- ✅ **GitIgnore Update:** Added plan file to `.gitignore` 
 - ✅ **Template Validation:** Only use `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
 - ✅ **Parameter Check:** No `message_thread_id` or other deprecated parameters
 - ✅ **JSON Format:** All `template_vars` must be valid JSON format
@@ -1032,13 +1217,18 @@ Do you want me to:
 - ✅ **GitHub Variables:** Use `${{ github.* }}` in `template_vars`, `inline_keyboard`, `run:` commands
 - ✅ **Template Variables:** Use `{{var}}` ONLY in `message:`/`caption:` WITH `template:`
 - ✅ **User Requirements:** Generated code matches ALL user questionnaire answers
+- ✅ **Language & Format:** Applied user's language and formatting preferences
+- ✅ **Scheduler Configuration:** If user selected scheduled workflows, applied custom cron expressions from user's free-form descriptions
+- ✅ **Cron Validation:** All schedule expressions are valid and include explanatory comments
+- ✅ **Topics Configuration:** If user selected topics, configured message_thread_id based on user's secret keys
+- ✅ **Topic Fallbacks:** All topic configurations include fallback to main chat if topic ID is missing
 
 ### **🎯 Example of CORRECT AI Interaction Flow**
 
 ```
 👤 User: "Add Telegram notifications to my project"
 
-🤖 AI: "I'll help you integrate telegram-notify-action! Please answer with [y] or [n] for each question:
+🤖 AI: "I'm Claude Sonnet 4.0, optimized for telegram-notify-action integration. I'll help you set this up! Please answer with [y] or [n] for each question:
 
 📋 Notification Types:
 1. 🔨 Do you want build/compilation result notifications? [ ]
@@ -1051,43 +1241,87 @@ Do you want me to:
 6. 📊 Do you want detailed notifications with metrics? [ ]
 7. 🎭 Do you want rich formatting with lots of emojis? [ ]
 
+🌍 Language & Format:  
+8. 🗣️ Do you want notifications in English? [ ]
+9. ✨ Do you want visual message formatting? [ ]
+
 ⚙️ Technical Setup:
-8. 🏢 Do you want notifications for Production environment? [ ]
-9. 🧪 Do you want notifications for Staging environment? [ ]
-10. 💻 Do you want notifications for Development environment? [ ]
-11. 🌿 Do you want notifications for all feature branches? [ ]
-12. 🔐 Do you already have Telegram bot TOKEN and CHAT_ID? [ ]
+10. 🏢 Do you want notifications for Production environment? [ ]
+11. 🧪 Do you want notifications for Staging environment? [ ]
+12. 💻 Do you want notifications for Development environment? [ ]
+13. 🌿 Do you want notifications for all feature branches? [ ]
+14. 🔐 Do you already have Telegram bot TOKEN and CHAT_ID? [ ]
 
 ⚡ Delivery Method:
-13. 📨 Do you want progressive updates (single message)? [ ]
+15. 📨 Do you want progressive updates (single message)? [ ]
 
 🔍 Repository Monitoring:
-14. 📊 Do you want GitHub Actions workflow results? [ ]
-15. 🔄 Do you want Pull Request activity notifications? [ ]
-16. 🐛 Do you want GitHub Issues activity notifications? [ ]
-17. 🏷️ Do you want Releases and Tags notifications? [ ]
-18. 📈 Do you want weekly/monthly summary reports? [ ]
+16. 📊 Do you want GitHub Actions workflow results? [ ]
+17. 🔄 Do you want Pull Request activity notifications? [ ]
+18. 🐛 Do you want GitHub Issues activity notifications? [ ]
+19. 🏷️ Do you want Releases and Tags notifications? [ ]
+20. 📈 Do you want weekly/monthly summary reports? [ ]
 
 🎯 Advanced Features:
-19. 🚀 Do you want interactive action buttons? [ ]
-20. 📊 Do you want real-time progress bars? [ ]
-21. 🌍 Do you want different rules per environment? [ ]
-22. 📎 Do you want file attachments? [ ]"
+21. 🚀 Do you want interactive action buttons? [ ]
+22. 📊 Do you want real-time progress bars? [ ]
+23. 🌍 Do you want different rules per environment? [ ]
+24. 📎 Do you want file attachments? [ ]
 
-👤 User: "1.[y] 2.[y] 3.[y] 4.[n] 5.[y] 6.[n] 7.[y] 8.[y] 9.[n] 10.[n] 11.[n] 12.[y] 13.[y] 14.[y] 15.[y] 16.[n] 17.[n] 18.[n] 19.[y] 20.[y] 21.[n] 22.[n]"
+⏰ Scheduled Workflows:
+25. ⏰ Do you want any scheduled/automatic workflows? [ ]
 
-🤖 AI: "Perfect! Based on your [y]/[n] answers, I'll create:
-- ✅ Build, deploy, test, and PR notifications
-- ✅ Rich emoji formatting with progressive updates
-- ✅ Production environment only
-- ✅ Interactive buttons and progress bars
+📋 Message Organization:
+26. 🧵 Do you want to send notifications to specific Telegram topics/threads? [ ]
+27. 📊 Do you want to split different notification types into separate topics? [ ]"
+
+👤 User: "1.[y] 2.[y] 3.[y] 4.[n] 5.[y] 6.[n] 7.[y] 8.[y] 9.[y] 10.[y] 11.[n] 12.[n] 13.[n] 14.[y] 15.[y] 16.[y] 17.[y] 18.[n] 19.[n] 20.[y] 21.[y] 22.[y] 23.[n] 24.[n] 25.[y] 26.[n] 27.[y]"
+
+🤖 AI: "You selected scheduled workflows and topic organization! Let me configure:
+
+⏰ **Scheduling Configuration:**
+📊 For repository summary reports:
+Current default: Weekly on Monday at 9:00 AM UTC
+- Do you want to keep this schedule? [y/n]
+
+🔍 For health checks/monitoring:  
+Current default: None (triggered by events only)
+- Do you want periodic health checks? [y/n]
+
+🧵 **Topics Configuration:**
+You selected to split notification types into separate topics.
+- How many different topics do you want? [number]
+- Please provide the SECRET KEYS (not values) for topic IDs"
+
+👤 User: "Scheduling: First [n] - I want every day at 12:00 except Friday and Saturday. Second [y] - every 6 hours but only during weekdays. Topics: 3 topics. Keys: TELEGRAM_BUILD_TOPIC_ID, TELEGRAM_DEPLOY_TOPIC_ID, TELEGRAM_ISSUES_TOPIC_ID"
+
+🤖 AI: "Perfect! I'll configure:
+📊 Reports: Daily at 12:00 UTC, Monday-Thursday only (cron: '0 12 * * 1-4')
+🔍 Health checks: Every 6 hours on weekdays (cron: '0 6,12,18,0 * * 1-5')
+🧵 Topics: 
+  - Build/Test notifications → TELEGRAM_BUILD_TOPIC_ID
+  - Deployment notifications → TELEGRAM_DEPLOY_TOPIC_ID  
+  - PR/Issues activity → TELEGRAM_ISSUES_TOPIC_ID"
+
+🤖 AI: "Perfect! Based on your answers, I'll create:
+- ✅ Build, deploy, test, and PR notifications in English with visual formatting
+- ✅ Rich emoji formatting with progressive updates  
+- ✅ Production environment only with interactive buttons and progress bars
 - ❌ No release notifications or summary reports
 
-I'll generate:
+🚨 Checking for existing integration plan...
+✅ No existing noty4u-integration-plan.md found.
+
+📋 Creating integration plan first...
+
+[Creates noty4u-integration-plan.md with detailed analysis]
+[Updates .gitignore to exclude plan file]
+
+✅ Integration plan created! Now generating:
 1. Progressive deployment workflow (single message updates)
 2. GitHub Actions integration with progress bars
-3. PR notification system with action buttons
-4. Rich template formatting for better readability
+3. PR notification system with action buttons  
+4. Rich template formatting in English with emojis
 
 [Generates CORRECT code with both deployment and monitoring workflows]"
 ```
@@ -1232,6 +1466,125 @@ curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/ex
     message: "✅ Deployment completed!"
 ```
 
+#### **✅ CORRECT: Scheduled Workflows with Custom Cron**
+```yaml
+# ✅ CORRECT: User said "every day at 12:00 except Friday and Saturday"
+name: 📊 Daily Repository Report
+on:
+  schedule:
+    # Daily at 12:00 UTC, Monday through Thursday (1-4)
+    - cron: '0 12 * * 1-4'  
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📊 Send Repository Summary
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        template: info
+        message: |
+          📊 **Daily Repository Summary**
+          Repository: {{repository}}
+          Period: Last 24 hours
+```
+
+```yaml  
+# ✅ CORRECT: User said "every 6 hours but only during weekdays"
+name: 🔍 System Health Check
+on:
+  schedule:
+    # Every 6 hours (6AM, 12PM, 6PM, 12AM UTC) on weekdays (1-5)
+    - cron: '0 6,12,18,0 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest 
+    steps:
+    - name: 🔍 Health Check Notification
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        template: info
+        message: |
+          🔍 **System Health Check**
+          Status: All systems operational
+          Time: {{currentTime}}
+```
+
+#### **✅ CORRECT: Telegram Topics Configuration**
+```yaml
+# ✅ CORRECT: User provided topic secret keys
+name: 🔨 Build Notification
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🔨 Build Complete
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        # Use build-specific topic, fallback to main chat
+        message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || '' }}
+        template: success
+        message: |
+          🔨 **Build Completed**
+          Repository: {{repository}}
+          Branch: {{refName}}
+```
+
+```yaml
+# ✅ CORRECT: Multiple topics for different notification types
+name: 🚀 Deploy Notification  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚀 Deploy to Production
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        # Use deployment-specific topic
+        message_thread_id: ${{ secrets.TELEGRAM_DEPLOY_TOPIC_ID }}
+        template: deploy
+        message: |
+          🚀 **Production Deployment**
+          Status: {{deploymentStatus}}
+          Environment: {{environment}}
+```
+
+```yaml
+# ✅ CORRECT: Issue notifications in separate topic
+name: 🐛 Issue Notification
+on:
+  issues:
+    types: [opened, closed]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🐛 Issue Activity
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        # Use issues-specific topic, fallback if not available
+        message_thread_id: ${{ secrets.TELEGRAM_ISSUES_TOPIC_ID || secrets.TELEGRAM_MAIN_TOPIC_ID }}
+        template: info
+        message: |
+          🐛 **Issue Activity**
+          Issue: {{issueTitle}}
+          Action: {{issueAction}}
+          Author: {{author}}
+```
+
 #### **❌ WRONG Examples (What NOT to do)**
 ```yaml
 # ❌ WRONG: Non-existent template
@@ -1374,6 +1727,72 @@ message: |
   ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
 ```
 
+### **❌ Mistake 6: Wrong Scheduler Configuration**
+```yaml
+# WRONG - Invalid cron expression
+on:
+  schedule:
+    - cron: '0 12 * * 1,2,3,4'  # Harder to read
+
+# WRONG - No explanatory comments  
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # What does this mean?
+
+# WRONG - User said "every day at 12:00 except Friday and Saturday" but AI used:
+on:
+  schedule:
+    - cron: '0 12 * * *'  # This runs EVERY day including weekends!
+```
+**✅ Solution:** Convert user's free-form descriptions accurately with comments:
+```yaml
+# CORRECT - User said "every day at 12:00 except Friday and Saturday"
+on:
+  schedule:
+    # Daily at 12:00 UTC, Monday through Thursday (excluding Fri/Sat)
+    - cron: '0 12 * * 1-4'
+  workflow_dispatch: # Always include manual trigger option
+
+# CORRECT - User said "every 6 hours but only during weekdays"  
+on:
+  schedule:
+    # Every 6 hours (6AM, 12PM, 6PM, 12AM UTC) on weekdays only
+    - cron: '0 6,12,18,0 * * 1-5'
+  workflow_dispatch:
+```
+
+### **❌ Mistake 7: Wrong Topic Configuration**
+```yaml
+# WRONG - Hardcoded topic ID
+message_thread_id: 123456  # Never hardcode topic IDs!
+
+# WRONG - Using wrong secret name that user didn't provide
+message_thread_id: ${{ secrets.TOPIC_ID }}  # User provided different key names
+
+# WRONG - No fallback if topic ID is missing
+message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID }}  # Will fail if secret not set
+
+# WRONG - Mixing all notification types in same topic despite user wanting separation
+# User said: "3 topics: build, deploy, issues" but AI put everything in build topic
+message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID }}  # Used for all notifications
+```
+**✅ Solution:** Use user's exact secret key names with proper fallbacks:
+```yaml
+# CORRECT - Use exact secret keys user provided
+message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || '' }}  # With fallback
+
+# CORRECT - Proper topic separation per user request
+# Build notifications
+message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID }}
+# Deploy notifications  
+message_thread_id: ${{ secrets.TELEGRAM_DEPLOY_TOPIC_ID }}
+# Issues notifications
+message_thread_id: ${{ secrets.TELEGRAM_ISSUES_TOPIC_ID }}
+
+# CORRECT - Multiple fallback levels
+message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_TOPIC_ID || '' }}
+```
+
 ### **🔧 Quick Validation Checklist for AI:**
 
 #### **📋 For NEW integrations:**
@@ -1386,6 +1805,16 @@ message: |
 - [ ] Version `@v3.1.0` or newer
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
+- [ ] **AI Identification**: Identified AI model at start (Sonnet 3.x/4.x recommended)
+- [ ] **Integration Plan**: Created `noty4u-integration-plan.md` BEFORE code generation
+- [ ] **GitIgnore Update**: Added plan file to `.gitignore` 
+- [ ] **Plan Conflict Check**: Verified no existing plan file before proceeding
+- [ ] **Language Settings**: Applied user's language preference (English/Russian/Chinese)
+- [ ] **Visual Formatting**: Applied user's formatting preferences (emojis/plain text)
+- [ ] **Scheduler Configuration**: If user wanted scheduled workflows, converted free-form descriptions to valid cron expressions
+- [ ] **Cron Comments**: All scheduled workflows include explanatory comments about timing
+- [ ] **Topics Configuration**: If user wanted topics, configured message_thread_id using user's provided secret keys
+- [ ] **Topic Organization**: Properly assigned notification types to appropriate topics with fallbacks
 - [ ] **Progressive notifications**: Used `message_id` for updates (recommended)
 - [ ] **GitHub integration**: Focused on repository events (PR, releases, workflows)
 - [ ] **NO FORBIDDEN MONITORING**: Did NOT suggest database, API, server, or infrastructure monitoring
