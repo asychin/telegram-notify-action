@@ -72,43 +72,43 @@ jobs:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: ${{ steps.notification-type.outputs.template }}
-          language: ru
+          language: en
           parse_mode: "Markdown"
           message: |
             ${{ steps.notification-type.outputs.emoji }} **Issue ${{ steps.notification-type.outputs.action_text }}**
 
-            **📋 Заголовок:** {{issueTitle}}
-            **👤 Автор:** `{{author}}`
-            **🔢 Номер:** #{{issueNumber}}
-            **📊 Статус:** `{{issueState}}`
-            **🏷️ Метки:** {{labels}}
-            **👥 Исполнители:** {{assignees}}
-            **📅 Создан:** {{createdAt}}
-            **🔄 Обновлен:** {{updatedAt}}
+            **📋 Title:** {{issueTitle}}
+            **👤 Author:** `{{author}}`
+            **🔢 Number:** #{{issueNumber}}
+            **📊 State:** `{{issueState}}`
+            **🏷️ Labels:** {{labels}}
+            **👥 Assignees:** {{assignees}}
+            **📅 Created:** {{createdAt}}
+            **🔄 Updated:** {{updatedAt}}
 
-            **📝 Описание:**
+            **📝 Description:**
             {{issueBody}}
 
-            **🏠 Репозиторий:** {{repository}}
-            **🌿 Ветка:** {{refName}}
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
           template_vars: |
             {
               "action": "${{ steps.notification-type.outputs.action_text }}",
               "emoji": "${{ steps.notification-type.outputs.emoji }}",
-              "customMessage": "Новая активность в репозитории {{repositoryName}}"
+              "customMessage": "New activity in repository {{repositoryName}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "💬 Добавить комментарий", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+              {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "💬 Add Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
             ],
             [
-              {"text": "✏️ Редактировать", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "🔒 Закрыть Issue", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "🔒 Close Issue", "url": "${{ github.event.issue.html_url }}"}
             ],
             [
-              {"text": "🏠 К репозиторию", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 Все Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
             ]
 
       - name: Send comment notification
@@ -120,37 +120,37 @@ jobs:
           template: info
           parse_mode: "Markdown"
           message: |
-            💬 **Новый комментарий к Issue**
+            💬 **New Issue Comment**
 
             **📋 Issue:** {{issueTitle}}
-            **🔢 Номер:** #{{issueNumber}}
-            **📊 Статус Issue:** {{issueState}}
+            **🔢 Number:** #{{issueNumber}}
+            **📊 Issue State:** {{issueState}}
 
-            **👤 Автор комментария:** {{commentAuthor}}
-            **🕐 Время комментария:** {{commentCreatedAt}}
-            **🆔 ID комментария:** {{commentId}}
+            **👤 Comment Author:** {{commentAuthor}}
+            **🕐 Comment Time:** {{commentCreatedAt}}
+            **🆔 Comment ID:** {{commentId}}
 
-            **💭 Текст комментария:**
+            **💭 Comment Text:**
             {{commentBody}}
 
-            **🏠 Репозиторий:** {{repository}}
-            **🌿 Ветка:** {{refName}}
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "Активность в репозитории {{repositoryName}} - новый комментарий от {{commentAuthor}}"
+              "customMessage": "Activity in repository {{repositoryName}} - new comment from {{commentAuthor}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть комментарий", "url": "${{ github.event.comment.html_url }}"},
-              {"text": "📝 Ответить", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+              {"text": "👀 View Comment", "url": "${{ github.event.comment.html_url }}"},
+              {"text": "📝 Reply", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
             ],
             [
-              {"text": "🔗 Перейти к Issue", "url": "${{ github.event.issue.html_url }}"},
-              {"text": "✏️ Редактировать Issue", "url": "${{ github.event.issue.html_url }}"}
+              {"text": "🔗 Go to Issue", "url": "${{ github.event.issue.html_url }}"},
+              {"text": "✏️ Edit Issue", "url": "${{ github.event.issue.html_url }}"}
             ],
             [
-              {"text": "🏠 К репозиторию", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 Все Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All Issues", "url": "${{ github.server_url }}/${{ github.repository }}/issues"}
             ]
 
   pr-notifications:
@@ -198,56 +198,56 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: deploy # Используем шаблон deploy для PR как развертывания кода
-          language: ru
+          template: deploy # Use deploy template for PR as code deployment
+          language: en
           parse_mode: "Markdown"
           message: |
             ${{ steps.pr-notification-type.outputs.emoji }} **Pull Request ${{ steps.pr-notification-type.outputs.action_text }}**
 
-            **📋 Заголовок:** {{prTitle}}
-            **🔢 Номер:** #{{prNumber}}
-            **👤 Автор:** {{author}}
-            **📊 Статус:** `{{prState}}`
-            **✏️ Черновик:** {{isDraft}}
-            **🔀 Можно слить:** {{mergeable}}
+            **📋 Title:** {{prTitle}}
+            **🔢 Number:** #{{prNumber}}
+            **👤 Author:** {{author}}
+            **📊 State:** `{{prState}}`
+            **✏️ Draft:** {{isDraft}}
+            **🔀 Mergeable:** {{mergeable}}
 
-            **🌿 Ветки:** `{{headBranch}}` → `{{baseBranch}}`
-            **🏷️ Метки:** {{labels}}
-            **👥 Исполнители:** {{assignees}}
+            **🌿 Branches:** `{{headBranch}}` → `{{baseBranch}}`
+            **🏷️ Labels:** {{labels}}
+            **👥 Assignees:** {{assignees}}
 
-            **📈 Статистика изменений:**
-            • 📁 **Файлов изменено:** ${{ github.event.pull_request.changed_files }}
-            • 📝 **Коммитов:** ${{ github.event.pull_request.commits }}
-            • 📊 **Изменения:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
-            • 📅 **Создан:** {{prCreatedAt}}
-            • 🔄 **Обновлен:** {{prUpdatedAt}}
+            **📈 Change Statistics:**
+            • 📁 **Files changed:** ${{ github.event.pull_request.changed_files }}
+            • 📝 **Commits:** ${{ github.event.pull_request.commits }}
+            • 📊 **Changes:** `+${{ github.event.pull_request.additions }} ➕ -${{ github.event.pull_request.deletions }} ➖`
+            • 📅 **Created:** {{prCreatedAt}}
+            • 🔄 **Updated:** {{prUpdatedAt}}
 
-            **📝 Описание:**
+            **📝 Description:**
             {{prBody}}
 
-            **🏠 Репозиторий:** {{repository}}
+            **🏠 Repository:** {{repository}}
           template_vars: |
             {
               "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
               "version": "PR#${{ github.event.pull_request.number }}",
-              "customMessage": "Pull Request {{prNumber}} в репозитории {{repositoryName}}"
+              "customMessage": "Pull Request {{prNumber}} in repository {{repositoryName}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "📝 Сделать ревью", "url": "${{ github.event.pull_request.html_url }}/files"}
+              {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
+              {"text": "📝 Review", "url": "${{ github.event.pull_request.html_url }}/files"}
             ],
             [
-              {"text": "✅ Одобрить", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
-              {"text": "❌ Запросить изменения", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
+              {"text": "✅ Approve", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"},
+              {"text": "❌ Request Changes", "url": "${{ github.event.pull_request.html_url }}/files#submit-review"}
             ],
             [
-              {"text": "🔄 Слить PR", "url": "${{ github.event.pull_request.html_url }}"},
-              {"text": "🔒 Закрыть PR", "url": "${{ github.event.pull_request.html_url }}"}
+              {"text": "🔄 Merge PR", "url": "${{ github.event.pull_request.html_url }}"},
+              {"text": "🔒 Close PR", "url": "${{ github.event.pull_request.html_url }}"}
             ],
             [
-              {"text": "🏠 К репозиторию", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 Все PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
             ]
 
       - name: Send review notification
@@ -259,39 +259,39 @@ jobs:
           template: info
           parse_mode: "Markdown"
           message: |
-            📝 **Обзор Pull Request**
+            📝 **Pull Request Review**
 
             **📋 PR:** {{prTitle}}
-            **🔢 Номер:** #{{prNumber}}
-            **📊 Статус PR:** {{prState}}
+            **🔢 Number:** #{{prNumber}}
+            **📊 PR State:** {{prState}}
             **🔗 URL:** {{prUrl}}
 
-            **👤 Ревьюер:** {{reviewAuthor}}
-            **⭐ Статус обзора:** {{reviewState}}
-            **🆔 ID обзора:** {{reviewId}}
-            **🕐 Время:** ${{ github.event.review.submitted_at }}
+            **👤 Reviewer:** {{reviewAuthor}}
+            **⭐ Review Status:** {{reviewState}}
+            **🆔 Review ID:** {{reviewId}}
+            **🕐 Time:** ${{ github.event.review.submitted_at }}
 
-            **💭 Комментарий к обзору:**
+            **💭 Review Comment:**
             {{reviewBody}}
 
-            **🏠 Репозиторий:** {{repository}}
-            **🌿 Ветка:** {{refName}}
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "Новый обзор от {{reviewAuthor}} для PR #{{prNumber}}"
+              "customMessage": "New review from {{reviewAuthor}} for PR #{{prNumber}}"
             }
           inline_keyboard: |
             [
-              {"text": "👀 Посмотреть ревью", "url": "${{ github.event.review.html_url }}"},
-              {"text": "📝 Перейти к PR", "url": "${{ github.event.pull_request.html_url }}"}
+              {"text": "👀 View Review", "url": "${{ github.event.review.html_url }}"},
+              {"text": "📝 Go to PR", "url": "${{ github.event.pull_request.html_url }}"}
             ],
             [
-              {"text": "💬 Ответить на ревью", "url": "${{ github.event.pull_request.html_url }}#discussion_r"},
-              {"text": "✏️ Редактировать PR", "url": "${{ github.event.pull_request.html_url }}"}
+              {"text": "💬 Reply to Review", "url": "${{ github.event.pull_request.html_url }}#discussion_r"},
+              {"text": "✏️ Edit PR", "url": "${{ github.event.pull_request.html_url }}"}
             ],
             [
-              {"text": "🏠 К репозиторию", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "📊 Все PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "📊 All PRs", "url": "${{ github.server_url }}/${{ github.repository }}/pulls"}
             ]
 
   discussion-notifications:
@@ -308,39 +308,39 @@ jobs:
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           template: info
           parse_mode: "Markdown"
-          language: ru
+          language: en
           message: |
-            💬 **Новое обсуждение ${{ github.event.action == 'created' && 'создано' || github.event.action == 'answered' && 'отвечено' || github.event.action }}**
+            💬 **New Discussion ${{ github.event.action == 'created' && 'Created' || github.event.action == 'answered' && 'Answered' || github.event.action }}**
 
-            **📢 Заголовок:** ${{ github.event.discussion.title }}
-            **👤 Автор:** ${{ github.event.discussion.user.login }}
-            **🏷️ Категория:** ${{ github.event.discussion.category.name }}
-            **📅 Создано:** ${{ github.event.discussion.created_at }}
-            **🆔 ID обсуждения:** ${{ github.event.discussion.number }}
-            **💬 Статус ответа:** ${{ github.event.discussion.answer_chosen_at && '✅ Есть выбранный ответ' || '❓ Ждет ответа' }}
-            **🔒 Заблокировано:** ${{ github.event.discussion.locked && '🔒 Да' || '🔓 Нет' }}
+            **📢 Title:** ${{ github.event.discussion.title }}
+            **👤 Author:** ${{ github.event.discussion.user.login }}
+            **🏷️ Category:** ${{ github.event.discussion.category.name }}
+            **📅 Created:** ${{ github.event.discussion.created_at }}
+            **🆔 Discussion ID:** ${{ github.event.discussion.number }}
+            **💬 Answer Status:** ${{ github.event.discussion.answer_chosen_at && '✅ Has chosen answer' || '❓ Awaiting answer' }}
+            **🔒 Locked:** ${{ github.event.discussion.locked && '🔒 Yes' || '🔓 No' }}
 
-            **📝 Содержание:**
+            **📝 Content:**
             ${{ github.event.discussion.body }}
 
-            **🏠 Репозиторий:** {{repository}}
-            **🌿 Ветка:** {{refName}}
+            **🏠 Repository:** {{repository}}
+            **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "Новое обсуждение в репозитории {{repositoryName}}"
+              "customMessage": "New discussion in repository {{repositoryName}}"
             }
           inline_keyboard: |
             [
-              {"text": "💬 Присоединиться", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "✍️ Ответить", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
+              {"text": "💬 Join Discussion", "url": "${{ github.event.discussion.html_url }}"},
+              {"text": "✍️ Reply", "url": "${{ github.event.discussion.html_url }}#discussioncomment-new"}
             ],
             [
-              {"text": "👍 Поставить реакцию", "url": "${{ github.event.discussion.html_url }}"},
-              {"text": "🔖 Подписаться", "url": "${{ github.event.discussion.html_url }}"}
+              {"text": "👍 React", "url": "${{ github.event.discussion.html_url }}"},
+              {"text": "🔖 Subscribe", "url": "${{ github.event.discussion.html_url }}"}
             ],
             [
-              {"text": "🏠 К репозиторию", "url": "${{ github.server_url }}/${{ github.repository }}"},
-              {"text": "💬 Все обсуждения", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              {"text": "🏠 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"},
+              {"text": "💬 All Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
             ]
 
   health-check:
