@@ -46,9 +46,11 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📊 Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔗 Коммит", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
-              {"text": "🏃 Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              [
+                {"text": "📊 Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
+                {"text": "🔗 Коммит", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
+                {"text": "🏃 Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              ]
             ]
 
       - name: 📝 Демо шаблона с вычисляемыми URL

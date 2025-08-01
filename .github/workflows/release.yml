@@ -95,16 +95,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📥 Download Release", "url": "${{ steps.release-info.outputs.download_url }}"},
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
-            ],
-            [
-              {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"},
-              {"text": "🐛 Report Issue", "url": "https://github.com/${{ github.repository }}/issues/new"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
-              {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
+              [
+                {"text": "📥 Download Release", "url": "${{ steps.release-info.outputs.download_url }}"},
+                {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
+              ],
+              [
+                {"text": "💬 Discussions", "url": "https://github.com/${{ github.repository }}/discussions"},
+                {"text": "🐛 Report Issue", "url": "https://github.com/${{ github.repository }}/issues/new"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
+                {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
+              ]
             ]
 
       - name: Send release notes as document
@@ -174,16 +176,18 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "🧪 Test Release", "url": "${{ steps.release-info.outputs.download_url }}"},
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
-            ],
-            [
-              {"text": "🐛 Report Bug", "url": "https://github.com/${{ github.repository }}/issues/new"},
-              {"text": "💬 Discussion", "url": "https://github.com/${{ github.repository }}/discussions"}
-            ],
-            [
-              {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
-              {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
+              [
+                {"text": "🧪 Test Release", "url": "${{ steps.release-info.outputs.download_url }}"},
+                {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"}
+              ],
+              [
+                {"text": "🐛 Report Bug", "url": "https://github.com/${{ github.repository }}/issues/new"},
+                {"text": "💬 Discussion", "url": "https://github.com/${{ github.repository }}/discussions"}
+              ],
+              [
+                {"text": "🏠 Repository", "url": "https://github.com/${{ github.repository }}"},
+                {"text": "📋 All Releases", "url": "https://github.com/${{ github.repository }}/releases"}
+              ]
             ]
 
   post-release-tasks:

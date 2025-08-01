@@ -236,12 +236,14 @@ jobs:
             Click on any button to navigate to different sections.
           inline_keyboard: |
             [
-              {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
-              {"text": "📝 View Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
-            ],
-            [
-              {"text": "🐛 Report Issue", "url": "${{ github.server_url }}/${{ github.repository }}/issues/new"},
-              {"text": "💬 Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              [
+                {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+                {"text": "📝 View Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+              ],
+              [
+                {"text": "🐛 Report Issue", "url": "${{ github.server_url }}/${{ github.repository }}/issues/new"},
+                {"text": "💬 Discussions", "url": "${{ github.server_url }}/${{ github.repository }}/discussions"}
+              ]
             ]
 
       # Message with retry configuration
@@ -316,7 +318,9 @@ jobs:
             Duration: 5 seconds
           inline_keyboard: |
             [
-              {"text": "📊 View Results", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              [
+                {"text": "📊 View Results", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              ]
             ]
 
   # 5. Multi-language Examples
@@ -417,8 +421,10 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📊 View Details", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
-              {"text": "📈 Coverage Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              [
+                {"text": "📊 View Details", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+                {"text": "📈 Coverage Report", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              ]
             ]
 
       # Example: Deployment notification
@@ -448,9 +454,11 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "🌐 View Site", "url": "${{ steps.deploy.outputs.url }}"},
-              {"text": "📊 Monitoring", "url": "https://monitoring.example.com"},
-              {"text": "📝 Logs", "url": "https://logs.example.com"}
+              [
+                {"text": "🌐 View Site", "url": "${{ steps.deploy.outputs.url }}"},
+                {"text": "📊 Monitoring", "url": "https://monitoring.example.com"},
+                {"text": "📝 Logs", "url": "https://logs.example.com"}
+              ]
             ]
 
       # Example: Enhanced Pull Request Deployment with Statistics
@@ -488,12 +496,14 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "🔗 View PR", "url": "${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pr-deploy.outputs.pr_number }}"},
-              {"text": "📊 Workflow Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-            ],
-            [
-              {"text": "📝 Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
-              {"text": "🌲 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+              [
+                {"text": "🔗 View PR", "url": "${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pr-deploy.outputs.pr_number }}"},
+                {"text": "📊 Workflow Run", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              ],
+              [
+                {"text": "📝 Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"},
+                {"text": "🌲 Repository", "url": "${{ github.server_url }}/${{ github.repository }}"}
+              ]
             ]
 
   # 8. Summary
@@ -541,7 +551,9 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
-              {"text": "💾 Download Action", "url": "https://github.com/${{ github.repository }}"},
-              {"text": "🐛 Report Issues", "url": "https://github.com/${{ github.repository }}/issues"}
+              [
+                {"text": "📖 Documentation", "url": "https://github.com/${{ github.repository }}/blob/main/README.md"},
+                {"text": "💾 Download Action", "url": "https://github.com/${{ github.repository }}"},
+                {"text": "🐛 Report Issues", "url": "https://github.com/${{ github.repository }}/issues"}
+              ]
             ]
