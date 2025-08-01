@@ -7,7 +7,7 @@ Automatically analyze user repositories and intelligently integrate `telegram-no
 
 ### 📍 **Original Repository**
 - **GitHub**: https://github.com/asychin/telegram-notify-action
-- **Latest Version**: v3.1.0
+- **Latest Version**: v3.2.0
 - **Action Marketplace**: https://github.com/marketplace/actions/telegram-notify-action
 
 ### 📄 **Get These Rules**
@@ -2642,6 +2642,61 @@ GitHub Actions API date range filtering may not work as expected:
     echo "runs=$filtered_runs" >> $GITHUB_OUTPUT
 ```
 
+### **❌ Problem 8: Heredoc Syntax in GitHub Release Workflows**
+🚨 **CRITICAL:** When creating workflows that process GitHub release content, improper heredoc syntax can cause shell command interpretation errors.
+
+```yaml
+# ❌ WRONG - Unquoted EOF allows shell expansion
+- name: Get release info
+  run: |
+    echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+    echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+    echo "EOF" >> $GITHUB_OUTPUT
+```
+
+**💡 Problem:** When release body contains template variables like `{{repository}}`, `{{baseBranch}}`, file names like `.ai-integration-rules`, or shell-special characters, they get executed as shell commands causing errors:
+
+```bash
+.ai-integration-rules: command not found
+{{repository}}: command not found  
+{{baseBranch}}: command not found
+refs/heads/: No such file or directory
+```
+
+**✅ Solutions:**
+```yaml
+# Option A: Quote the EOF delimiter to prevent expansion
+- name: Get release info
+  run: |
+    {
+      echo "release_notes<<'EOF'"
+      echo "${{ github.event.release.body }}"
+      echo "EOF"
+    } >> $GITHUB_OUTPUT
+
+# Option B: Use alternative delimiter approach
+- name: Get release info  
+  run: |
+    RELEASE_BODY="${{ github.event.release.body }}"
+    {
+      echo "release_notes<<'RELEASE_END'"
+      echo "$RELEASE_BODY"
+      echo "RELEASE_END"
+    } >> $GITHUB_OUTPUT
+
+# Option C: Use jq for safe JSON processing
+- name: Get release info
+  run: |
+    release_body=$(echo '${{ toJSON(github.event.release.body) }}' | jq -r '.')
+    echo "release_notes=$release_body" >> $GITHUB_OUTPUT
+```
+
+**🛡️ Key Points:**
+- Always quote heredoc delimiters: `'EOF'` instead of `EOF`
+- Group output redirection using `{}` for complex heredoc
+- Be especially careful with content from external sources (release notes, PR descriptions)
+- Test workflows with complex CHANGELOG content that contains template variables
+
 ---
 
 ## 🛡️ **VALIDATION & BEST PRACTICES**
@@ -2673,6 +2728,8 @@ message: |
 - Missing fallback values for API-dependent data
 - Invalid permissions causing API access errors
 - Hard-coded timestamps instead of dynamic generation
+- 🚨 **Heredoc without quotes:** `EOF` instead of `'EOF'` in release workflows
+- 🚨 **Shell command errors:** `.ai-integration-rules: command not found` or `{{variable}}: command not found`
 
 ---
 
@@ -2693,6 +2750,15 @@ message: |
 ---
 
 ## 📝 **CHANGELOG**
+
+### v3.2.0 (2025-08-02) - AI Integration Rules Update & Critical Workflow Fix
+- 🚨 **NEW:** Added Problem 8 - Heredoc Syntax in GitHub Release Workflows
+- 🛡️ **CRITICAL:** Warning about unquoted EOF delimiters causing shell command interpretation
+- 💡 **ADDED:** Three different solutions for safe heredoc handling in workflows
+- ⚠️ **ENHANCED:** Common Warning Signs section with heredoc-specific warnings  
+- 🔧 **FIXED:** Updated Latest Version reference to v3.2.0
+- 📋 **EXAMPLES:** Comprehensive examples of problematic vs. correct heredoc syntax
+- 🎯 **FOCUS:** Special attention to GitHub release content processing safety
 
 ### v3.1.1.3 (2025-01-31) - GitHub API Integration & Permissions Update
 - 🔐 **NEW:** Comprehensive GitHub API permissions guidelines and examples
