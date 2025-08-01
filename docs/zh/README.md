@@ -154,6 +154,7 @@
 ```
 
 ## 🤖 AI 驱动的自动集成
+*📄 [AI 集成规则](../../.ai-integration-rules) | [在线最新规则](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
 
 **v3 新功能！** 让 AI 自动将 `telegram-notify-action` 集成到您的仓库中，并进行最佳配置。
 

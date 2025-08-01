@@ -153,6 +153,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 ```
 
 ## 🤖 AI-Powered Auto-Integration
+*📄 [AI Integration Rules](../../.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
 
 **NEW IN v3!** Let AI automatically integrate `telegram-notify-action` into your repository with optimal configuration.
 

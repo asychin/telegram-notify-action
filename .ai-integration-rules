@@ -3,6 +3,57 @@
 ## 📋 Mission Statement
 Automatically analyze user repositories and intelligently integrate `telegram-notify-action@v3` with optimal configuration based on project structure, existing workflows, and user preferences.
 
+## 🔗 Source & Usage Information
+
+### 📍 **Original Repository**
+- **GitHub**: https://github.com/asychin/telegram-notify-action
+- **Latest Version**: v3.1.0
+- **Action Marketplace**: https://github.com/marketplace/actions/telegram-notify-action
+
+### 📄 **Get These Rules**
+```bash
+# Download latest AI integration rules
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+
+# Or view in browser
+https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
+```
+
+### 🧠 **For AI Systems**
+These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) when users request:
+- "Add Telegram notifications to my project"
+- "Integrate telegram-notify-action into my workflows"  
+- "Set up GitHub Actions notifications"
+- "Add deployment notifications"
+
+### 📚 **Documentation Links**
+- **Full Documentation**: https://github.com/asychin/telegram-notify-action/tree/main/docs
+- **English Docs**: https://github.com/asychin/telegram-notify-action/blob/main/docs/en/README.md
+- **Russian Docs**: https://github.com/asychin/telegram-notify-action/blob/main/docs/ru/README.md
+- **Chinese Docs**: https://github.com/asychin/telegram-notify-action/blob/main/docs/zh/README.md
+- **Template System**: https://github.com/asychin/telegram-notify-action/blob/main/docs/en/TEMPLATE-SYSTEM.md
+- **Examples**: https://github.com/asychin/telegram-notify-action/tree/main/examples
+
+### 🚀 **Quick Start Reference**
+```yaml
+# Basic integration example
+- name: 📢 Notify Telegram
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: "Deployment completed!"
+```
+
+### ⚠️ **Important Notes**
+- Always use specific version tags (e.g., `@v3.1.0`) not `@main`
+- These rules are updated with each major release
+- Check repository for latest template variables and features
+- Verify examples compatibility with current version
+
+---
+
 ## 🔍 Repository Analysis Phase
 
 ### 1. Repository Structure Analysis
@@ -395,4 +446,94 @@ automated_integration:
       - [ ] No sensitive data in notifications
 ```
 
-Remember: This is an intelligent integration system. Always prioritize user experience, security, and non-disruptive implementation. The goal is to enhance existing workflows, not replace them.
+## 📖 How to Use These Rules
+
+### 🤖 **For AI Assistants**
+When a user requests Telegram notifications integration:
+
+1. **Check for existing `.ai-integration-rules`** in their repository
+2. **If found**: Use their customized rules (they may have modified these)
+3. **If not found**: Apply these standard rules from telegram-notify-action repository
+
+### 👨‍💻 **For Developers** 
+```bash
+# Add these rules to your repository for consistent AI integration
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+
+# Customize the rules for your specific project needs
+# AI assistants will use your customized version when helping with integrations
+```
+
+### 🔄 **Keeping Rules Updated**
+```bash
+# Check for updates (compare versions)
+curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules | head -10
+
+# Update to latest version  
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+```
+
+### 🎯 **AI Usage Instructions**
+
+#### **Step 1: Repository Analysis**
+- Scan project structure and existing workflows
+- Identify deployment patterns and CI/CD setup
+- Check for existing Telegram integration
+
+#### **Step 2: User Questionnaire**  
+- Ask about notification preferences (basic/detailed/dynamic)
+- Determine visual formatting preferences (minimal/rich emojis)
+- Identify deployment environments and triggers
+
+#### **Step 3: Smart Integration**
+- Apply appropriate template based on project complexity
+- Generate workflow modifications with proper variable usage
+- Ensure security best practices (secrets, permissions)
+
+#### **Step 4: Documentation & Testing**
+- Provide setup instructions for secrets
+- Generate test cases for notification validation
+- Include troubleshooting guidance
+
+### 📝 **Integration Examples Reference**
+
+#### **Quick Commands for AI**
+```bash
+# Get latest action version
+curl -s https://api.github.com/repos/asychin/telegram-notify-action/releases/latest | grep '"tag_name"'
+
+# Check template variables  
+curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/docs/en/TEMPLATE-SYSTEM.md
+
+# View examples
+curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/examples/
+```
+
+---
+
+## 🚨 **Critical Reminders**
+
+### **Version Management**
+- ⚠️ **Always** use specific version tags: `@v3.1.0` (not `@main` or `@latest`)
+- 🔄 Update version references when new releases are available
+- 📋 Check CHANGELOG.md for breaking changes between versions
+
+### **Variable Usage Rules** 
+- 🎯 Template variables (`{{var}}`) work ONLY in `message:`/`caption:` WITH `template:`
+- ⚙️ GitHub Actions variables (`${{var}}`) work in `template_vars:`, `inline_keyboard:`, `run:` commands
+- 🚫 Never mix template and GitHub Actions variable types
+
+### **Security First**
+- 🔐 Always use repository/organization secrets
+- 🚫 Never expose tokens in code or logs  
+- 🛡️ Use minimal required permissions
+- 🔍 Sanitize sensitive data in notifications
+
+---
+
+**Remember: This is an intelligent integration system. Always prioritize user experience, security, and non-disruptive implementation. The goal is to enhance existing workflows, not replace them.**
+
+---
+
+*Last updated: v3.1.0 (2025-01-31) - telegram-notify-action by @asychin*  
+*Latest rules: https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules*

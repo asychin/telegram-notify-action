@@ -51,6 +51,7 @@ Choose your preferred language:
 - ✅ **Retry Logic** - Robust error handling with exponential backoff
 
 ### 🤖 AI-Powered Integration
+*📄 [AI Integration Rules](./.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
 
 - 🔮 **Auto-Integration** - AI-powered automatic integration into any repository
 - 🧠 **Smart Analysis** - Intelligent project structure analysis and workflow detection
