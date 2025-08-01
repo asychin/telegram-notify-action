@@ -437,6 +437,7 @@ git push origin v4.0.0 v4.0 v4
 ### 📋 Version Release Checklist
 
 #### **Before Any Release:**
+
 - [ ] All tests pass (`npm test`)
 - [ ] ESLint passes (`npm run lint`)
 - [ ] Documentation updated (all languages)
@@ -444,12 +445,14 @@ git push origin v4.0.0 v4.0 v4
 - [ ] No "dry data" issues in templates
 
 #### **For Patch Releases (x.x.1):**
+
 - [ ] Bug fixes only, no new features
 - [ ] Version in `package.json` updated
 - [ ] `CHANGELOG.md` updated with fixes
 - [ ] Tests updated if needed
 
 #### **For Minor Releases (x.1.0):**
+
 - [ ] New features are backwards compatible
 - [ ] New tests for new functionality
 - [ ] Documentation for new features (all languages)
@@ -457,6 +460,7 @@ git push origin v4.0.0 v4.0 v4
 - [ ] `.ai-integration-rules` updated if needed
 
 #### **For Major Releases (1.0.0):**
+
 - [ ] Breaking changes documented
 - [ ] Migration guide created (`docs/MIGRATION-vX.md`)
 - [ ] All examples updated for new API
@@ -475,7 +479,7 @@ v3.1.0, v3.1.1, v3.2.0, v4.0.0
 v3.1 → points to latest v3.1.x
 v3.2 → points to latest v3.2.x
 
-# Major version tags (auto-updated)  
+# Major version tags (auto-updated)
 v3 → points to latest v3.x.x
 v4 → points to latest v4.x.x
 

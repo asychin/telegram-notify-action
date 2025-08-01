@@ -80,46 +80,13 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: release
+          template: release  
           parse_mode: "Markdown"
           language: en
           template_vars: |
             {
               "customMessage": "New release ${{ steps.release-info.outputs.version }} for project ${{ github.repository }} published!"
             }
-          message: |
-            🎉 **New Release Available!**
-
-            **🏷️ Version:** {{releaseName}}
-            **🏠 Repository:** {{repository}}
-            **👤 Release Author:** {{releaseAuthor}}
-            **📅 Date:** {{releaseCreatedAt}}
-            **🔖 Tag:** {{releaseTag}}
-            **🧪 Prerelease:** {{isPrerelease}}
-            **📝 Draft:** {{isDraft}}
-
-            **💬 Custom Message:** {{customMessage}}
-
-            **✨ Key Improvements in This Version:**
-            • 🎯 Automatic Event Context Extraction
-            • 🌐 Ready-to-Use URL Variables
-            • 🔄 Enhanced Retry Logic
-            • 📤 Advanced File Upload
-            • 🛡️ Additional Security Features
-            • 🧪 Comprehensive Testing
-            • 📖 Completely Updated Documentation
-
-            **📋 Release Notes:**
-            {{releaseBody}}
-
-            **🚀 Usage:**
-            ```yaml
-            - uses: asychin/telegram-notify-action@{{releaseTag}}
-              with:
-                telegram_token: ${{ '{{' }} secrets.TELEGRAM_BOT_TOKEN {{ '}}' }}
-                chat_id: ${{ '{{' }} secrets.TELEGRAM_CHAT_ID {{ '}}' }}
-                message: "Your notification message"
-            ```
           inline_keyboard: |
             [
               {"text": "📥 Download Release", "url": "${{ steps.release-info.outputs.download_url }}"},

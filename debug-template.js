@@ -126,7 +126,7 @@ process.env.GITHUB_EVENT_NAME = "release";
 process.env.GITHUB_EVENT_PATH = releaseEventFile;
 process.env.PARSE_MODE = "Markdown";
 process.env.TEMPLATE = "release";
-process.env.MESSAGE = "Release notification test";
+process.env.MESSAGE = ""; // Empty to use template
 process.env.LANGUAGE = "en";
 process.env.TEMPLATE_VARS = JSON.stringify({
   "customMessage": "New release v3.1.0 is now available with bug fixes!"
@@ -137,6 +137,25 @@ const notifier5 = new TelegramNotify();
 const result5 = notifier5.processTemplate();
 console.log("Result 5:");
 console.log(result5);
+
+// Test 6: Russian release template
+console.log();
+console.log("=== Test 6: Russian release template ===");
+process.env.GITHUB_EVENT_NAME = "release";
+process.env.GITHUB_EVENT_PATH = releaseEventFile;
+process.env.PARSE_MODE = "Markdown";
+process.env.TEMPLATE = "release";
+process.env.MESSAGE = ""; // Empty to use template
+process.env.LANGUAGE = "ru";
+process.env.TEMPLATE_VARS = JSON.stringify({
+  "customMessage": "Новый релиз v3.1.0 доступен с исправлениями багов!"
+});
+
+delete require.cache[require.resolve("./telegram-notify.js")];
+const notifier6 = new TelegramNotify();
+const result6 = notifier6.processTemplate();
+console.log("Result 6:");
+console.log(result6);
 
 require.main = originalMain;
 
