@@ -33,12 +33,10 @@ jobs:
           else
             echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
             echo "prerelease=${{ github.event.release.prerelease }}" >> $GITHUB_OUTPUT
-            # Use safe output for release notes without heredoc
-            {
-              echo "release_notes<<'RELEASE_BODY_END'"
-              printf '%s\n' "${{ github.event.release.body }}"
-              echo "RELEASE_BODY_END"
-            } >> $GITHUB_OUTPUT
+            # Use base64 encoding to safely handle release body with any content
+            RELEASE_BODY_B64=$(echo '${{ toJSON(github.event.release.body) }}' | jq -r '.' | base64 -w 0)
+            echo "release_notes_b64=${RELEASE_BODY_B64}" >> $GITHUB_OUTPUT
+            echo "release_notes=Release notes (see base64 decoded content)" >> $GITHUB_OUTPUT
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
 
@@ -57,7 +55,12 @@ jobs:
           echo "**Prerelease:** ${{ steps.release-info.outputs.prerelease }}" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
           echo "## Release Notes" >> RELEASE_NOTES.md
-          printf '%s\n' "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
+          # Safely decode base64 release notes
+          if [ -n "${{ steps.release-info.outputs.release_notes_b64 }}" ]; then
+            echo "${{ steps.release-info.outputs.release_notes_b64 }}" | base64 -d >> RELEASE_NOTES.md
+          else
+            echo "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
+          fi
           echo "" >> RELEASE_NOTES.md
           echo "## What's Changed" >> RELEASE_NOTES.md
           echo "- Enhanced Telegram notifications with file support" >> RELEASE_NOTES.md
@@ -91,7 +94,7 @@ jobs:
           language: en
           template_vars: |
             {
-              "customMessage": "New release ${{ steps.release-info.outputs.version }} for project ${{ github.repository }} published!"
+              "customMessage": "New release published successfully with enhanced features and improvements!"
             }
           inline_keyboard: |
             [
@@ -154,7 +157,7 @@ jobs:
             **🔖 Tag:** {{releaseTag}}
 
             **⚠️ Development Team Attention:**
-            A prerelease version ${{ steps.release-info.outputs.version }} has been published.
+            A prerelease version has been published and requires team testing.
 
             **📋 Required Actions:**
             • 🧪 Conduct thorough testing
@@ -164,7 +167,7 @@ jobs:
             • ✅ Confirm readiness for stable release
 
             **📋 Release Notes:**
-            {{releaseBody}}
+            See attached release notes document for full details.
 
             Please test thoroughly before promoting to stable release.
 
@@ -172,7 +175,7 @@ jobs:
             **👤 Workflow:** {{workflow}}
           template_vars: |
             {
-              "customMessage": "Attention! New prerelease ${{ steps.release-info.outputs.version }} requires team testing"
+              "customMessage": "Attention! New prerelease requires team testing and thorough validation"
             }
           inline_keyboard: |
             [
@@ -216,5 +219,5 @@ jobs:
             The action is now available on GitHub Marketplace.
           template_vars: |
             {
-              "customMessage": "Release process completed successfully for version ${{ github.event.release.tag_name || github.event.inputs.version }}"
+              "customMessage": "Release process completed successfully - all post-release tasks finished"
             }

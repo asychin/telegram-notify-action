@@ -107,13 +107,12 @@ jobs:
       - name: 📄 Create Test File
         if: matrix.test-case.name == 'File Upload'
         run: |
-          cat > test-file.txt << EOF
-          📋 Test file content for GitHub Actions
-          🏠 Repository: ${{ github.repository }}
-          📝 Commit: ${{ github.sha }}
-          🔄 Workflow: ${{ github.workflow }}
-          🌿 Branch: ${{ github.head_ref || github.ref_name }}
-          EOF
+          # Create test file safely without heredoc
+          echo "📋 Test file content for GitHub Actions" > test-file.txt
+          echo "🏠 Repository: ${{ github.repository }}" >> test-file.txt
+          echo "📝 Commit: ${{ github.sha }}" >> test-file.txt
+          echo "🔄 Workflow: ${{ github.workflow }}" >> test-file.txt
+          echo "🌿 Branch: ${{ github.head_ref || github.ref_name }}" >> test-file.txt
 
       - name: 🚀 Test ${{ matrix.test-case.name }}
         uses: ./
@@ -208,13 +207,12 @@ jobs:
       - name: 📄 Create Test Document
         if: matrix.file-type.type == 'document'
         run: |
-          cat > test-file.${{ matrix.file-type.extension }} << EOF
-          ${{ matrix.file-type.content }}
-          📅 Build Date: $(date)
-          📝 Commit SHA: ${{ github.sha }}
-          👤 Actor: ${{ github.actor }}
-          🔄 Workflow: ${{ github.workflow }}
-          EOF
+          # Create test document safely without heredoc
+          printf '%s\n' "${{ matrix.file-type.content }}" > test-file.${{ matrix.file-type.extension }}
+          echo "📅 Build Date: $(date)" >> test-file.${{ matrix.file-type.extension }}
+          echo "📝 Commit SHA: ${{ github.sha }}" >> test-file.${{ matrix.file-type.extension }}
+          echo "👤 Actor: ${{ github.actor }}" >> test-file.${{ matrix.file-type.extension }}
+          echo "🔄 Workflow: ${{ github.workflow }}" >> test-file.${{ matrix.file-type.extension }}
 
       - name: 🖼️ Create Test Image
         if: matrix.file-type.type == 'photo'
@@ -439,7 +437,7 @@ jobs:
             • 🖼️ Image Tests (C2PA): ${{ needs.image-upload-tests.result }}
           template_vars: |
             {
-              "customMessage": "All tests completed for commit ${{ github.sha }} in repository ${{ github.repository }}"
+              "customMessage": "Complete test suite execution finished - all validation and security checks completed"
             }
           inline_keyboard: |
             [

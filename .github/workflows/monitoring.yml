@@ -139,7 +139,7 @@ jobs:
             **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "Activity in repository ${{ github.event.repository.name }} - new comment from ${{ github.event.comment.user.login }}"
+              "customMessage": "New comment activity detected - check repository for latest discussion updates"
             }
           inline_keyboard: |
             [
@@ -232,9 +232,9 @@ jobs:
             **🏠 Repository:** {{repository}}
           template_vars: |
             {
-              "deployStatus": "${{ steps.pr-notification-type.outputs.action_text }}",
-              "version": "PR#${{ github.event.pull_request.number }}",
-              "customMessage": "Pull Request #${{ github.event.pull_request.number }} in repository ${{ github.event.repository.name }}"
+              "deployStatus": "Pull Request Activity",
+              "version": "Latest PR",
+              "customMessage": "Pull Request activity detected - review changes and provide feedback"
             }
           inline_keyboard: |
             [
@@ -284,7 +284,7 @@ jobs:
             **🌿 Branch:** {{refName}}
           template_vars: |
             {
-              "customMessage": "New review from ${{ github.event.review.user.login }} for PR #${{ github.event.pull_request.number }}"
+              "customMessage": "New code review submitted - check Pull Request for feedback and suggestions"
             }
           inline_keyboard: |
             [
