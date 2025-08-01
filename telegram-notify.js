@@ -77,7 +77,7 @@ class TelegramNotify {
     // GitHub context
     this.githubContext = {
       repository: process.env.GITHUB_REPOSITORY,
-      refName: process.env.GITHUB_REF_NAME,
+      refName: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME,
       sha: process.env.GITHUB_SHA,
       actor: process.env.GITHUB_ACTOR,
       workflow: process.env.GITHUB_WORKFLOW,
@@ -322,6 +322,16 @@ class TelegramNotify {
             eventContext.assignees = Array.isArray(assignees)
               ? assignees.map((assignee) => assignee.login).join(", ")
               : "";
+
+            // PR change statistics
+            eventContext.filesChanged =
+              safeGet(eventData, "pull_request.changed_files") || 0;
+            eventContext.additions =
+              safeGet(eventData, "pull_request.additions") || 0;
+            eventContext.deletions =
+              safeGet(eventData, "pull_request.deletions") || 0;
+            eventContext.commitCount =
+              safeGet(eventData, "pull_request.commits") || 0;
           }
           break;
 
