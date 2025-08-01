@@ -7,7 +7,7 @@ Automatically analyze user repositories and intelligently integrate `telegram-no
 
 ### 📍 **Original Repository**
 - **GitHub**: https://github.com/asychin/telegram-notify-action
-- **Latest Version**: v3.2.3
+- **Latest Version**: v3.2.4
 - **Action Marketplace**: https://github.com/marketplace/actions/telegram-notify-action
 
 ### 📄 **Get These Rules**
@@ -47,7 +47,7 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 
 **🔍 For EXISTING integration audit:**
 1. **FIRST** analyze existing telegram-notify-action code
-2. **IDENTIFY** all errors against current rules (v3.2.3)
+2. **IDENTIFY** all errors against current rules (v3.2.4)
 3. **ASK** user about desired improvements (questionnaire)
 4. **PROVIDE** detailed error report with fixes
 5. **GENERATE** corrected code with explanations
@@ -64,7 +64,7 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 ```yaml
 # Basic integration example
 - name: 📢 Notify Telegram
-  uses: asychin/telegram-notify-action@v3.2.3
+  uses: asychin/telegram-notify-action@v3.2.4
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -73,9 +73,9 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 ```
 
 ### ⚠️ **Important Notes**
-- **RECOMMENDED:** Use `@v3.2.3` for latest security fixes and bug corrections
-- Always use specific version tags (e.g., `@v3.2.3`) not `@main`  
-- **SECURITY:** v3.2.3 completes critical shell injection vulnerability fixes in workflows
+- **RECOMMENDED:** Use `@v3.2.4` for latest security fixes and syntax corrections
+- Always use specific version tags (e.g., `@v3.2.4`) not `@main`  
+- **SECURITY:** v3.2.4 completes ALL vulnerability and syntax fixes in workflows
 - **COMPATIBILITY:** v3.2.1+ fixes JSON parsing errors for inline_keyboard
 - These rules are updated with each major release
 - Check repository for latest template variables and features
@@ -1435,7 +1435,7 @@ Would you like me to:
 👤 User: "Check my telegram notifications, they have errors"
 [Provides files with custom templates, deprecated parameters]
 
-🤖 AI: "I'll audit your telegram-notify-action setup against v3.2.3 standards.
+🤖 AI: "I'll audit your telegram-notify-action setup against v3.2.4 standards.
 
 🔍 **ANALYSIS COMPLETE - Found 15 errors:**
 
@@ -1476,7 +1476,7 @@ Do you want me to:
 
 - [ ] **Templates:** All templates are built-in (`success`, `error`, `warning`, `info`, `deploy`, `test`, `release`)
 - [ ] **Parameters:** No `message_thread_id` or other deprecated parameters  
-- [ ] **Versions:** Using `@v3.2.3` or newer (not `@main`, `@v1`, `@v2`) - examples show v3.1.0 for reference
+- [ ] **Versions:** Using `@v3.2.4` or newer (not `@main`, `@v1`, `@v2`) - examples show v3.1.0 for reference
 - [ ] **template_vars:** All in JSON format, no bash-style assignments
 - [ ] **Conflicts:** No mixing of `template:` and `message:` parameters
 - [ ] **Variable Scopes:** `{{}}` only in `message:`/`caption:` WITH `template:`, `${{}}` in JSON/shell
@@ -1584,7 +1584,7 @@ Do you want me to:
 - ✅ **Parameter Check:** No `message_thread_id` or other deprecated parameters
 - ✅ **JSON Format:** All `template_vars` must be valid JSON format
 - ✅ **No Conflicts:** Never use `template:` and `message:` together
-- ✅ **Version Check:** Always use `@v3.2.3` or newer specific version (examples use v3.1.0 for stability)
+- ✅ **Version Check:** Always use `@v3.2.4` or newer specific version (examples use v3.1.0 for stability)
 - ✅ **GitHub Variables:** Use `${{ github.* }}` in `template_vars`, `inline_keyboard`, `run:` commands
 - ✅ **Template Variables:** Use `{{var}}` ONLY in `message:`/`caption:` WITH `template:`
 - ✅ **User Requirements:** Generated code matches ALL user questionnaire answers
@@ -2370,7 +2370,7 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 - [ ] No `message_thread_id` parameter
 - [ ] `template_vars` in JSON format
 - [ ] Not mixing `template:` and `message:`
-- [ ] Version `@v3.2.3` or newer (recommended for security)
+- [ ] Version `@v3.2.4` or newer (recommended for security)
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
 - [ ] **AI Identification**: Identified AI model at start (Sonnet 3.x/4.x recommended)
@@ -2401,7 +2401,7 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 #### **🔍 For AUDIT scenarios:**
 - [ ] Read ALL documentation before analysis
 - [ ] Created comprehensive error report
-- [ ] Cross-referenced against current v3.2.3 standards
+- [ ] Cross-referenced against current v3.2.4 standards
 - [ ] Provided before/after comparisons
 - [ ] Explained reasoning for each fix
 - [ ] Asked user preferences for fixes vs redesign
@@ -2779,6 +2779,13 @@ message: |
 ---
 
 ## 📝 **CHANGELOG**
+
+### v3.2.4 (2025-08-02) - Final Syntax Fix - Quote Escaping
+- 🚨 **FINAL SYNTAX PATCH:** Fixed unescaped quote in date format causing 'unexpected EOF while looking for matching quote' error
+- 🛠️ **SHELL SYNTAX:** Properly escaped quotes in timestamp generation command in release workflow
+- ✅ **COMPLETE FIX:** All shell syntax errors now resolved in release.yml - no remaining parsing errors
+- 🔒 **FINAL PATCH:** Eliminated final shell parsing error causing workflow failure
+- 🎯 **COMPLETED:** ALL fix series - security, injection, JSON, and syntax now complete
 
 ### v3.2.3 (2025-08-02) - Complete Shell Injection Security Fix
 - 🚨 **FINAL SECURITY PATCH:** Fixed remaining heredoc vulnerability in release-info step processing github.event.release.body
