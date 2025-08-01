@@ -17,14 +17,15 @@
   - Fixed github.event.release.body shell injection with safe base64 encoding approach
   - Removed dangerous GitHub variables from template_vars in release and prerelease notifications
   - Eliminated ALL heredoc vulnerabilities completely
-  
 - **🛡️ monitoring.yml Security Enhancements:**
+
   - Removed ${{github.event.repository.name}} from template_vars customMessage
   - Removed ${{github.event.comment.user.login}} from JSON contexts
   - Removed ${{github.event.pull_request.number}} from version and customMessage fields
   - Fixed all mixed variable contexts that could cause injection
 
 - **🔧 test.yml Heredoc Security Fixes:**
+
   - Replaced ALL unsafe heredoc (cat << EOF) patterns with safe echo commands
   - Fixed matrix.file-type.content shell injection risk in file creation
   - Eliminated ALL EOF vulnerabilities in test file generation workflows
