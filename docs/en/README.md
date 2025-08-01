@@ -153,7 +153,8 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 ```
 
 ## 🤖 AI-Powered Auto-Integration
-*📄 [AI Integration Rules](../../.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
+
+_📄 [AI Integration Rules](../../.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)_
 
 **NEW IN v3!** Let AI automatically integrate `telegram-notify-action` into your repository with optimal configuration.
 
@@ -265,6 +266,7 @@ The AI integration ensures:
 #### ⚡ Quick Start with AI
 
 **Option 1: Download AI Rules to Your Repository**
+
 ```bash
 # Download the latest AI integration rules
 curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
@@ -274,9 +276,10 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 ```
 
 **Option 2: Direct URL Reference**
+
 ```
 Ask any AI assistant:
-"Use the AI integration rules from https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+"Use the AI integration rules from https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
 to integrate telegram-notify-action into my GitHub project"
 ```
 
@@ -285,6 +288,7 @@ to integrate telegram-notify-action into my GitHub project"
 When you provide the AI integration rules, AI assistants will:
 
 1. **📋 Ask Comprehensive Questions**
+
    - What types of notifications do you want? (build/deploy/test/monitoring/etc.)
    - What level of detail? (basic/standard/detailed/progressive)
    - Visual preferences? (minimal/standard/rich emojis)
@@ -293,12 +297,14 @@ When you provide the AI integration rules, AI assistants will:
    - Telegram bot setup status?
 
 2. **🔍 Analyze Your Repository**
+
    - Project structure and technology stack
    - Existing workflow files and CI/CD setup
    - Current notification patterns
    - Deployment environments and patterns
 
 3. **🛠️ Generate Perfect Integration**
+
    - Workflow files with correct templates and variables
    - Proper JSON formatting for `template_vars`
    - No deprecated parameters or wrong templates
@@ -317,8 +323,8 @@ Already have telegram-notify-action but experiencing issues? AI can audit and fi
 
 ```
 Ask any AI assistant:
-"Please audit my telegram-notify-action setup using the rules from 
-https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+"Please audit my telegram-notify-action setup using the rules from
+https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
 and fix all errors according to v3.1.0 standards"
 
 [Then provide your workflow files]
@@ -327,6 +333,7 @@ and fix all errors according to v3.1.0 standards"
 **AI will systematically:**
 
 1. **📊 Create Detailed Error Report**
+
    - Template errors (non-existent custom templates)
    - Deprecated parameters (`message_thread_id`, old versions)
    - Format errors (bash-style vs JSON `template_vars`)
@@ -335,6 +342,7 @@ and fix all errors according to v3.1.0 standards"
    - Syntax errors (Handlebars, invalid YAML)
 
 2. **📚 Cross-Reference Documentation**
+
    - Validate against current template system
    - Check variable availability and usage
    - Version compatibility verification
@@ -355,7 +363,7 @@ and fix all errors according to v3.1.0 standards"
 📋 Integration Scope:
 1. What do you want notifications about?
    - [ ] Build/compilation results
-   - [ ] Deployment status  
+   - [ ] Deployment status
    - [ ] Test results
    - [ ] Release announcements
    [... full questionnaire ...]
@@ -375,6 +383,7 @@ Please answer all questions so I can create the perfect integration for you."
 #### 🌍 Multi-Language Support
 
 The AI integration rules support multiple languages:
+
 - **English** - Full documentation and examples
 - **Русский** - Complete Russian language support
 - **中文** - Full Chinese language documentation
@@ -382,6 +391,7 @@ The AI integration rules support multiple languages:
 #### 🚨 AI Integration Benefits
 
 **✅ Advantages of Using AI Integration:**
+
 - **Zero errors** - AI follows strict validation rules
 - **Best practices** - Always uses latest standards
 - **Customized** - Tailored to your specific needs
@@ -390,6 +400,7 @@ The AI integration rules support multiple languages:
 - **Future-proof** - Updated with latest features
 
 **🔗 Resources:**
+
 - **[AI Integration Rules File](./.ai-integration-rules)** - Complete rules for AI assistants
 - **[Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)** - Always up-to-date version
 

@@ -154,7 +154,8 @@
 ```
 
 ## 🤖 AI 驱动的自动集成
-*📄 [AI 集成规则](../../.ai-integration-rules) | [在线最新规则](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
+
+_📄 [AI 集成规则](../../.ai-integration-rules) | [在线最新规则](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)_
 
 **v3 新功能！** 让 AI 自动将 `telegram-notify-action` 集成到您的仓库中，并进行最佳配置。
 
@@ -266,6 +267,7 @@ AI 集成确保：
 #### ⚡ AI 快速开始
 
 **选项 1：下载 AI 规则到您的仓库**
+
 ```bash
 # 下载最新的 AI 集成规则
 curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
@@ -275,9 +277,10 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 ```
 
 **选项 2：直接引用 URL**
+
 ```
 请求任何 AI 助手：
-"使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+"使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
 的 AI 集成规则将 telegram-notify-action 集成到我的 GitHub 项目中"
 ```
 
@@ -286,6 +289,7 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 当您提供 AI 集成规则时，AI 助手将：
 
 1. **📋 询问全面问题**
+
    - 您想要什么类型的通知？（构建/部署/测试/监控/等）
    - 详细程度？（基础/标准/详细/渐进式）
    - 视觉偏好？（最小化/标准/丰富表情符号）
@@ -294,12 +298,14 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
    - Telegram 机器人设置状态？
 
 2. **🔍 分析您的仓库**
+
    - 项目结构和技术栈
    - 现有工作流文件和 CI/CD 设置
    - 当前通知模式
    - 部署环境和模式
 
 3. **🛠️ 生成完美集成**
+
    - 使用正确模板和变量的工作流文件
    - `template_vars` 的正确 JSON 格式
    - 无废弃参数或错误模板
@@ -318,7 +324,7 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 
 ```
 请求任何 AI 助手：
-"请使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+"请使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
 的规则审计我的 telegram-notify-action 设置，并根据 v3.1.0 标准修复所有错误"
 
 [然后提供您的工作流文件]
@@ -327,6 +333,7 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 **AI 将系统性地：**
 
 1. **📊 创建详细错误报告**
+
    - 模板错误（不存在的自定义模板）
    - 废弃参数（`message_thread_id`、旧版本）
    - 格式错误（bash 样式 vs JSON `template_vars`）
@@ -335,6 +342,7 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
    - 语法错误（Handlebars、无效 YAML）
 
 2. **📚 交叉参考文档**
+
    - 对照当前模板系统验证
    - 检查变量可用性和使用
    - 版本兼容性验证
@@ -375,6 +383,7 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 #### 🌍 多语言支持
 
 AI 集成规则支持多种语言：
+
 - **English** - 完整文档和示例
 - **Русский** - 完整俄语语言支持
 - **中文** - 完整中文语言文档
@@ -382,6 +391,7 @@ AI 集成规则支持多种语言：
 #### 🚨 AI 集成优势
 
 **✅ 使用 AI 集成的优势：**
+
 - **零错误** - AI 遵循严格的验证规则
 - **最佳实践** - 始终使用最新标准
 - **定制化** - 根据您的具体需求量身定制
@@ -390,6 +400,7 @@ AI 集成规则支持多种语言：
 - **面向未来** - 随最新功能更新
 
 **🔗 资源：**
+
 - **[AI 集成规则文件](../../.ai-integration-rules)** - AI 助手的完整规则
 - **[最新在线规则](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)** - 始终最新版本
 

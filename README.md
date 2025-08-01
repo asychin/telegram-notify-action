@@ -51,13 +51,15 @@ Choose your preferred language:
 - ✅ **Retry Logic** - Robust error handling with exponential backoff
 
 ### 🤖 AI-Powered Integration
-*📄 [AI Integration Rules](./.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
+
+_📄 [AI Integration Rules](./.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)_
 
 Get telegram-notify-action automatically integrated into your project by AI assistants (ChatGPT, Claude, Copilot, etc.)!
 
 #### ⚡ Quick Start with AI
 
 **Option 1: Use AI Integration Rules**
+
 ```bash
 # Download AI rules to your repository
 curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
@@ -67,9 +69,10 @@ curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram
 ```
 
 **Option 2: Direct AI Command**
+
 ```
 Ask any AI assistant:
-"Use https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+"Use https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules
 to integrate Telegram notifications into my GitHub project"
 ```
 
@@ -91,15 +94,17 @@ Ask AI: "Audit my telegram-notify-action setup and fix all errors according to v
 ```
 
 AI will:
+
 - 🔍 Find all errors (wrong templates, deprecated parameters, format issues)
 - 📋 Create detailed error report with line numbers
 - 🛠️ Generate corrected versions with explanations
 - 📖 Cross-reference against official documentation
 
 #### 🌍 Supported Languages
+
 - 🇺🇸 English - Full AI integration support
-- 🇷🇺 Русский - Полная поддержка ИИ интеграции  
-- 🇨🇳 中文 - 完整的AI集成支持
+- 🇷🇺 Русский - Полная поддержка ИИ интеграции
+- 🇨🇳 中文 - 完整的 AI 集成支持
 
 ### Advanced Features
 

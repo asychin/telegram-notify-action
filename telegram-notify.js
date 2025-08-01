@@ -552,7 +552,8 @@ class TelegramNotify {
         eventContext.isDraft = false;
       }
       if (!Object.hasOwn(eventContext, "releaseBody")) {
-        eventContext.releaseBody = "Test release with bug fixes and improvements.";
+        eventContext.releaseBody =
+          "Test release with bug fixes and improvements.";
       }
     } catch (error) {
       this.warning(`Error extracting event context: ${error.message}`);
