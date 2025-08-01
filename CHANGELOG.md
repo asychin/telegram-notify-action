@@ -14,7 +14,7 @@
 #### 🧪 **Testing Infrastructure**
 
 - **🆕 NEW:** Added `tests/release-security.test.js` for comprehensive security validation
-- **📦 DEPENDENCY:** Added `js-yaml` dependency for YAML parsing in security tests  
+- **📦 DEPENDENCY:** Added `js-yaml` dependency for YAML parsing in security tests
 - **✅ VALIDATION:** Automated detection of shell injection vulnerabilities in workflows
 - **🔍 COVERAGE:** Enhanced test coverage for release workflow security patterns
 
@@ -42,8 +42,9 @@ This release strengthens the action's security posture with comprehensive testin
 **Technical Details:**
 
 - **🧹 cleanMarkdownContent() Function Added:**
+
   - Automatically balances unmatched `**` bold markers
-  - Fixes unclosed `*` italic markers 
+  - Fixes unclosed `*` italic markers
   - Closes incomplete `\`\`\`` code blocks
   - Balances single backtick inline code
   - Removes incomplete `[]` and `()` link patterns
@@ -51,6 +52,7 @@ This release strengthens the action's security posture with comprehensive testin
   - Removes zero-width characters that break parsing
 
 - **🔄 Enhanced Release Body Processing:**
+
   - Detects and decodes base64-encoded release notes for security
   - Applies format-specific cleaning (HTML vs Markdown)
   - Prevents shell injection while maintaining readability
@@ -60,6 +62,7 @@ This release strengthens the action's security posture with comprehensive testin
   - Compatible with Node.js 16+ environment
 
 **🎯 FIXES THE EXACT ERROR:**
+
 ```
 ❌ Before: "can't parse entities: Can't find end of the entity starting at byte offset 2697"
 ✅ After: Clean, properly formatted messages that parse correctly
