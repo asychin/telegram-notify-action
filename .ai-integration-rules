@@ -7,7 +7,7 @@ Automatically analyze user repositories and intelligently integrate `telegram-no
 
 ### 📍 **Original Repository**
 - **GitHub**: https://github.com/asychin/telegram-notify-action
-- **Latest Version**: v3.2.0
+- **Latest Version**: v3.2.2
 - **Action Marketplace**: https://github.com/marketplace/actions/telegram-notify-action
 
 ### 📄 **Get These Rules**
@@ -47,7 +47,7 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 
 **🔍 For EXISTING integration audit:**
 1. **FIRST** analyze existing telegram-notify-action code
-2. **IDENTIFY** all errors against current rules (v3.1.0)
+2. **IDENTIFY** all errors against current rules (v3.2.2)
 3. **ASK** user about desired improvements (questionnaire)
 4. **PROVIDE** detailed error report with fixes
 5. **GENERATE** corrected code with explanations
@@ -64,7 +64,7 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 ```yaml
 # Basic integration example
 - name: 📢 Notify Telegram
-  uses: asychin/telegram-notify-action@v3.1.0
+  uses: asychin/telegram-notify-action@v3.2.2
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -73,10 +73,12 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 ```
 
 ### ⚠️ **Important Notes**
-- Always use specific version tags (e.g., `@v3.1.0`) not `@main`
+- **RECOMMENDED:** Use `@v3.2.2` for latest security fixes and bug corrections
+- Always use specific version tags (e.g., `@v3.2.2`) not `@main`  
+- **SECURITY:** v3.2.2 fixes critical shell injection vulnerability in workflows
+- **COMPATIBILITY:** v3.2.1+ fixes JSON parsing errors for inline_keyboard
 - These rules are updated with each major release
 - Check repository for latest template variables and features
-- Verify examples compatibility with current version
 
 ---
 
@@ -1433,7 +1435,7 @@ Would you like me to:
 👤 User: "Check my telegram notifications, they have errors"
 [Provides files with custom templates, deprecated parameters]
 
-🤖 AI: "I'll audit your telegram-notify-action setup against v3.1.0 standards.
+🤖 AI: "I'll audit your telegram-notify-action setup against v3.2.2 standards.
 
 🔍 **ANALYSIS COMPLETE - Found 15 errors:**
 
@@ -1474,7 +1476,7 @@ Do you want me to:
 
 - [ ] **Templates:** All templates are built-in (`success`, `error`, `warning`, `info`, `deploy`, `test`, `release`)
 - [ ] **Parameters:** No `message_thread_id` or other deprecated parameters  
-- [ ] **Versions:** Using `@v3.1.0` or newer (not `@main`, `@v1`, `@v2`)
+- [ ] **Versions:** Using `@v3.2.2` or newer (not `@main`, `@v1`, `@v2`) - examples show v3.1.0 for reference
 - [ ] **template_vars:** All in JSON format, no bash-style assignments
 - [ ] **Conflicts:** No mixing of `template:` and `message:` parameters
 - [ ] **Variable Scopes:** `{{}}` only in `message:`/`caption:` WITH `template:`, `${{}}` in JSON/shell
@@ -1582,7 +1584,7 @@ Do you want me to:
 - ✅ **Parameter Check:** No `message_thread_id` or other deprecated parameters
 - ✅ **JSON Format:** All `template_vars` must be valid JSON format
 - ✅ **No Conflicts:** Never use `template:` and `message:` together
-- ✅ **Version Check:** Always use `@v3.1.0` or newer specific version
+- ✅ **Version Check:** Always use `@v3.2.2` or newer specific version (examples use v3.1.0 for stability)
 - ✅ **GitHub Variables:** Use `${{ github.* }}` in `template_vars`, `inline_keyboard`, `run:` commands
 - ✅ **Template Variables:** Use `{{var}}` ONLY in `message:`/`caption:` WITH `template:`
 - ✅ **User Requirements:** Generated code matches ALL user questionnaire answers
@@ -2368,7 +2370,7 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 - [ ] No `message_thread_id` parameter
 - [ ] `template_vars` in JSON format
 - [ ] Not mixing `template:` and `message:`
-- [ ] Version `@v3.1.0` or newer
+- [ ] Version `@v3.2.2` or newer (recommended for security)
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
 - [ ] **AI Identification**: Identified AI model at start (Sonnet 3.x/4.x recommended)
@@ -2399,7 +2401,7 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 #### **🔍 For AUDIT scenarios:**
 - [ ] Read ALL documentation before analysis
 - [ ] Created comprehensive error report
-- [ ] Cross-referenced against current v3.1.0 standards
+- [ ] Cross-referenced against current v3.2.2 standards
 - [ ] Provided before/after comparisons
 - [ ] Explained reasoning for each fix
 - [ ] Asked user preferences for fixes vs redesign
@@ -2689,7 +2691,34 @@ refs/heads/: No such file or directory
   run: |
     release_body=$(echo '${{ toJSON(github.event.release.body) }}' | jq -r '.')
     echo "release_notes=$release_body" >> $GITHUB_OUTPUT
+
+# Option D: Use echo commands instead of heredoc (SAFEST for file creation)
+- name: Create release notes safely
+  run: |
+    # Replace unsafe heredoc with secure echo commands
+    echo "# Release ${{ github.event.release.tag_name }}" > RELEASE_NOTES.md
+    echo "" >> RELEASE_NOTES.md
+    echo "## Release Notes" >> RELEASE_NOTES.md
+    printf '%s\n' "${{ github.event.release.body }}" >> RELEASE_NOTES.md
+    echo "" >> RELEASE_NOTES.md
+    echo "## Download" >> RELEASE_NOTES.md
+    echo "- [Download](${{ github.event.release.html_url }})" >> RELEASE_NOTES.md
 ```
+
+**🚨 REAL CASE (Fixed in v3.2.2):**
+When creating release notes from CHANGELOG containing emoji and template variables:
+```yaml
+# ❌ WRONG - Shell injection vulnerability
+cat > RELEASE_NOTES.md << 'EOF'
+${{ steps.release-info.outputs.release_notes }}
+EOF
+
+# ✅ FIXED - Safe echo-based approach  
+echo "## Release Notes" >> RELEASE_NOTES.md
+printf '%s\n' "${{ steps.release-info.outputs.release_notes }}" >> RELEASE_NOTES.md
+```
+
+**❗ Impact:** CHANGELOG.md with content like `inline_keyboard: |` was interpreted as shell command causing `inline_keyboard: command not found` errors.
 
 **🛡️ Key Points:**
 - Always quote heredoc delimiters: `'EOF'` instead of `EOF`
@@ -2750,6 +2779,21 @@ message: |
 ---
 
 ## 📝 **CHANGELOG**
+
+### v3.2.2 (2025-01-31) - Critical Security Fixes & Enhanced Shell Injection Prevention
+- 🚨 **SECURITY FIX:** Added Option D - Echo-based approach to replace unsafe heredoc in file creation
+- 🛡️ **REAL CASE:** Documented actual shell injection vulnerability fixed in telegram-notify-action@v3.2.2
+- 🔧 **CRITICAL:** Added specific example of CHANGELOG.md content causing `inline_keyboard: command not found`
+- ✅ **SOLUTION:** Demonstrated safe `printf '%s\n'` approach for multiline content handling
+- 📋 **ENHANCED:** Problem 8 now includes real production fix with before/after examples
+- 🔧 **UPDATED:** Latest Version reference to v3.2.2 with security patches
+- 🎯 **IMPACT:** Prevents shell command interpretation of release notes containing special characters
+
+### v3.2.1 (2025-01-31) - JSON Parsing & Telegram API Compliance Fix
+- 🐛 **FIXED:** Inline keyboard JSON format from `[{...}],[{...}]` to `[[{...}],[{...}]]`
+- ✅ **COMPLIANCE:** Restored Telegram Bot API compatibility for inline_keyboard parameter
+- 📋 **UPDATED:** All workflow examples and documentation with correct JSON structure
+- 🔧 **TECHNICAL:** Fixed `Unexpected non-whitespace character after JSON` parsing errors
 
 ### v3.2.0 (2025-08-02) - AI Integration Rules Update & Critical Workflow Fix
 - 🚨 **NEW:** Added Problem 8 - Heredoc Syntax in GitHub Release Workflows
