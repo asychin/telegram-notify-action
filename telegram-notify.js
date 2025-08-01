@@ -567,109 +567,109 @@ class TelegramNotify {
       success: {
         en: `✅ ${bold}Success${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
+🏠 **Repository:** {{repository}}
+🌿 **Branch:** {{refName}}
+📝 **Commit:** {{sha}}
+👤 **Actor:** {{actor}}
+🔄 **Workflow:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `✅ ${bold}Успех${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
+🏠 **Репозиторий:** {{repository}}
+🌿 **Ветка:** {{refName}}
+📝 **Коммит:** {{sha}}
+👤 **Автор:** {{actor}}
+🔄 **Workflow:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `✅ ${bold}成功${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
+🏠 **仓库:** {{repository}}
+🌿 **分支:** {{refName}}
+📝 **提交:** {{sha}}
+👤 **执行者:** {{actor}}
+🔄 **工作流:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       error: {
         en: `❌ ${bold}Error${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Actor: {{actor}}
-Workflow: {{workflow}}
-Job Status: {{jobStatus}}
+🏠 **Repository:** {{repository}}
+🌿 **Branch:** {{refName}}
+📝 **Commit:** {{sha}}
+👤 **Actor:** {{actor}}
+🔄 **Workflow:** {{workflow}}
+🚨 **Job Status:** {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `❌ ${bold}Ошибка${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
-Статус задачи: {{jobStatus}}
+🏠 **Репозиторий:** {{repository}}
+🌿 **Ветка:** {{refName}}
+📝 **Коммит:** {{sha}}
+👤 **Автор:** {{actor}}
+🔄 **Workflow:** {{workflow}}
+🚨 **Статус задачи:** {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `❌ ${bold}错误${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-执行者: {{actor}}
-工作流: {{workflow}}
-任务状态: {{jobStatus}}
+🏠 **仓库:** {{repository}}
+🌿 **分支:** {{refName}}
+📝 **提交:** {{sha}}
+👤 **执行者:** {{actor}}
+🔄 **工作流:** {{workflow}}
+🚨 **任务状态:** {{jobStatus}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       warning: {
         en: `⚠️ ${bold}Warning${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Workflow: {{workflow}}
+🏠 **Repository:** {{repository}}
+🌿 **Branch:** {{refName}}
+🔄 **Workflow:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `⚠️ ${bold}Предупреждение${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Workflow: {{workflow}}
+🏠 **Репозиторий:** {{repository}}
+🌿 **Ветка:** {{refName}}
+🔄 **Workflow:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `⚠️ ${bold}警告${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-工作流: {{workflow}}
+🏠 **仓库:** {{repository}}
+🌿 **分支:** {{refName}}
+🔄 **工作流:** {{workflow}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       info: {
         en: `ℹ️ ${bold}Information${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Actor: {{actor}}
+🏠 **Repository:** {{repository}}
+🌿 **Branch:** {{refName}}
+👤 **Actor:** {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `ℹ️ ${bold}Информация${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Автор: {{actor}}
+🏠 **Репозиторий:** {{repository}}
+🌿 **Ветка:** {{refName}}
+👤 **Автор:** {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `ℹ️ ${bold}信息${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-执行者: {{actor}}
+🏠 **仓库:** {{repository}}
+🌿 **分支:** {{refName}}
+👤 **执行者:** {{actor}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       deploy: {
         en: `🚀 ${bold}Deployment${boldEnd}
@@ -745,69 +745,72 @@ Actor: {{actor}}
       test: {
         en: `🧪 ${bold}Test Results${boldEnd}
 
-Repository: {{repository}}
-Branch: {{refName}}
-Commit: {{sha}}
-Run: #{{runNumber}}
+🏠 **Repository:** {{repository}}
+🌿 **Branch:** {{refName}}
+📝 **Commit:** {{sha}}
+🔢 **Run:** #{{runNumber}}
 
-Test Status: {{testStatus}}
-Coverage: {{coverage}}
+📊 **Test Status:** {{testStatus}}
+📈 **Coverage:** {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `🧪 ${bold}Результаты тестов${boldEnd}
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
+🏠 **Репозиторий:** {{repository}}
+🌿 **Ветка:** {{refName}}
+📝 **Коммит:** {{sha}}
+🔢 **Запуск:** #{{runNumber}}
 
-Статус тестов: {{testStatus}}
-Покрытие: {{coverage}}
+📊 **Статус тестов:** {{testStatus}}
+📈 **Покрытие:** {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `🧪 ${bold}测试结果${boldEnd}
 
-仓库: {{repository}}
-分支: {{refName}}
-提交: {{sha}}
-运行: #{{runNumber}}
+🏠 **仓库:** {{repository}}
+🌿 **分支:** {{refName}}
+📝 **提交:** {{sha}}
+🔢 **运行:** #{{runNumber}}
 
-测试状态: {{testStatus}}
-覆盖率: {{coverage}}
+📊 **测试状态:** {{testStatus}}
+📈 **覆盖率:** {{coverage}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
       release: {
         en: `🎉 ${bold}New Release${boldEnd}
 
-Repository: {{repository}}
-Version: {{version}}
-Tag: {{tag}}
-Released by: {{actor}}
+🏠 **Repository:** {{repository}}
+🏷️ **Version:** {{version}}
+🔖 **Tag:** {{tag}}
+👤 **Released by:** {{actor}}
 
+📋 **Release Notes:**
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         ru: `🎉 ${bold}Новый релиз${boldEnd}
 
-Репозиторий: {{repository}}
-Версия: {{version}}
-Тег: {{tag}}
-Выпустил: {{actor}}
+🏠 **Репозиторий:** {{repository}}
+🏷️ **Версия:** {{version}}
+🔖 **Тег:** {{tag}}
+👤 **Выпустил:** {{actor}}
 
+📋 **Заметки к релизу:**
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
         zh: `🎉 ${bold}新版本发布${boldEnd}
 
-仓库: {{repository}}
-版本: {{version}}
-标签: {{tag}}
-发布者: {{actor}}
+🏠 **仓库:** {{repository}}
+🏷️ **版本:** {{version}}
+🔖 **标签:** {{tag}}
+👤 **发布者:** {{actor}}
 
+📋 **发布说明:**
 {{releaseNotes}}
 
-{{customMessage}}`,
+💬 {{customMessage}}`,
       },
     };
 
