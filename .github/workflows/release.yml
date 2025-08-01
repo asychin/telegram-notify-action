@@ -82,7 +82,7 @@ jobs:
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          template: release  
+          template: release
           parse_mode: "Markdown"
           language: en
           template_vars: |
