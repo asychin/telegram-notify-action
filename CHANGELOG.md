@@ -2,6 +2,13 @@
 
 ## [v3.2.0] - 2025-08-02
 
+### 🐛 **Bug Fixes**
+
+#### 🔧 **Release Workflow Fix**
+- **🚨 Fixed Critical Pipeline Error** - Fixed heredoc syntax in release workflow preventing shell command interpretation
+- **🛡️ Security Improvement** - Template variables from release notes no longer executed as shell commands
+- **⚡ Workflow Stability** - Release workflow now handles complex CHANGELOG content safely
+
 ### ✨ **New Features**
 
 #### 🤖 **AI Integration Rules**
