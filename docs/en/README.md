@@ -11,8 +11,8 @@
 ### 🌐 Language / 语言 / Язык
 
 | [🇺🇸 **English**](README.md) | [🇨🇳 中文](../zh/README.md) | [🇷🇺 Русский](../ru/README.md) |
-|:-----------------------------:|:-----------------------------:|:-------------------------------:|
-| **Complete Documentation**   | **完整文档**                   | **Полная документация**         |
+| :-------------------------: | :------------------------: | :---------------------------: |
+| **Complete Documentation**  |        **完整文档**        |    **Полная документация**    |
 
 </div>
 
@@ -54,7 +54,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ```yaml
 - name: Send Telegram Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -65,7 +65,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ```yaml
 - name: Success Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -82,7 +82,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ```yaml
 - name: Send Report
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -95,7 +95,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ```yaml
 - name: Interactive Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -118,7 +118,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
   id: convert
 
 - name: Send Base64 Image
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -132,7 +132,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ```yaml
 - name: Send Image with C2PA Handling
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -142,7 +142,7 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
     caption: "🖼️ Image with smart processing"
 
 - name: Force Send as Photo
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -244,7 +244,7 @@ The action automatically detects C2PA (Coalition for Content Provenance and Auth
 
 ```yaml
 - name: Smart Image Upload
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -257,7 +257,7 @@ The action automatically detects C2PA (Coalition for Content Provenance and Auth
 
 ```yaml
 - name: Force Photo Upload
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -278,7 +278,7 @@ Base64 uploads support the same smart processing:
 
 ```yaml
 - name: Base64 with Smart Processing
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -354,7 +354,7 @@ The following GitHub context variables are automatically available:
 
 ```yaml
 - name: Upload Test Results
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -432,7 +432,7 @@ Send notifications only when specific conditions are met:
 ```yaml
 - name: Failure Notification
   if: failure()
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -445,7 +445,7 @@ Send notifications only when specific conditions are met:
 
 ```yaml
 - name: Success Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -525,7 +525,7 @@ jobs:
 
       - name: Test Results
         if: always()
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -558,7 +558,7 @@ jobs:
         id: deploy
 
       - name: Deployment Notification
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -580,7 +580,7 @@ jobs:
     npm run test:report
 
 - name: Send Report
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -603,7 +603,7 @@ jobs:
 ```yaml
 - name: Start Process
   id: start
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -616,7 +616,7 @@ jobs:
     echo "Deployment complete!"
 
 - name: Update Status
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}

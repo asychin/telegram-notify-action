@@ -217,9 +217,10 @@ jobs:
             📎 **File Upload Test**
 
             Type: ${{ matrix.file-type.type }}
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Workflow: ${{ github.workflow }}
+            Repository: {{repository}}
+            Branch: {{refName}}
+            Workflow: {{workflow}}
+            Commit: {{shortSha}}
 
   error-handling-tests:
     name: Error Handling Tests
@@ -410,10 +411,10 @@ jobs:
             • 🖼️ Image Tests (C2PA): ${{ needs.image-upload-tests.result }}
           template_vars: |
             {
-              "customMessage": "All tests completed for commit ${{ github.sha }}"
+              "customMessage": "All tests completed for commit {{shortSha}} ({{repositoryName}})"
             }
           inline_keyboard: |
             [
-              {"text": "📊 View Workflow", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
-              {"text": "📝 View Commit", "url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}
+              {"text": "📊 View Workflow", "url": "{{runUrl}}"},
+              {"text": "📝 View Commit", "url": "{{commitUrl}}"}
             ]

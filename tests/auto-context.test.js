@@ -3,11 +3,11 @@ const path = require("path");
 
 describe("Auto Context Variables Tests", () => {
   let originalEnv;
-  
+
   beforeEach(() => {
     // Save original environment
     originalEnv = { ...process.env };
-    
+
     // Mock environment variables
     process.env.TELEGRAM_TOKEN = "test_token";
     process.env.CHAT_ID = "test_chat_id";
@@ -22,7 +22,7 @@ describe("Auto Context Variables Tests", () => {
     process.env.GITHUB_EVENT_NAME = "issues";
     process.env.JOB_STATUS = "success";
   });
-  
+
   afterEach(() => {
     // Restore original environment
     process.env = originalEnv;
@@ -34,7 +34,7 @@ describe("Auto Context Variables Tests", () => {
     // Prevent script execution
     const originalMain = require.main;
     require.main = null;
-    
+
     try {
       // Create mock event data
       const mockEventData = {
@@ -50,14 +50,8 @@ describe("Auto Context Variables Tests", () => {
             login: "john-doe",
             id: 54321,
           },
-          labels: [
-            { name: "bug" },
-            { name: "enhancement" },
-          ],
-          assignees: [
-            { login: "assignee1" },
-            { login: "assignee2" },
-          ],
+          labels: [{ name: "bug" }, { name: "enhancement" }],
+          assignees: [{ login: "assignee1" }, { login: "assignee2" }],
         },
         sender: {
           login: "event-sender",
@@ -78,7 +72,7 @@ describe("Auto Context Variables Tests", () => {
       // Test basic GitHub context
       const basicVars = [
         "repository",
-        "refName", 
+        "refName",
         "sha",
         "actor",
         "workflow",
@@ -99,7 +93,7 @@ describe("Auto Context Variables Tests", () => {
 
       const expectedVars = [
         "triggerUser",
-        "triggerUserId", 
+        "triggerUserId",
         "action",
         "author",
         "issueNumber",
@@ -118,12 +112,13 @@ describe("Auto Context Variables Tests", () => {
 
       // Test template processing with automatic variables
       process.env.TEMPLATE = "info";
-      process.env.MESSAGE = "Issue {{issueNumber}} by {{author}} with {{labels}}";
-      
+      process.env.MESSAGE =
+        "Issue {{issueNumber}} by {{author}} with {{labels}}";
+
       // Create a new instance with updated env
       const notifierForTemplate = new TelegramNotify();
       const templateText = notifierForTemplate.processTemplate();
-      
+
       expect(typeof templateText).toBe("string");
       expect(templateText.length).toBeGreaterThan(0);
 
@@ -131,7 +126,6 @@ describe("Auto Context Variables Tests", () => {
       if (fs.existsSync(tempEventPath)) {
         fs.unlinkSync(tempEventPath);
       }
-      
     } finally {
       require.main = originalMain;
     }

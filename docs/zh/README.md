@@ -11,8 +11,8 @@
 ### 🌐 语言 / Language / Язык
 
 | [🇺🇸 English](../en/README.md) | [🇨🇳 **中文**](README.md) | [🇷🇺 Русский](../ru/README.md) |
-|:-------------------------------:|:-------------------------:|:-------------------------------:|
-| **Complete Documentation**     | **完整文档**               | **Полная документация**         |
+| :---------------------------: | :----------------------: | :---------------------------: |
+|  **Complete Documentation**   |       **完整文档**       |    **Полная документация**    |
 
 </div>
 
@@ -54,7 +54,7 @@
 
 ```yaml
 - name: 发送 Telegram 通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -65,7 +65,7 @@
 
 ```yaml
 - name: 成功通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -83,7 +83,7 @@
 
 ```yaml
 - name: 发送报告
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -96,7 +96,7 @@
 
 ```yaml
 - name: 交互式通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -119,7 +119,7 @@
   id: convert
 
 - name: 发送 Base64 图像
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -133,7 +133,7 @@
 
 ```yaml
 - name: 发送带 C2PA 处理的图像
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -143,7 +143,7 @@
     caption: "🖼️ 智能处理的图像"
 
 - name: 强制作为照片发送
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -157,52 +157,52 @@
 
 ### 必需参数
 
-| 参数             | 描述             | 示例                                |
-| ---------------- | ---------------- | ----------------------------------- |
+| 参数             | 描述                | 示例                                |
+| ---------------- | ------------------- | ----------------------------------- |
 | `telegram_token` | Telegram 机器人令牌 | `${{ secrets.TELEGRAM_BOT_TOKEN }}` |
-| `chat_id`        | Telegram 聊天 ID   | `${{ secrets.TELEGRAM_CHAT_ID }}`   |
+| `chat_id`        | Telegram 聊天 ID    | `${{ secrets.TELEGRAM_CHAT_ID }}`   |
 
 ### 消息参数
 
-| 参数                       | 描述             | 默认值  | 示例                             |
-| -------------------------- | ---------------- | ------- | -------------------------------- |
-| `message`                  | 消息文本         | -       | `"你好世界!"`                    |
-| `parse_mode`               | 消息解析模式     | `HTML`  | `HTML`, `Markdown`, `MarkdownV2` |
-| `disable_web_page_preview` | 禁用链接预览     | `true`  | `true`, `false`                  |
-| `disable_notification`     | 静默发送         | `false` | `true`, `false`                  |
-| `language`                 | 界面语言         | `en`    | `en`, `ru`, `zh`                 |
+| 参数                       | 描述         | 默认值  | 示例                             |
+| -------------------------- | ------------ | ------- | -------------------------------- |
+| `message`                  | 消息文本     | -       | `"你好世界!"`                    |
+| `parse_mode`               | 消息解析模式 | `HTML`  | `HTML`, `Markdown`, `MarkdownV2` |
+| `disable_web_page_preview` | 禁用链接预览 | `true`  | `true`, `false`                  |
+| `disable_notification`     | 静默发送     | `false` | `true`, `false`                  |
+| `language`                 | 界面语言     | `en`    | `en`, `ru`, `zh`                 |
 
 ### 高级消息参数
 
-| 参数                          | 描述                     | 默认值  | 示例            |
-| ----------------------------- | ------------------------ | ------- | --------------- |
-| `message_thread_id`           | 论坛主题 ID              | -       | `123`           |
-| `message_id`                  | 要编辑的消息 ID          | -       | `456`           |
-| `reply_to_message_id`         | 回复消息 ID              | -       | `789`           |
-| `protect_content`             | 保护内容免受转发         | `false` | `true`, `false` |
-| `allow_sending_without_reply` | 如果回复目标丢失则发送   | `true`  | `true`, `false` |
-| `message_effect_id`           | 消息效果 ID              | -       | `effect_id`     |
-| `business_connection_id`      | 商业连接 ID              | -       | `business_id`   |
+| 参数                          | 描述                   | 默认值  | 示例            |
+| ----------------------------- | ---------------------- | ------- | --------------- |
+| `message_thread_id`           | 论坛主题 ID            | -       | `123`           |
+| `message_id`                  | 要编辑的消息 ID        | -       | `456`           |
+| `reply_to_message_id`         | 回复消息 ID            | -       | `789`           |
+| `protect_content`             | 保护内容免受转发       | `false` | `true`, `false` |
+| `allow_sending_without_reply` | 如果回复目标丢失则发送 | `true`  | `true`, `false` |
+| `message_effect_id`           | 消息效果 ID            | -       | `effect_id`     |
+| `business_connection_id`      | 商业连接 ID            | -       | `business_id`   |
 
 ### 文件上传参数
 
-| 参数             | 描述                           | 默认值     | 示例                              |
-| ---------------- | ------------------------------ | ---------- | --------------------------------- |
-| `file_path`      | 文件路径                       | -          | `./report.pdf`                    |
-| `file_base64`    | Base64 编码的文件内容          | -          | `iVBORw0KGgoAAAANSUhEUgAAAA...`  |
-| `file_name`      | 文件名（base64 时必需）        | -          | `"screenshot.png"`                |
-| `file_type`      | 文件类型                       | `document` | `photo`, `document`, `video`, `audio` |
-| `force_as_photo` | 即使有元数据也强制作为照片     | `false`    | `true`, `false`                   |
-| `caption`        | 文件说明                       | -          | `"📊 报告"`                       |
+| 参数             | 描述                       | 默认值     | 示例                                  |
+| ---------------- | -------------------------- | ---------- | ------------------------------------- |
+| `file_path`      | 文件路径                   | -          | `./report.pdf`                        |
+| `file_base64`    | Base64 编码的文件内容      | -          | `iVBORw0KGgoAAAANSUhEUgAAAA...`       |
+| `file_name`      | 文件名（base64 时必需）    | -          | `"screenshot.png"`                    |
+| `file_type`      | 文件类型                   | `document` | `photo`, `document`, `video`, `audio` |
+| `force_as_photo` | 即使有元数据也强制作为照片 | `false`    | `true`, `false`                       |
+| `caption`        | 文件说明                   | -          | `"📊 报告"`                           |
 
 > **注意**: 使用 `file_path` 或 `file_base64` 中的一个（不能同时使用）。使用 `file_base64` 时，`file_name` 是必需的。
 
 ### 模板参数
 
-| 参数            | 描述             | 默认值 | 示例                                                           |
-| --------------- | ---------------- | ------ | -------------------------------------------------------------- |
+| 参数            | 描述             | 默认值 | 示例                                                               |
+| --------------- | ---------------- | ------ | ------------------------------------------------------------------ |
 | `template`      | 模板名称         | -      | `success`, `error`, `warning`, `info`, `deploy`, `test`, `release` |
-| `template_vars` | 模板变量（JSON） | `{}`   | `{"version": "v1.0.0"}`                                        |
+| `template_vars` | 模板变量（JSON） | `{}`   | `{"version": "v1.0.0"}`                                            |
 
 ### 交互功能
 
@@ -212,10 +212,10 @@
 
 ### 重试配置
 
-| 参数          | 描述                   | 默认值 | 示例 |
-| ------------- | ---------------------- | ------ | ---- |
-| `max_retries` | 最大重试次数           | `3`    | `5`  |
-| `retry_delay` | 初始重试延迟（秒）     | `1`    | `2`  |
+| 参数          | 描述               | 默认值 | 示例 |
+| ------------- | ------------------ | ------ | ---- |
+| `max_retries` | 最大重试次数       | `3`    | `5`  |
+| `retry_delay` | 初始重试延迟（秒） | `1`    | `2`  |
 
 ### 条件发送
 
@@ -245,7 +245,7 @@
 
 ```yaml
 - name: 智能图像上传
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -258,7 +258,7 @@
 
 ```yaml
 - name: 强制照片上传
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -279,7 +279,7 @@ Base64 上传支持相同的智能处理：
 
 ```yaml
 - name: 带智能处理的 Base64
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -340,22 +340,22 @@ template_vars: |
 
 ### 支持的文件类型
 
-| 类型          | 描述                     | 最大大小 |
-| ------------- | ------------------------ | -------- |
-| `photo`       | 图像（JPEG、PNG、WebP）  | 10 MB    |
-| `document`    | 任何文件类型             | 50 MB    |
-| `video`       | 视频文件                 | 50 MB    |
-| `audio`       | 音频文件                 | 50 MB    |
-| `animation`   | GIF 动画                 | 50 MB    |
-| `voice`       | 语音消息                 | 50 MB    |
-| `video_note`  | 视频笔记                 | 50 MB    |
-| `sticker`     | 贴纸文件                 | 50 MB    |
+| 类型         | 描述                    | 最大大小 |
+| ------------ | ----------------------- | -------- |
+| `photo`      | 图像（JPEG、PNG、WebP） | 10 MB    |
+| `document`   | 任何文件类型            | 50 MB    |
+| `video`      | 视频文件                | 50 MB    |
+| `audio`      | 音频文件                | 50 MB    |
+| `animation`  | GIF 动画                | 50 MB    |
+| `voice`      | 语音消息                | 50 MB    |
+| `video_note` | 视频笔记                | 50 MB    |
+| `sticker`    | 贴纸文件                | 50 MB    |
 
 ### 文件上传示例
 
 ```yaml
 - name: 上传测试结果
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -433,7 +433,7 @@ retry_delay: 2 # 初始延迟（秒）（每次重试翻倍）
 ```yaml
 - name: 失败通知
   if: failure()
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -447,7 +447,7 @@ retry_delay: 2 # 初始延迟（秒）（每次重试翻倍）
 
 ```yaml
 - name: 成功通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -528,7 +528,7 @@ jobs:
 
       - name: 测试结果
         if: always()
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -562,7 +562,7 @@ jobs:
         id: deploy
 
       - name: 部署通知
-        uses: asychin/telegram-notify-action@v2
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -585,7 +585,7 @@ jobs:
     npm run test:report
 
 - name: 发送报告
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -608,7 +608,7 @@ jobs:
 ```yaml
 - name: 开始进程
   id: start
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -621,7 +621,7 @@ jobs:
     echo "部署完成！"
 
 - name: 更新状态
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -735,8 +735,8 @@ npm run lint
 
 - 感谢所有贡献者
 - 受 GitHub Actions 社区启发
-- 为开发者用❤️构建
+- 为开发者用 ❤️ 构建
 
 ---
 
-**由 [Sychin Andrey](https://github.com/asychin) 用❤️制作**
+**由 [Sychin Andrey](https://github.com/asychin) 用 ❤️ 制作**

@@ -1,6 +1,24 @@
 # 📝 Changelog
 
-## [Unreleased] - 2024-07-31
+## [Unreleased] - 2025-01-31
+
+### 🚀 GitHub Variables
+
+- **📝 New hardcoded GitHub variables** - Added 15+ new variables including `{{shortSha}}`, `{{repositoryName}}`, `{{repositoryOwnerName}}`
+- **🔗 Ready-to-use URL variables** - `{{runUrl}}`, `{{commitUrl}}`, `{{workflowUrl}}`, `{{compareUrl}}`, `{{issuesUrl}}`, `{{pullRequestsUrl}}`, `{{releasesUrl}}`
+- **🛠️ Additional system variables** - `{{jobId}}`, `{{actionPath}}`, `{{stepSummary}}`, `{{envPath}}`, `{{path}}`
+- **📚 Updated documentation** - Information about new GitHub variables integrated into Template System guides
+- **🎯 Practical examples** - New `github-variables.yml` example showcasing all new variables
+
+### 🔧 Workflow Improvements
+
+- **✨ Simplified inline keyboards** - Replaced complex URL constructions with simple variables
+- **💡 Template optimization** - Updated existing workflows to use new variables
+- **📊 Better readability** - More concise and maintainable workflow files
+
+---
+
+## [v2.x] - 2024-07-31
 
 ### ✨ Added
 

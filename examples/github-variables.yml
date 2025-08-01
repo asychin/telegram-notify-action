@@ -1,0 +1,121 @@
+name: GitHub Variables Demo
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  github-variables-demo:
+    name: GitHub Variables Demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🚀 Demo захардкоженных переменных
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: success
+          parse_mode: "Markdown"
+          message: |
+            🎯 **Демонстрация GitHub переменных**
+
+            🏠 **Репозиторий:**
+            • Полное имя: `{{repository}}`
+            • Только имя: `{{repositoryName}}`
+            • Владелец: `{{repositoryOwnerName}}`
+
+            🔗 **Полезные ссылки:**
+            • [Коммит]({{commitUrl}}) (`{{shortSha}}`)
+            • [Текущий run]({{runUrl}}) (#{{runNumber}})
+            • [Workflow]({{workflowUrl}})
+            • [Issues]({{issuesUrl}}) | [PRs]({{pullRequestsUrl}}) | [Releases]({{releasesUrl}})
+
+            📊 **Техническая информация:**
+            • Ветка: `{{refName}}` ({{refType}})
+            • Runner: {{runnerOs}}/{{runnerArch}}
+            • Попытка: {{runAttempt}}
+            • Job ID: {{jobId}}
+          template_vars: |
+            {
+              "customMessage": "Все переменные теперь доступны без template_vars!"
+            }
+          inline_keyboard: |
+            [
+              {"text": "📊 Workflow", "url": "{{workflowUrl}}"},
+              {"text": "🔗 Коммит", "url": "{{commitUrl}}"},
+              {"text": "🏃 Run", "url": "{{runUrl}}"}
+            ]
+
+      - name: 📝 Демо шаблона с вычисляемыми URL
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          parse_mode: "Markdown"
+          message: |
+            💡 **Теперь можно использовать готовые URL переменные:**
+
+            Вместо конструкций типа:
+            ```
+            ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+            ```
+
+            Просто используйте:
+            ```
+            {{commitUrl}}
+            ```
+
+            📋 **Доступные URL переменные:**
+            • `{{commitUrl}}` - ссылка на коммит
+            • `{{runUrl}}` - ссылка на текущий run
+            • `{{workflowUrl}}` - ссылка на workflow
+            • `{{compareUrl}}` - сравнение с базовой веткой
+            • `{{issuesUrl}}` - страница issues
+            • `{{pullRequestsUrl}}` - страница pull requests  
+            • `{{releasesUrl}}` - страница releases
+
+            ✨ **Дополнительные полезности:**
+            • `{{shortSha}}` - короткий SHA вместо полного
+            • `{{repositoryName}}` - только имя репозитория
+            • `{{repositoryOwnerName}}` - только владелец
+
+      - name: 🔧 Техническая информация
+        uses: ./
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: deploy
+          parse_mode: "Markdown"
+          message: |
+            🛠️ **Техническая информация о среде выполнения:**
+
+            **🖥️ Runner:**
+            • OS: {{runnerOs}}
+            • Архитектура: {{runnerArch}}
+            • Имя: {{runnerName}}
+            • Среда: {{runnerEnvironment}}
+
+            **📁 Пути:**
+            • Workspace: {{workspace}}
+            • Temp: {{runnerTemp}}
+            • Tool Cache: {{runnerToolCache}}
+
+            **🔧 GitHub Action:**
+            • Action Path: {{actionPath}}
+            • Action Ref: {{actionRef}}
+            • Action Repository: {{actionRepository}}
+
+            **📊 Workflow:**
+            • Workflow Ref: {{workflowRef}}
+            • Workflow SHA: {{workflowSha}}
+            • Retention Days: {{retentionDays}}
+          template_vars: |
+            {
+              "deployStatus": "информационный"
+            }

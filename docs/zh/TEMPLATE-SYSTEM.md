@@ -198,6 +198,39 @@ graph TD
 | `eventName`  | 触发事件      | `push`, `pull_request` |
 | `jobStatus`  | 作业状态      | `success`, `failure`   |
 
+### URL 变量（自动可用）
+
+用于内联键盘和消息的现成链接：
+
+| 变量              | 描述           | 示例                                                    |
+| ----------------- | -------------- | ------------------------------------------------------- |
+| `workflowUrl`     | 工作流链接     | `https://github.com/user/repo/actions/workflows/ci.yml` |
+| `runUrl`          | 当前运行链接   | `https://github.com/user/repo/actions/runs/123456`      |
+| `commitUrl`       | 提交链接       | `https://github.com/user/repo/commit/abc123...`         |
+| `compareUrl`      | 与基础分支比较 | `https://github.com/user/repo/compare/main...feature`   |
+| `issuesUrl`       | Issues 页面    | `https://github.com/user/repo/issues`                   |
+| `pullRequestsUrl` | PR 页面        | `https://github.com/user/repo/pulls`                    |
+| `releasesUrl`     | 发布页面       | `https://github.com/user/repo/releases`                 |
+
+### 格式化变量（自动可用）
+
+| 变量                  | 描述                 | 示例                     |
+| --------------------- | -------------------- | ------------------------ |
+| `shortSha`            | 短 SHA（7 字符）     | `abc1234`                |
+| `repositoryName`      | 仓库名称（仅名称）   | `telegram-notify-action` |
+| `repositoryOwnerName` | 所有者名称（仅名称） | `asychin`                |
+
+### 系统变量（自动可用）
+
+| 变量         | 描述              | 示例                             |
+| ------------ | ----------------- | -------------------------------- |
+| `serverUrl`  | GitHub 服务器 URL | `https://github.com`             |
+| `workspace`  | 工作空间路径      | `/home/runner/work/repo`         |
+| `runnerOs`   | 运行器操作系统    | `Linux`                          |
+| `runnerArch` | 运行器架构        | `X64`                            |
+| `jobId`      | 当前作业 ID       | `1234567`                        |
+| `actionPath` | Action 路径       | `/home/runner/work/_actions/...` |
+
 ### 特殊变量
 
 | 变量            | 描述                 | 使用     |
@@ -248,7 +281,7 @@ language: zh  # 中文（默认如上）
 
 ```yaml
 - name: 成功通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -261,7 +294,7 @@ language: zh  # 中文（默认如上）
 
 ```yaml
 - name: 测试结果
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -282,7 +315,7 @@ language: zh  # 中文（默认如上）
 
 ```yaml
 - name: 部署通知
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -308,7 +341,7 @@ language: zh  # 中文（默认如上）
 
 ```yaml
 - name: 条件模板
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -322,13 +355,42 @@ language: zh  # 中文（默认如上）
       }
 ```
 
+### 使用 URL 变量创建内联键盘
+
+```yaml
+- name: 带链接的增强通知
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      ✅ **构建成功！**
+
+      仓库：{{repositoryName}}
+      提交：{{shortSha}} 由 {{actor}}
+      分支：{{refName}}
+    inline_keyboard: |
+      [
+        {"text": "🔗 查看提交", "url": "{{commitUrl}}"},
+        {"text": "📊 查看运行", "url": "{{runUrl}}"},
+        {"text": "🏠 仓库", "url": "{{issuesUrl}}"}
+      ]
+```
+
+**URL 变量的优势：**
+
+- **简化语法**：使用 `{{runUrl}}` 而不是 `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+- **一致格式**：无需手动构建 URL
+- **即用即得**：在所有模板中可用，无需额外配置
+
 ## 🎨 创建自定义消息
 
 ### 不使用模板
 
 ```yaml
 - name: 自定义消息
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -346,7 +408,7 @@ language: zh  # 中文（默认如上）
 
 ```yaml
 - name: 增强模板
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -509,7 +571,7 @@ env:
 
 ```yaml
 - name: 模板测试
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}

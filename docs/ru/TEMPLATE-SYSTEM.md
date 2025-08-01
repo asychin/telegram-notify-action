@@ -6,8 +6,8 @@
 ### 🌐 Язык / Language / 语言
 
 | [🇺🇸 English](../en/TEMPLATE-SYSTEM.md) | [🇨🇳 中文](../zh/TEMPLATE-SYSTEM.md) | [🇷🇺 **Русский**](TEMPLATE-SYSTEM.md) |
-|:----------------------------------------:|:------------------------------------:|:--------------------------------------:|
-| **Template System Guide**               | **模板系统指南**                      | **Руководство по системе шаблонов**    |
+| :------------------------------------: | :---------------------------------: | :----------------------------------: |
+|       **Template System Guide**        |          **模板系统指南**           | **Руководство по системе шаблонов**  |
 
 </div>
 
@@ -47,7 +47,7 @@ graph TD
     D --> E[Подстановка значений]
     E --> F[Очистка HTML]
     F --> G[Финальное сообщение]
-    
+
     H[GitHub Context] --> D
     I[Template Vars] --> D
     J[Custom Message] --> D
@@ -64,13 +64,8 @@ graph TD
 ```html
 ✅ <b>Успех</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
-
-{{customMessage}}
+Репозиторий: {{repository}} Ветка: {{refName}} Коммит: {{sha}} Автор: {{actor}}
+Workflow: {{workflow}} {{customMessage}}
 ```
 
 ### `error` - Ошибка выполнения
@@ -82,14 +77,8 @@ Workflow: {{workflow}}
 ```html
 ❌ <b>Ошибка</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Автор: {{actor}}
-Workflow: {{workflow}}
-Статус задачи: {{jobStatus}}
-
-{{customMessage}}
+Репозиторий: {{repository}} Ветка: {{refName}} Коммит: {{sha}} Автор: {{actor}}
+Workflow: {{workflow}} Статус задачи: {{jobStatus}} {{customMessage}}
 ```
 
 ### `warning` - Предупреждение
@@ -101,10 +90,7 @@ Workflow: {{workflow}}
 ```html
 ⚠️ <b>Предупреждение</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Workflow: {{workflow}}
-
+Репозиторий: {{repository}} Ветка: {{refName}} Workflow: {{workflow}}
 {{customMessage}}
 ```
 
@@ -117,10 +103,7 @@ Workflow: {{workflow}}
 ```html
 ℹ️ <b>Информация</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Автор: {{actor}}
-
+Репозиторий: {{repository}} Ветка: {{refName}} Автор: {{actor}}
 {{customMessage}}
 ```
 
@@ -133,15 +116,8 @@ Workflow: {{workflow}}
 ```html
 🚀 <b>Развертывание</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
-
-Развернул: {{actor}}
-Статус: {{deployStatus}}
-
-{{customMessage}}
+Репозиторий: {{repository}} Ветка: {{refName}} Коммит: {{sha}} Запуск:
+#{{runNumber}} Развернул: {{actor}} Статус: {{deployStatus}} {{customMessage}}
 ```
 
 ### `test` - Результаты тестов
@@ -153,14 +129,8 @@ Workflow: {{workflow}}
 ```html
 🧪 <b>Результаты тестов</b>
 
-Репозиторий: {{repository}}
-Ветка: {{refName}}
-Коммит: {{sha}}
-Запуск: #{{runNumber}}
-
-Статус тестов: {{testStatus}}
-Покрытие: {{coverage}}
-
+Репозиторий: {{repository}} Ветка: {{refName}} Коммит: {{sha}} Запуск:
+#{{runNumber}} Статус тестов: {{testStatus}} Покрытие: {{coverage}}
 {{customMessage}}
 ```
 
@@ -173,14 +143,8 @@ Workflow: {{workflow}}
 ```html
 🎉 <b>Новый релиз</b>
 
-Репозиторий: {{repository}}
-Версия: {{version}}
-Тег: {{tag}}
-Выпустил: {{actor}}
-
-{{releaseNotes}}
-
-{{customMessage}}
+Репозиторий: {{repository}} Версия: {{version}} Тег: {{tag}} Выпустил: {{actor}}
+{{releaseNotes}} {{customMessage}}
 ```
 
 ## 🔧 Синтаксис переменных
@@ -202,9 +166,7 @@ Workflow: {{workflow}}
 **Шаблон:**
 
 ```html
-Repository: {{repository}}
-Unknown: {{unknownVariable}}
-Empty: {{emptyValue}}
+Repository: {{repository}} Unknown: {{unknownVariable}} Empty: {{emptyValue}}
 ```
 
 **Переменные:**
@@ -219,9 +181,7 @@ Empty: {{emptyValue}}
 **Результат:**
 
 ```html
-Repository: user/repo
-Unknown: {{unknownVariable}}
-Empty: 
+Repository: user/repo Unknown: {{unknownVariable}} Empty:
 ```
 
 ## 📊 Доступные переменные
@@ -240,6 +200,39 @@ Empty:
 | `runNumber`  | Номер запуска       | `42`                   |
 | `eventName`  | Событие-триггер     | `push`, `pull_request` |
 | `jobStatus`  | Статус задачи       | `success`, `failure`   |
+
+### URL переменные (автоматически доступны)
+
+Готовые ссылки для inline клавиатур и сообщений:
+
+| Переменная        | Описание                   | Пример                                                  |
+| ----------------- | -------------------------- | ------------------------------------------------------- |
+| `workflowUrl`     | Ссылка на workflow         | `https://github.com/user/repo/actions/workflows/ci.yml` |
+| `runUrl`          | Ссылка на текущий запуск   | `https://github.com/user/repo/actions/runs/123456`      |
+| `commitUrl`       | Ссылка на коммит           | `https://github.com/user/repo/commit/abc123...`         |
+| `compareUrl`      | Сравнение с базовой веткой | `https://github.com/user/repo/compare/main...feature`   |
+| `issuesUrl`       | Страница issues            | `https://github.com/user/repo/issues`                   |
+| `pullRequestsUrl` | Страница pull requests     | `https://github.com/user/repo/pulls`                    |
+| `releasesUrl`     | Страница релизов           | `https://github.com/user/repo/releases`                 |
+
+### Форматированные переменные (автоматически доступны)
+
+| Переменная            | Описание                  | Пример                   |
+| --------------------- | ------------------------- | ------------------------ |
+| `shortSha`            | Короткий SHA (7 символов) | `abc1234`                |
+| `repositoryName`      | Только имя репозитория    | `telegram-notify-action` |
+| `repositoryOwnerName` | Только имя владельца      | `asychin`                |
+
+### Системные переменные (автоматически доступны)
+
+| Переменная   | Описание             | Пример                           |
+| ------------ | -------------------- | -------------------------------- |
+| `serverUrl`  | URL GitHub сервера   | `https://github.com`             |
+| `workspace`  | Путь к workspace     | `/home/runner/work/repo`         |
+| `runnerOs`   | ОС runner'а          | `Linux`                          |
+| `runnerArch` | Архитектура runner'а | `X64`                            |
+| `jobId`      | ID текущей задачи    | `1234567`                        |
+| `actionPath` | Путь к action        | `/home/runner/work/_actions/...` |
 
 ### Специальные переменные
 
@@ -291,7 +284,7 @@ language: zh  # 中文
 
 ```yaml
 - name: Уведомление об успехе
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -304,7 +297,7 @@ language: zh  # 中文
 
 ```yaml
 - name: Результаты тестов
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -325,7 +318,7 @@ language: zh  # 中文
 
 ```yaml
 - name: Уведомление о развертывании
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -333,7 +326,7 @@ language: zh  # 中文
     language: ru
     message: |
       🎯 **Детали развертывания:**
-      
+
       - Среда: Продакшн
       - База данных мигрирована: ✅
       - Кеш CDN очищен: ✅
@@ -351,7 +344,7 @@ language: zh  # 中文
 
 ```yaml
 - name: Условный шаблон
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -365,23 +358,52 @@ language: zh  # 中文
       }
 ```
 
+### Использование URL переменных для Inline клавиатур
+
+```yaml
+- name: Расширенное уведомление со ссылками
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      ✅ **Сборка успешна!**
+
+      Репозиторий: {{repositoryName}}
+      Коммит: {{shortSha}} от {{actor}}
+      Ветка: {{refName}}
+    inline_keyboard: |
+      [
+        {"text": "🔗 Посмотреть коммит", "url": "{{commitUrl}}"},
+        {"text": "📊 Посмотреть запуск", "url": "{{runUrl}}"},
+        {"text": "🏠 Репозиторий", "url": "{{issuesUrl}}"}
+      ]
+```
+
+**Преимущества URL переменных:**
+
+- **Упрощенный синтаксис**: `{{runUrl}}` вместо `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+- **Консистентное форматирование**: Никакой ручной сборки URL
+- **Готовые к использованию**: Доступны во всех шаблонах без дополнительной настройки
+
 ## 🎨 Создание кастомных сообщений
 
 ### Без шаблона
 
 ```yaml
 - name: Кастомное сообщение
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
     message: |
       🔧 <b>Кастомное уведомление</b>
-      
+
       Репозиторий: ${{ github.repository }}
       Ветка: ${{ github.ref_name }}
       Запустил: ${{ github.actor }}
-      
+
       Кастомные детали здесь...
 ```
 
@@ -389,7 +411,7 @@ language: zh  # 中文
 
 ```yaml
 - name: Улучшенный шаблон
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -400,7 +422,7 @@ language: zh  # 中文
       - Обновленных сервисов: 5
       - Время простоя: 0 секунд
       - Производительность: +15% быстрее
-      
+
       <a href="https://app.example.com">🌐 Открыть приложение</a>
     template_vars: |
       {
@@ -495,11 +517,11 @@ template_vars: |
 # ✅ Хорошо - четкая структура
 message: |
   <b>📊 Сводка сборки</b>
-  
+
   <i>Статус:</i> {{buildStatus}}
   <i>Длительность:</i> {{buildDuration}}
   <i>Тесты:</i> {{testResults}}
-  
+
   <b>🚀 Следующие шаги:</b>
   {{nextSteps}}
 
@@ -552,7 +574,7 @@ env:
 
 ```yaml
 - name: Тест шаблона
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -624,7 +646,7 @@ message: |
 # ✅ Поддерживаемые теги
 message: |
   <b>Предупреждение</b>
-  
+
   Это важно
 ```
 

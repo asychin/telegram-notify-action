@@ -352,10 +352,10 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📊 Действия", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
-              {"text": "🔒 Безопасность", "url": "${{ github.server_url }}/${{ github.repository }}/security"},
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "🔧 Настройки", "url": "${{ github.server_url }}/${{ github.repository }}/settings"}
+              {"text": "📊 Действия", "url": "{{workflowUrl}}"},
+              {"text": "🔒 Безопасность", "url": "{{serverUrl}}/{{repository}}/security"},
+              {"text": "📈 Аналитика", "url": "{{serverUrl}}/{{repository}}/pulse"},
+              {"text": "🔧 Настройки", "url": "{{serverUrl}}/{{repository}}/settings"}
             ]
 
   repository-stats:
@@ -428,8 +428,8 @@ jobs:
             }
           inline_keyboard: |
             [
-              {"text": "📈 Аналитика", "url": "${{ github.server_url }}/${{ github.repository }}/pulse"},
-              {"text": "👥 Участники", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/contributors"},
-              {"text": "📊 Статистика", "url": "${{ github.server_url }}/${{ github.repository }}/graphs/traffic"},
-              {"text": "🏷️ Релизы", "url": "${{ github.server_url }}/${{ github.repository }}/releases"}
+              {"text": "📈 Аналитика", "url": "{{serverUrl}}/{{repository}}/pulse"},
+              {"text": "👥 Участники", "url": "{{serverUrl}}/{{repository}}/graphs/contributors"},
+              {"text": "📊 Статистика", "url": "{{serverUrl}}/{{repository}}/graphs/traffic"},
+              {"text": "🏷️ Релизы", "url": "{{releasesUrl}}"}
             ]

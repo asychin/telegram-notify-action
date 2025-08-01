@@ -201,6 +201,39 @@ Repository: user/repo Unknown: {{unknownVariable}} Empty:
 | `eventName`  | Trigger event   | `push`, `pull_request` |
 | `jobStatus`  | Job status      | `success`, `failure`   |
 
+### URL Variables (automatically available)
+
+Ready-to-use links for inline keyboards and messages:
+
+| Variable          | Description        | Example                                                 |
+| ----------------- | ------------------ | ------------------------------------------------------- |
+| `workflowUrl`     | Workflow link      | `https://github.com/user/repo/actions/workflows/ci.yml` |
+| `runUrl`          | Current run link   | `https://github.com/user/repo/actions/runs/123456`      |
+| `commitUrl`       | Commit link        | `https://github.com/user/repo/commit/abc123...`         |
+| `compareUrl`      | Compare with base  | `https://github.com/user/repo/compare/main...feature`   |
+| `issuesUrl`       | Issues page        | `https://github.com/user/repo/issues`                   |
+| `pullRequestsUrl` | Pull requests page | `https://github.com/user/repo/pulls`                    |
+| `releasesUrl`     | Releases page      | `https://github.com/user/repo/releases`                 |
+
+### Formatted Variables (automatically available)
+
+| Variable              | Description          | Example                  |
+| --------------------- | -------------------- | ------------------------ |
+| `shortSha`            | Short SHA (7 chars)  | `abc1234`                |
+| `repositoryName`      | Repository name only | `telegram-notify-action` |
+| `repositoryOwnerName` | Owner name only      | `asychin`                |
+
+### System Variables (automatically available)
+
+| Variable     | Description         | Example                          |
+| ------------ | ------------------- | -------------------------------- |
+| `serverUrl`  | GitHub server URL   | `https://github.com`             |
+| `workspace`  | Workspace path      | `/home/runner/work/repo`         |
+| `runnerOs`   | Runner OS           | `Linux`                          |
+| `runnerArch` | Runner architecture | `X64`                            |
+| `jobId`      | Current job ID      | `1234567`                        |
+| `actionPath` | Action path         | `/home/runner/work/_actions/...` |
+
 ### Special Variables
 
 | Variable        | Description                    | Usage           |
@@ -251,7 +284,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Success Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -264,7 +297,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Test Results
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -285,7 +318,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Deployment Notification
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -311,7 +344,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Conditional Template
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -325,13 +358,42 @@ If a template is not found for the specified language, the English version is us
       }
 ```
 
+### Using URL Variables for Inline Keyboards
+
+```yaml
+- name: Enhanced Notification with Links
+  uses: asychin/telegram-notify-action@v3
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: success
+    message: |
+      ✅ **Build Successful!**
+
+      Repository: {{repositoryName}}
+      Commit: {{shortSha}} by {{actor}}
+      Branch: {{refName}}
+    inline_keyboard: |
+      [
+        {"text": "🔗 View Commit", "url": "{{commitUrl}}"},
+        {"text": "📊 View Run", "url": "{{runUrl}}"},
+        {"text": "🏠 Repository", "url": "{{issuesUrl}}"}
+      ]
+```
+
+**Benefits of URL Variables:**
+
+- **Simplified syntax**: `{{runUrl}}` instead of `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+- **Consistent formatting**: No manual URL construction
+- **Ready-to-use**: Available in all templates without additional configuration
+
 ## 🎨 Creating Custom Messages
 
 ### Without Template
 
 ```yaml
 - name: Custom Message
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -349,7 +411,7 @@ If a template is not found for the specified language, the English version is us
 
 ```yaml
 - name: Enhanced Template
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -512,7 +574,7 @@ env:
 
 ```yaml
 - name: Template Test
-  uses: asychin/telegram-notify-action@v2
+  uses: asychin/telegram-notify-action@v3
   with:
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}

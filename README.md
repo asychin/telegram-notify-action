@@ -18,11 +18,11 @@ Choose your preferred language:
 
 <div align="center">
 
-| Language | Documentation | Description |
-|----------|---------------|-------------|
-| 🇺🇸 **English** | **[📖 Read English Docs](docs/en/README.md)** | Complete documentation in English |
+| Language       | Documentation                                 | Description                          |
+| -------------- | --------------------------------------------- | ------------------------------------ |
+| 🇺🇸 **English** | **[📖 Read English Docs](docs/en/README.md)** | Complete documentation in English    |
 | 🇷🇺 **Русский** | **[📖 Читать на русском](docs/ru/README.md)** | Полная документация на русском языке |
-| 🇨🇳 **中文** | **[📖 阅读中文文档](docs/zh/README.md)** | 完整的中文文档 |
+| 🇨🇳 **中文**    | **[📖 阅读中文文档](docs/zh/README.md)**      | 完整的中文文档                       |
 
 </div>
 

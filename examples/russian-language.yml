@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Russian notification
-        uses: asychin/telegram-notify-action@v1
+        uses: asychin/telegram-notify-action@v3
         with:
           telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ vars.TELEGRAM_CHAT_ID }}

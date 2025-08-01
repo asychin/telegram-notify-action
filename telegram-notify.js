@@ -86,6 +86,7 @@ class TelegramNotify {
       runNumber: process.env.GITHUB_RUN_NUMBER,
       eventName: process.env.GITHUB_EVENT_NAME,
       jobStatus: process.env.JOB_STATUS,
+
       // Дополнительные GitHub переменные
       repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER,
       repositoryId: process.env.GITHUB_REPOSITORY_ID,
@@ -109,6 +110,58 @@ class TelegramNotify {
       workflowSha: process.env.GITHUB_WORKFLOW_SHA,
       retentionDays: process.env.GITHUB_RETENTION_DAYS,
       secretSource: process.env.GITHUB_SECRET_SOURCE,
+      jobId: process.env.GITHUB_JOB_ID,
+      actionPath: process.env.GITHUB_ACTION_PATH,
+      stepSummary: process.env.GITHUB_STEP_SUMMARY,
+      envPath: process.env.GITHUB_ENV,
+      path: process.env.GITHUB_PATH,
+
+      // Вычисляемые полезные переменные
+      shortSha: process.env.GITHUB_SHA
+        ? process.env.GITHUB_SHA.substring(0, 7)
+        : "",
+      repositoryName: process.env.GITHUB_REPOSITORY
+        ? process.env.GITHUB_REPOSITORY.split("/")[1]
+        : "",
+      repositoryOwnerName: process.env.GITHUB_REPOSITORY
+        ? process.env.GITHUB_REPOSITORY.split("/")[0]
+        : "",
+      workflowUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/workflows/${process.env.GITHUB_WORKFLOW}`
+          : "",
+      runUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_RUN_ID
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+          : "",
+      commitUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_SHA
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`
+          : "",
+      compareUrl:
+        process.env.GITHUB_SERVER_URL &&
+        process.env.GITHUB_REPOSITORY &&
+        process.env.GITHUB_SHA &&
+        process.env.GITHUB_BASE_REF
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/compare/${process.env.GITHUB_BASE_REF}...${process.env.GITHUB_SHA}`
+          : "",
+      issuesUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/issues`
+          : "",
+      pullRequestsUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/pulls`
+          : "",
+      releasesUrl:
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/releases`
+          : "",
+
       // Runner переменные
       runnerOs: process.env.RUNNER_OS,
       runnerArch: process.env.RUNNER_ARCH,
@@ -117,6 +170,7 @@ class TelegramNotify {
       runnerTemp: process.env.RUNNER_TEMP,
       runnerToolCache: process.env.RUNNER_TOOL_CACHE,
       runnerDebug: process.env.RUNNER_DEBUG,
+
       // CI переменная
       ci: process.env.CI,
     };
@@ -805,7 +859,9 @@ Released by: {{actor}}
     const processedText = templateText.replace(
       /\{\{(\w+)\}\}/g,
       (match, key) => {
-        return Object.prototype.hasOwnProperty.call(allVars, key) ? allVars[key] : match;
+        return Object.prototype.hasOwnProperty.call(allVars, key)
+          ? allVars[key]
+          : match;
       }
     );
 
