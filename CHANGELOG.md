@@ -1,22 +1,111 @@
 # 📝 Changelog
 
-## [Unreleased] - 2025-01-31
+## [v3.0.0] - 2025-01-31
 
-### 🚀 GitHub Variables
+### 🎯 **Major Features - v3.0.0 Release**
 
-- **📝 New hardcoded GitHub variables** - Added 15+ new variables including `{{shortSha}}`, `{{repositoryName}}`, `{{repositoryOwnerName}}`
-- **🔗 Ready-to-use URL variables** - `{{runUrl}}`, `{{commitUrl}}`, `{{workflowUrl}}`, `{{compareUrl}}`, `{{issuesUrl}}`, `{{pullRequestsUrl}}`, `{{releasesUrl}}`
-- **🛠️ Additional system variables** - `{{jobId}}`, `{{actionPath}}`, `{{stepSummary}}`, `{{envPath}}`, `{{path}}`
-- **📚 Updated documentation** - Information about new GitHub variables integrated into Template System guides
-- **🎯 Practical examples** - New `github-variables.yml` example showcasing all new variables
+#### ✨ **Automatic Event Context Extraction (NEW!)**
+- **🚀 Smart Event Detection** - Automatically extracts relevant variables based on GitHub event type
+- **🔍 Issue Events** - `author`, `issueNumber`, `issueTitle`, `issueState`, `issueBody`, `labels`, `assignees`, `createdAt`, `updatedAt`
+- **🔄 Pull Request Events** - `author`, `prNumber`, `prTitle`, `prState`, `prBody`, `prUrl`, `baseBranch`, `headBranch`, `isDraft`, `mergeable`, `labels`, `assignees`
+- **📤 Push Events** - `pusher`, `commitCount`, `lastCommitMessage`, `lastCommitAuthor`, `lastCommitId`
+- **🎉 Release Events** - `releaseAuthor`, `releaseName`, `releaseTag`, `releaseBody`, `isPrerelease`, `isDraft`, `releaseCreatedAt`
+- **⚙️ Workflow Run Events** - `workflowName`, `workflowStatus`, `workflowConclusion`, `workflowId`, `workflowRunNumber`, `workflowActor`
+- **🧪 No Configuration Required** - All variables available without manual setup
 
-### 🔧 Workflow Improvements
+#### 🌐 **Ready-to-Use URL Variables (NEW!)**
+- **🔗 Pre-built URLs** - `{{runUrl}}`, `{{commitUrl}}`, `{{workflowUrl}}`, `{{compareUrl}}`
+- **📋 Repository URLs** - `{{issuesUrl}}`, `{{pullRequestsUrl}}`, `{{releasesUrl}}`
+- **🏗️ GitHub Enterprise Support** - Works with custom GitHub servers
+- **💡 Simplified Templates** - No need to construct URLs manually
 
-- **✨ Simplified inline keyboards** - Replaced complex URL constructions with simple variables
-- **💡 Template optimization** - Updated existing workflows to use new variables
-- **📊 Better readability** - More concise and maintainable workflow files
+#### 🔄 **Enhanced Retry Logic**
+- **⚡ Improved Rate Limiting** - Separate `max_rate_limit_retries` parameter (default: 8)
+- **🛡️ Smart Backoff** - Different strategies for different error types
+- **📈 Better Defaults** - Increased `max_retries` from 3 to 5
+- **📊 Enhanced Logging** - Detailed retry attempt tracking
+- **🎯 Handles Long Delays** - Supports 'retry after X seconds' from Telegram API
+
+#### 📤 **Enhanced File Upload**
+- **🖼️ Smart Image Processing** - Automatic C2PA metadata detection
+- **📱 Base64 Upload Support** - Send files directly from base64 encoded data  
+- **🎛️ Force Photo Mode** - Override automatic file type conversion with `force_as_photo`
+- **🔍 Intelligent Processing** - Optimized file handling for better Telegram compatibility
+
+### 🎨 **Template System Improvements**
+
+#### 🚀 **Unified Template System**
+- **📝 Markdown Support** - Full migration from HTML to Markdown formatting
+- **🌍 Multi-language** - Enhanced templates for English, Russian, and Chinese
+- **🔧 Template Fixes** - Fixed all `<b>text</b>` → `**text**` conversions
+- **📋 Better Variables** - Improved template variable handling and validation
+
+#### 💡 **Advanced Template Features**
+- **🎯 Dynamic Template Selection** - Based on GitHub events and conditions
+- **🚀 Creative Template Usage** - Deploy template for PRs, test template for health checks
+- **⚠️ Context-Aware Messages** - Templates adapt to event context automatically
+- **📊 Rich Variable Support** - 50+ automatic variables available
+
+### 🛡️ **Security & Advanced Features**
+
+#### 🔒 **Enhanced Security**
+- **🏢 Business Connections** - Support for Telegram Business API
+- **✨ Message Effects** - Support for message effects (stars, hearts, etc.)
+- **🔐 Content Protection** - Prevent message forwarding and saving
+- **📊 Extended GitHub Context** - 20+ additional GitHub variables available
+
+#### 🏃 **System Improvements**
+- **📊 Runner Information** - OS, architecture, environment details
+- **🛠️ Additional Variables** - `{{jobId}}`, `{{actionPath}}`, `{{stepSummary}}`
+- **🔧 Better Error Handling** - Improved validation for all parameters
+- **📈 Performance Optimizations** - Faster variable processing and template rendering
+
+### 🧪 **Testing & Quality**
+
+#### ✅ **Comprehensive Test Suite**
+- **🧪 Event Context Tests** - Full coverage for automatic variable extraction
+- **📝 Template Tests** - All templates tested across multiple languages
+- **🔄 Retry Logic Tests** - Rate limiting and error handling validation
+- **📤 File Upload Tests** - Base64, C2PA, and force_as_photo scenarios
+- **🛡️ Security Tests** - Input validation and error handling
+
+#### 📖 **Documentation Overhaul**
+- **📚 Complete Rewrite** - All documentation updated for v3
+- **🌍 Multi-language Docs** - English, Russian, Chinese documentation
+- **📋 More Examples** - Extensive usage examples for all features
+- **🎯 Migration Guide** - Easy upgrade path from v2
+
+### 🔧 **Workflow & Examples**
+
+#### 📊 **Enhanced Monitoring Workflows**  
+- **🔍 Advanced Monitoring** - Comprehensive example with all event types
+- **🎨 Rich Formatting** - Better emoji usage and visual appeal
+- **📱 Improved Keyboards** - Multi-row inline keyboards with more actions
+- **🌐 URL Simplification** - Using new URL variables instead of manual construction
+
+#### 🎯 **Practical Examples**
+- **📁 New Examples** - `github-variables.yml`, `advanced-monitoring.yml`
+- **🔧 Updated Workflows** - All examples updated to use v3 features
+- **💡 Best Practices** - Demonstrated proper usage patterns
+- **📝 Code Documentation** - Better comments and explanations
+
+### 🚀 **Migration & Compatibility**
+
+#### 📈 **Breaking Changes**
+- **⬆️ Version Bump** - Updated from v2.x to v3.0.0
+- **📝 Template Format** - HTML → Markdown migration required
+- **🔧 New Parameters** - Additional optional parameters available
+- **📊 Enhanced Defaults** - Better default values for production use
+
+#### 🛠️ **Backwards Compatibility**
+- **✅ Existing Workflows** - Most v2 workflows work without changes
+- **📋 Parameter Names** - All existing parameters maintained
+- **🔄 Gradual Migration** - Can adopt new features incrementally
+- **📖 Clear Documentation** - Migration guide provided
 
 ---
+
+## [v2.x] - 2024-07-31
 
 ## [v2.x] - 2024-07-31
 
