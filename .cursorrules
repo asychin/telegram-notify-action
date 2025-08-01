@@ -249,4 +249,249 @@ npm run lint          # ESLint check
 - Missing formatting = hardcoded formatting instead of variables
 - Empty values = missing event context extraction
 
+## 🏷️ Version Management
+
+### Semantic Versioning Rules
+
+This project follows **Semantic Versioning (SemVer)**: `MAJOR.MINOR.PATCH`
+
+- **MAJOR version** (v3.0.0 → v4.0.0): Breaking changes
+- **MINOR version** (v3.0.0 → v3.1.0): New features, backwards compatible
+- **PATCH version** (v3.1.0 → v3.1.1): Bug fixes, backwards compatible
+
+### 🔧 Creating Patch Versions (Bug Fixes)
+
+**When to use**: Bug fixes, "dry data" fixes, ESLint compliance, minor documentation updates
+
+```bash
+# 1. Update version in package.json
+"version": "3.1.1"
+
+# 2. Update CHANGELOG.md
+## [v3.1.1] - 2025-01-31
+### 🐛 Bug Fixes
+- Fixed specific issue description
+- Enhanced error handling
+
+# 3. Commit changes
+git add package.json CHANGELOG.md
+git commit -m "chore: Bump version to 3.1.1 - Bug fixes
+
+- Fixed [specific issue]
+- Enhanced [specific component]
+- Updated documentation"
+
+# 4. Create and push tags
+git tag -a v3.1.1 -m "Release v3.1.1: Bug fixes
+
+🐛 Bug Fixes:
+- [List of fixes]
+
+✅ All tests pass
+✅ ESLint clean"
+
+git push origin main
+git push origin v3.1.1
+
+# 5. Update minor version tag (optional)
+git tag -f -a v3.1 -m "Release v3.1: Latest in 3.1.x series
+
+🔧 Current: v3.1.1 - Latest patch with bug fixes"
+git push --force origin v3.1
+```
+
+### 🚀 Creating Minor Versions (New Features)
+
+**When to use**: New templates, new variables, enhanced functionality, new language support
+
+```bash
+# 1. Update version in package.json
+"version": "3.2.0"
+
+# 2. Update CHANGELOG.md
+## [v3.2.0] - 2025-02-15
+### ✨ New Features
+- Added new template: monitoring
+- Enhanced event context with new variables
+- Added support for custom keyboards
+
+# 3. Update tests for new version
+# In tests/basic.test.js:
+expect(packageJson.version).toBe("3.2.0");
+
+# 4. Commit changes
+git add package.json CHANGELOG.md tests/
+git commit -m "feat: Release v3.2.0 - New monitoring template and features
+
+✨ New Features:
+- Added monitoring template for system health
+- Enhanced event context extraction
+- Added custom keyboard support
+- New variables: systemHealth, uptime, responseTime
+
+🔧 Technical:
+- Updated test expectations
+- Enhanced documentation
+- Added new examples"
+
+# 5. Create and push tags
+git tag -a v3.2.0 -m "Release v3.2.0: New monitoring features
+
+✨ New Features:
+- [List of new features]
+
+🔧 Enhancements:
+- [List of enhancements]
+
+✅ All tests pass
+✅ Backwards compatible"
+
+git tag -a v3.2 -m "Release v3.2: Latest in 3.2.x series
+
+🔧 Current: v3.2.0 - New monitoring template and features"
+
+git push origin main
+git push origin v3.2.0 v3.2
+
+# 6. Update major version tag
+git tag -f -a v3 -m "Release v3: Latest in 3.x series
+
+🔧 Current: v3.2.0 - Latest minor with new features"
+git push --force origin v3
+```
+
+### 💥 Creating Major Versions (Breaking Changes)
+
+**When to use**: Breaking API changes, removed features, changed behavior, new architecture
+
+```bash
+# 1. Update version in package.json
+"version": "4.0.0"
+
+# 2. Update CHANGELOG.md
+## [v4.0.0] - 2025-06-01
+### 💥 BREAKING CHANGES
+- Removed deprecated `message_thread_id` parameter
+- Changed `template_vars` format from string to object
+- Minimum Node.js version now 18+
+
+### ✨ New Features
+- Complete rewrite of template system
+- New unified configuration format
+
+# 3. Update action.yml for breaking changes
+# Update inputs, remove deprecated parameters
+
+# 4. Update all tests and documentation
+# Update expected versions in tests
+# Update all examples in docs/
+# Update .ai-integration-rules version references
+
+# 5. Migration guide (MANDATORY for major versions)
+# Create docs/MIGRATION-v4.md with detailed migration steps
+
+# 6. Commit changes
+git add .
+git commit -m "feat!: Release v4.0.0 - Major rewrite with breaking changes
+
+💥 BREAKING CHANGES:
+- [List breaking changes]
+- [Migration steps]
+
+✨ New Features:
+- [List new features]
+
+📚 Documentation:
+- Added migration guide
+- Updated all examples
+- Updated AI integration rules
+
+⚡ Requirements:
+- Node.js 18+ required
+- Updated template format"
+
+# 7. Create and push tags
+git tag -a v4.0.0 -m "Release v4.0.0: Major rewrite
+
+💥 BREAKING CHANGES:
+- [List breaking changes]
+
+✨ New Features:
+- [List new features]
+
+📋 Migration: See docs/MIGRATION-v4.md
+✅ All tests pass"
+
+git tag -a v4.0 -m "Release v4.0: Latest in 4.0.x series
+
+🔧 Current: v4.0.0 - Major rewrite with breaking changes"
+
+git tag -a v4 -m "Release v4: Latest in 4.x series
+
+🔧 Current: v4.0.0 - Latest major version"
+
+git push origin main
+git push origin v4.0.0 v4.0 v4
+```
+
+### 📋 Version Release Checklist
+
+#### **Before Any Release:**
+- [ ] All tests pass (`npm test`)
+- [ ] ESLint passes (`npm run lint`)
+- [ ] Documentation updated (all languages)
+- [ ] Examples work with new version
+- [ ] No "dry data" issues in templates
+
+#### **For Patch Releases (x.x.1):**
+- [ ] Bug fixes only, no new features
+- [ ] Version in `package.json` updated
+- [ ] `CHANGELOG.md` updated with fixes
+- [ ] Tests updated if needed
+
+#### **For Minor Releases (x.1.0):**
+- [ ] New features are backwards compatible
+- [ ] New tests for new functionality
+- [ ] Documentation for new features (all languages)
+- [ ] Examples showcasing new features
+- [ ] `.ai-integration-rules` updated if needed
+
+#### **For Major Releases (1.0.0):**
+- [ ] Breaking changes documented
+- [ ] Migration guide created (`docs/MIGRATION-vX.md`)
+- [ ] All examples updated for new API
+- [ ] Deprecation warnings in previous version
+- [ ] Community notification about breaking changes
+
+### 🎯 Tag Strategy
+
+**Use this tag hierarchy:**
+
+```bash
+# Specific versions (recommended for users)
+v3.1.0, v3.1.1, v3.2.0, v4.0.0
+
+# Minor version tags (auto-updated)
+v3.1 → points to latest v3.1.x
+v3.2 → points to latest v3.2.x
+
+# Major version tags (auto-updated)  
+v3 → points to latest v3.x.x
+v4 → points to latest v4.x.x
+
+# Usage in workflows:
+uses: asychin/telegram-notify-action@v3.1.0  # Specific (safest)
+uses: asychin/telegram-notify-action@v3.1    # Latest patch in 3.1.x
+uses: asychin/telegram-notify-action@v3      # Latest in 3.x (may get minor updates)
+```
+
+### ⚠️ Important Version Notes
+
+- **Always test** with `debug-template.js` before releasing
+- **Update test expectations** for version numbers in `tests/basic.test.js`
+- **Check .ai-integration-rules** version references
+- **Update all documentation** examples with new version numbers
+- **Never delete tags** - only force-update minor/major tracking tags
+- **Use force-update** only for v3.1, v3 tracking tags, never for specific versions
+
 Remember: This is a production GitHub Action used by many developers. Maintain high code quality, thorough testing, and clear documentation.
