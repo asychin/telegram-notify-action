@@ -333,10 +333,10 @@ git add package.json CHANGELOG.md tests/
 git commit -m "feat: Release v3.2.0 - New monitoring template and features
 
 ✨ New Features:
-- Added monitoring template for system health
+- Added repository monitoring template for GitHub events
 - Enhanced event context extraction
 - Added custom keyboard support
-- New variables: systemHealth, uptime, responseTime
+- New variables: prStatus, releaseInfo, workflowMetrics
 
 🔧 Technical:
 - Updated test expectations

@@ -215,14 +215,14 @@ Based on your project structure, the AI automatically selects optimal templates:
 
 - 🔄 Real-time progress tracking between jobs
 - 📊 Dynamic message updates with statistics
-- ⏱️ Deployment timing and performance metrics
+- ⏱️ Deployment timing and GitHub workflow statistics
 
 #### Enterprise Integration
 
 - 🌍 Multi-environment notifications
 - 🎯 Service-specific progress tracking
 - 🛡️ Advanced failure analysis and debugging
-- 🔄 Rollback notifications and health checks
+- 🔄 Rollback notifications and GitHub workflow monitoring
 
 ### 📋 Automatic PR Generation
 
@@ -289,7 +289,7 @@ When you provide the AI integration rules, AI assistants will:
 
 1. **📋 Ask Comprehensive Questions**
 
-   - What types of notifications do you want? (build/deploy/test/monitoring/etc.)
+   - What types of notifications do you want? (build/deploy/test/repository events/etc.)
    - What level of detail? (basic/standard/detailed/progressive)
    - Visual preferences? (minimal/standard/rich emojis)
    - Which environments? (dev/staging/production)

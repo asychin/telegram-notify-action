@@ -41,8 +41,9 @@ These rules should be used by AI assistants (ChatGPT, Claude, Copilot, etc.) whe
 1. **NEVER** generate code immediately
 2. **ALWAYS** start with full questionnaire from Step 2
 3. **WAIT** for complete user responses
-4. **THEN** generate customized integration
-5. This prevents the common problem of generating incorrect integrations
+4. **NEVER** suggest infrastructure monitoring (database, API, server health checks, etc.)
+5. **THEN** generate customized integration
+6. This prevents the common problem of generating incorrect integrations
 
 **🔍 For EXISTING integration audit:**
 1. **FIRST** analyze existing telegram-notify-action code
@@ -798,6 +799,37 @@ Ask the user these REQUIRED questions:
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
+### **🚫 FORBIDDEN: What AI Must NEVER Suggest**
+
+**❌ NEVER suggest these types of monitoring (outside project scope):**
+- Database connection checks
+- API response time monitoring  
+- Server health monitoring
+- System resource monitoring (CPU, memory, disk)
+- Application performance monitoring (APM)
+- Security vulnerability scanning
+- Infrastructure health checks
+- Service availability monitoring
+- Network monitoring
+- Log analysis systems
+- Scheduled system health checks (e.g., "every 15 minutes")
+- External service monitoring
+
+**🚨 If user asks for these, respond:**
+"That's outside the scope of telegram-notify-action, which focuses on GitHub repository events. For [specific monitoring type], I recommend using dedicated tools like Prometheus, Datadog, New Relic, or PagerDuty, then integrate their alerts with telegram-notify-action."
+
+**✅ ONLY suggest GitHub-related monitoring:**
+- Workflow execution results (CI/CD pipeline status)
+- Pull Request activity (opened, merged, reviewed)
+- Issue and comment activity  
+- Release notifications (published, created)
+- Deployment status from GitHub Actions workflows
+- Repository events (push, branch creation, repository settings)
+- GitHub Actions job success/failure
+- Scheduled **repository** reports (weekly stats, contributor activity)
+
+**🎯 Remember: If it's not a GitHub event, don't suggest it!**
+
 ## 🔍 **EXISTING INTEGRATION AUDIT PROCESS**
 
 ### **When User Has Existing telegram-notify-action Code**
@@ -1139,6 +1171,42 @@ I'll generate:
 - No user preference collection
 - Missing before/after comparisons
 
+#### **🚫 Infrastructure Monitoring Mistakes:**
+```
+👤 User: "Set up Telegram notifications for my project"
+[AI follows questionnaire correctly, user selects some GitHub events]
+
+🤖 AI: "Great! I'll set that up. Also, would you like to add:
+📈 Nужен мониторинг состояния системы?
+- Scheduled health checks (каждые 15 минут)
+- API response time monitoring
+- Database connection checks"
+
+👤 User: "This is wrong! The project is about GitHub events, not infrastructure!"
+```
+
+**🚨 Problems with this approach:**
+- Suggesting infrastructure monitoring despite clear project scope
+- Ignoring the FORBIDDEN list in the rules
+- Not understanding the difference between GitHub events and system monitoring
+- Going beyond the defined scope of telegram-notify-action
+
+**✅ CORRECT approach:**
+```
+👤 User: "Set up Telegram notifications for my project"
+
+🤖 AI: [Follows questionnaire correctly, focuses ONLY on GitHub events]
+"Based on your answers, I'll set up:
+✅ Pull Request notifications (opened, merged, reviewed)
+✅ Deployment status from GitHub Actions workflows  
+✅ Release announcements
+✅ Weekly repository activity reports
+
+Note: For infrastructure monitoring (API health, database checks, etc.), 
+I recommend dedicated tools like Prometheus or Datadog, which you can 
+then integrate with telegram-notify-action for alerts."
+```
+
 ### 📝 **Integration Examples Reference**
 
 #### **Quick Commands for AI**
@@ -1364,6 +1432,7 @@ message: |
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
 - [ ] **Progressive notifications**: Used `message_id` for updates (recommended)
 - [ ] **GitHub integration**: Focused on repository events (PR, releases, workflows)
+- [ ] **NO FORBIDDEN MONITORING**: Did NOT suggest database, API, server, or infrastructure monitoring
 - [ ] **Action buttons**: Added `inline_keyboard` for GitHub operations (view PR, merge, rerun)
 - [ ] **Multi-environment**: Conditional logic for different environments (prod/staging/dev)
 
@@ -1408,6 +1477,18 @@ For infrastructure monitoring, recommend dedicated tools like:
 - Sentry for error tracking
 
 telegram-notify-action should integrate with these tools to relay **their alerts** to Telegram, not replace them.
+
+## 🚨 **FINAL REMINDER FOR AI SYSTEMS**
+
+**If you're an AI reading these rules:**
+
+**✅ DO suggest:** GitHub events (PR, issues, releases, workflow results, repository activity)
+**❌ DON'T suggest:** Infrastructure monitoring (database, API, server health, performance metrics)
+
+**If user asks for infrastructure monitoring:**
+"That's outside telegram-notify-action's scope. For [monitoring type], use [dedicated tool], then integrate alerts with telegram-notify-action."
+
+**🎯 Remember: GitHub events ONLY. Nothing else.**
 
 ---
 
