@@ -33,9 +33,11 @@ jobs:
           else
             echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
             echo "prerelease=${{ github.event.release.prerelease }}" >> $GITHUB_OUTPUT
-            echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-            echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            {
+              echo "release_notes<<'EOF'"
+              echo "${{ github.event.release.body }}"
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
             echo "download_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
           fi
 
