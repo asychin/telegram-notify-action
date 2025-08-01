@@ -531,6 +531,29 @@ class TelegramNotify {
       if (!Object.hasOwn(eventContext, "deployStatus")) {
         eventContext.deployStatus = "successful";
       }
+
+      // Provide default values for release template variables if not set
+      if (!Object.hasOwn(eventContext, "releaseName")) {
+        eventContext.releaseName = "Test Release v1.0.0";
+      }
+      if (!Object.hasOwn(eventContext, "releaseTag")) {
+        eventContext.releaseTag = "v1.0.0";
+      }
+      if (!Object.hasOwn(eventContext, "releaseAuthor")) {
+        eventContext.releaseAuthor = this.githubContext.actor || "Unknown";
+      }
+      if (!Object.hasOwn(eventContext, "releaseCreatedAt")) {
+        eventContext.releaseCreatedAt = new Date().toISOString();
+      }
+      if (!Object.hasOwn(eventContext, "isPrerelease")) {
+        eventContext.isPrerelease = false;
+      }
+      if (!Object.hasOwn(eventContext, "isDraft")) {
+        eventContext.isDraft = false;
+      }
+      if (!Object.hasOwn(eventContext, "releaseBody")) {
+        eventContext.releaseBody = "Test release with bug fixes and improvements.";
+      }
     } catch (error) {
       this.warning(`Error extracting event context: ${error.message}`);
     }
