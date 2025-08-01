@@ -102,11 +102,48 @@ const result4 = notifier4.processTemplate();
 console.log("Result 4:");
 console.log(result4);
 
+// Test 5: Release template
+console.log();
+console.log("=== Test 5: Release template ===");
+
+// Mock release event data
+const releaseEventData = {
+  release: {
+    name: "v3.1.0 - Deploy Template Fix",
+    tag_name: "v3.1.0", 
+    author: { login: "asychin" },
+    body: "Bug fixes and improvements for deploy template variable substitution. Fixed 'dry data' issues and enhanced event context extraction.",
+    prerelease: false,
+    draft: false,
+    created_at: "2025-01-31T10:30:00Z"
+  }
+};
+
+const releaseEventFile = path.join(__dirname, "mock-release-event.json");
+fs.writeFileSync(releaseEventFile, JSON.stringify(releaseEventData, null, 2));
+
+process.env.GITHUB_EVENT_NAME = "release";
+process.env.GITHUB_EVENT_PATH = releaseEventFile;
+process.env.PARSE_MODE = "Markdown";
+process.env.TEMPLATE = "release";
+process.env.MESSAGE = "Release notification test";
+process.env.LANGUAGE = "en";
+process.env.TEMPLATE_VARS = JSON.stringify({
+  "customMessage": "New release v3.1.0 is now available with bug fixes!"
+});
+
+delete require.cache[require.resolve("./telegram-notify.js")];
+const notifier5 = new TelegramNotify();
+const result5 = notifier5.processTemplate();
+console.log("Result 5:");
+console.log(result5);
+
 require.main = originalMain;
 
-// Clean up mock event file
+// Clean up mock event files
 try {
   fs.unlinkSync(eventFile);
+  fs.unlinkSync(releaseEventFile);
 } catch (error) {
   // Ignore cleanup errors
 }

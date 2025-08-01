@@ -85,9 +85,6 @@ jobs:
           language: en
           template_vars: |
             {
-              "version": "${{ steps.release-info.outputs.version }}",
-              "tag": "${{ steps.release-info.outputs.version }}",
-              "releaseNotes": "${{ steps.release-info.outputs.release_notes }}",
               "customMessage": "New release ${{ steps.release-info.outputs.version }} for project ${{ github.repository }} published!"
             }
           message: |
@@ -100,6 +97,8 @@ jobs:
             **🔖 Tag:** {{releaseTag}}
             **🧪 Prerelease:** {{isPrerelease}}
             **📝 Draft:** {{isDraft}}
+
+            **💬 Custom Message:** {{customMessage}}
 
             **✨ Key Improvements in This Version:**
             • 🎯 Automatic Event Context Extraction
@@ -240,5 +239,5 @@ jobs:
             The action is now available on GitHub Marketplace.
           template_vars: |
             {
-              "version": "${{ github.event.release.tag_name || github.event.inputs.version }}"
+              "customMessage": "Release process completed successfully for version ${{ github.event.release.tag_name || github.event.inputs.version }}"
             }

@@ -851,34 +851,43 @@ class TelegramNotify {
         en: `🎉 ${bold}New Release${boldEnd}
 
 🏠 ${bold}Repository:${boldEnd} {{repository}}
-🏷️ ${bold}Version:${boldEnd} {{version}}
-🔖 ${bold}Tag:${boldEnd} {{tag}}
-👤 ${bold}Released by:${boldEnd} {{actor}}
+🏷️ ${bold}Version:${boldEnd} {{releaseName}}
+🔖 ${bold}Tag:${boldEnd} {{releaseTag}}
+👤 ${bold}Released by:${boldEnd} {{releaseAuthor}}
+📅 ${bold}Date:${boldEnd} {{releaseCreatedAt}}
+🧪 ${bold}Prerelease:${boldEnd} {{isPrerelease}}
+📝 ${bold}Draft:${boldEnd} {{isDraft}}
 
 📋 ${bold}Release Notes:${boldEnd}
-{{releaseNotes}}
+{{releaseBody}}
 
 💬 {{customMessage}}`,
         ru: `🎉 ${bold}Новый релиз${boldEnd}
 
 🏠 ${bold}Репозиторий:${boldEnd} {{repository}}
-🏷️ ${bold}Версия:${boldEnd} {{version}}
-🔖 ${bold}Тег:${boldEnd} {{tag}}
-👤 ${bold}Выпустил:${boldEnd} {{actor}}
+🏷️ ${bold}Версия:${boldEnd} {{releaseName}}
+🔖 ${bold}Тег:${boldEnd} {{releaseTag}}
+👤 ${bold}Выпустил:${boldEnd} {{releaseAuthor}}
+📅 ${bold}Дата:${boldEnd} {{releaseCreatedAt}}
+🧪 ${bold}Предрелиз:${boldEnd} {{isPrerelease}}
+📝 ${bold}Черновик:${boldEnd} {{isDraft}}
 
 📋 ${bold}Заметки к релизу:${boldEnd}
-{{releaseNotes}}
+{{releaseBody}}
 
 💬 {{customMessage}}`,
         zh: `🎉 ${bold}新版本发布${boldEnd}
 
 🏠 ${bold}仓库:${boldEnd} {{repository}}
-🏷️ ${bold}版本:${boldEnd} {{version}}
-🔖 ${bold}标签:${boldEnd} {{tag}}
-👤 ${bold}发布者:${boldEnd} {{actor}}
+🏷️ ${bold}版本:${boldEnd} {{releaseName}}
+🔖 ${bold}标签:${boldEnd} {{releaseTag}}
+👤 ${bold}发布者:${boldEnd} {{releaseAuthor}}
+📅 ${bold}日期:${boldEnd} {{releaseCreatedAt}}
+🧪 ${bold}预发布:${boldEnd} {{isPrerelease}}
+📝 ${bold}草稿:${boldEnd} {{isDraft}}
 
 📋 ${bold}发布说明:${boldEnd}
-{{releaseNotes}}
+{{releaseBody}}
 
 💬 {{customMessage}}`,
       },
