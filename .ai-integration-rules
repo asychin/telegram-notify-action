@@ -374,7 +374,7 @@ progressive_deployment:
         template_vars: |
           {
             "deployStatus": "${{ job.status == 'success' && 'successful' || 'failed' }}",
-            "customMessage": "Deployment ${{ job.status == 'success' && 'completed successfully!' || 'failed!' }}"
+            "customMessage": "${{ job.status == 'success' && 'Deployment completed successfully!' || 'Deployment failed!' }}"
           }
 ```
 
@@ -392,6 +392,8 @@ monitoring_system:
     jobs:
       health_check:
         runs-on: ubuntu-latest
+        permissions:
+          contents: read        # ✅ Basic repository access for notifications
         steps:
           - name: 🏥 Check System Health
             id: health_check
@@ -409,7 +411,7 @@ monitoring_system:
               template: info
               template_vars: |
                 {
-                  "customMessage": "🏥 System Health: ${{ steps.health_check.outputs.status }}\n📊 Response Time: ${{ steps.health_check.outputs.response_time }}ms\n🚨 Errors: ${{ steps.health_check.outputs.error_count }}"
+                  "customMessage": "🏥 System Health: ${{ steps.health_check.outputs.status || 'unknown' }}\n📊 Response Time: ${{ steps.health_check.outputs.response_time || '0' }}ms\n🚨 Errors: ${{ steps.health_check.outputs.error_count || '0' }}"
                 }
 
           - name: 🚨 Critical Alert
@@ -421,7 +423,7 @@ monitoring_system:
               template: error
               template_vars: |
                 {
-                  "customMessage": "🚨 CRITICAL SYSTEM ALERT\n\n💥 Health Check Failed\n⏰ Time: $(date)\n🔗 Repository: ${{ github.repository }}"
+                  "customMessage": "🚨 CRITICAL SYSTEM ALERT\n\n💥 Health Check Failed\n⏰ Time: ${{ github.event.head_commit.timestamp || 'unknown' }}\n🔗 Repository: ${{ github.repository }}"
                 }
               inline_keyboard: |
                 [
@@ -441,6 +443,8 @@ monitoring_system:
     jobs:
       generate_report:
         runs-on: ubuntu-latest
+        permissions:
+          contents: read        # ✅ Basic repository access for notifications
         steps:
           - name: 📊 Generate Weekly Stats
             id: stats
@@ -543,11 +547,331 @@ workflow_security:
     - minimal: only required permissions for each job
     - secure: use specific action versions (@v3, not @main)
     - validate: third-party action usage
+    - explicit: always declare permissions block when using GitHub API
   
   error_handling:
     - graceful: failure handling without breaking pipelines
     - informative: error messages without sensitive data
     - recoverable: continue-on-error for non-critical notifications
+```
+
+### 3. GitHub API Integration and Permissions
+
+⚠️ **CRITICAL:** When generating workflow integrations that use GitHub API calls, ALWAYS include appropriate `permissions:` block.
+
+#### 📋 **Required Permissions by API Type:**
+
+```yaml
+# 🔍 Repository monitoring and Actions API
+permissions:
+  contents: read        # ✅ Required - Basic repository access
+  actions: read         # ✅ Required - For workflow runs API
+  
+# 🐛 Issues monitoring  
+permissions:
+  contents: read        # ✅ Required - Basic repository access
+  issues: read          # ✅ Required - For issues and comments API
+
+# 🔄 Pull Requests monitoring
+permissions:
+  contents: read        # ✅ Required - Basic repository access  
+  pull-requests: read   # ✅ Required - For PRs and reviews API
+
+# 📊 Complex monitoring (Issues + PRs + Actions)
+permissions:
+  contents: read        # ✅ Required - Basic repository access
+  issues: read          # ✅ Required - For issues API
+  pull-requests: read   # ✅ Required - For PRs API  
+  actions: read         # ✅ Required - For workflow runs API
+```
+
+#### ✅ **Complete Workflow Example with Permissions:**
+
+```yaml
+name: 🔍 GitHub Actions Monitoring
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  monitor-workflows:
+    name: 🔍 Monitor GitHub Actions Health
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read      # ✅ Basic repository access
+      actions: read       # ✅ For GitHub Actions API
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 📊 Analyze workflow runs  
+        id: analysis
+        run: |
+          # Get recent workflow runs (using github.token, not secrets.GITHUB_TOKEN)
+          recent_data=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=50")
+          
+          # Count failures in last 24 hours
+          failures=$(echo "$recent_data" | jq --arg date "$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ')" \
+            '[.workflow_runs[] | select(.created_at >= $date and .conclusion == "failure")] | length')
+          
+          echo "failures=${failures:-0}" >> $GITHUB_OUTPUT
+      
+      - name: 📢 Send monitoring alert
+        if: steps.analysis.outputs.failures > 2
+        uses: asychin/telegram-notify-action@v3.1.0
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: warning
+          template_vars: |
+            {
+              "customMessage": "⚠️ GitHub Actions Alert\\n\\n🚨 Failed runs: ${{ steps.analysis.outputs.failures }}\\n🏷️ Repository: ${{ github.repository }}\\n⏰ Last 24 hours"
+            }
+```
+
+#### 🚨 **Common Permission Errors:**
+
+```yaml
+# ❌ WRONG - Missing permissions block
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    # Missing permissions block!
+    steps:
+      - run: curl -H "Authorization: token ${{ github.token }}" api.github.com/...
+        # Will fail with 403 Forbidden
+
+# ❌ WRONG - Using non-existent permission  
+permissions:
+  contents: read
+  metadata: read        # ❌ ERROR: 'metadata' permission doesn't exist!
+
+# ❌ WRONG - Missing required permission
+permissions:
+  contents: read        # ✅ OK
+  # Missing 'actions: read' for workflow runs API
+  
+# ✅ CORRECT - Proper permissions
+permissions:
+  contents: read        # ✅ Basic access
+  actions: read         # ✅ For workflow runs API
+```
+
+#### 🔧 **API Troubleshooting:**
+
+**Problem:** `HTTP 403 Forbidden` from GitHub API  
+**Solution:** Add missing permissions to workflow job:
+```yaml
+permissions:
+  contents: read
+  actions: read         # Add this for workflow runs API
+  issues: read          # Add this for issues API  
+  pull-requests: read   # Add this for PRs API
+```
+
+**Problem:** `HTTP 404 Not Found` from Actions API  
+**Solution:** Check if Actions are enabled in repository settings:
+- Repository → Settings → Actions → General
+- Ensure "Actions permissions" allows workflow runs
+- Check "Workflow permissions" has read access
+
+## 🔗 GitHub Events Integration Patterns
+
+### 1. Issues and Comments Monitoring
+
+```yaml
+name: 🐛 Issues Notifications
+on:
+  issues:
+    types: [opened, closed, reopened, assigned, labeled]
+  issue_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  issue-notification:
+    name: 📢 Issue Activity Notification  
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # ✅ Basic repository access
+      issues: read          # ✅ Required for issues API
+    
+    steps:
+      - name: 📢 Send Issue notification
+        uses: asychin/telegram-notify-action@v3.1.0
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: |
+            🐛 <b>Issue ${{ github.event.action }}</b>
+            
+            <b>📋 Title:</b> ${{ github.event.issue.title }}
+            <b>🔗 Issue:</b> #${{ github.event.issue.number }}
+            <b>👤 Author:</b> @${{ github.event.issue.user.login }}
+            <b>🏷️ Repository:</b> ${{ github.repository }}
+          inline_keyboard: |
+            [
+              [
+                {"text": "👀 View Issue", "url": "${{ github.event.issue.html_url }}"},
+                {"text": "📝 Comment", "url": "${{ github.event.issue.html_url }}#issuecomment-new"}
+              ]
+            ]
+```
+
+### 2. Pull Request Monitoring  
+
+```yaml
+name: 🔔 Pull Request Notifications
+on:
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+jobs:
+  pr-notification:
+    name: 📢 PR Activity Notification
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # ✅ Basic repository access
+      pull-requests: read   # ✅ Required for PRs API
+    
+    steps:
+      - name: 📢 Send PR notification
+        uses: asychin/telegram-notify-action@v3.1.0
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: |
+            🔄 <b>Pull Request ${{ github.event.action }}</b>
+            
+            <b>📋 Title:</b> ${{ github.event.pull_request.title }}
+            <b>👤 Author:</b> @${{ github.event.pull_request.user.login }}
+            <b>🌿 Branch:</b> ${{ github.head_ref || github.ref_name }} → ${{ github.base_ref }}
+            <b>📊 Changes:</b> +${{ github.event.pull_request.additions || 0 }} -${{ github.event.pull_request.deletions || 0 }}
+          inline_keyboard: |
+            [
+              [
+                {"text": "👀 View PR", "url": "${{ github.event.pull_request.html_url }}"},
+                {"text": "📊 View Files", "url": "${{ github.event.pull_request.html_url }}/files"}
+              ]
+            ]
+```
+
+### 3. Release and Tag Monitoring
+
+```yaml
+name: 🏷️ Release Notifications  
+on:
+  release:
+    types: [published, prereleased, created]
+  create:  # For tags
+  delete:  # For tags
+
+jobs:
+  release-notification:
+    name: 📢 Release Activity Notification
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # ✅ Basic repository access (releases via events, not API)
+    
+    steps:
+      - name: 📢 Send Release notification  
+        if: github.event_name == 'release'
+        uses: asychin/telegram-notify-action@v3.1.0
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: release
+          template_vars: |
+            {
+              "customMessage": "🎉 <b>Release Published</b>\\n\\n🏷️ <b>Version:</b> ${{ github.event.release.tag_name }}\\n👤 <b>Author:</b> @${{ github.event.release.author.login }}\\n🏷️ <b>Repository:</b> ${{ github.repository }}"
+            }
+          inline_keyboard: |
+            [
+              [
+                {"text": "📦 Download Release", "url": "${{ github.event.release.html_url }}"},
+                {"text": "📋 View Release", "url": "${{ github.event.release.html_url }}"}
+              ]
+            ]
+```
+
+### 4. Advanced Workflow Monitoring
+
+```yaml
+name: 📊 Weekly Repository Reports
+on:
+  schedule:
+    - cron: "0 9 * * 1"  # Every Monday at 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  weekly-report:
+    name: 📈 Generate Weekly Report
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # ✅ Basic repository access
+      issues: read          # ✅ For issues statistics
+      pull-requests: read   # ✅ For PRs statistics  
+      actions: read         # ✅ For workflow runs statistics
+    
+    steps:
+      - name: 📊 Collect repository statistics
+        id: stats  
+        run: |
+          # GitHub API calls using github.token
+          
+          # Get PRs opened this week
+          START_DATE="$(date -d 'last monday' '+%Y-%m-%dT00:00:00Z')"
+          END_DATE="$(date -d 'sunday' '+%Y-%m-%dT23:59:59Z')"
+          
+          # Get PRs (using proper authentication)
+          prs_data=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&per_page=100&sort=created&direction=desc")
+          prs_opened=$(echo "$prs_data" | jq --arg start "$START_DATE" --arg end "$END_DATE" \
+            '[.[] | select(.created_at >= $start and .created_at <= $end)] | length')
+            
+          # Get workflow runs
+          runs_data=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100")
+          successful_runs=$(echo "$runs_data" | jq --arg start "$START_DATE" --arg end "$END_DATE" \
+            '[.workflow_runs[] | select(.created_at >= $start and .created_at <= $end and .conclusion == "success")] | length')
+          
+          echo "prs_opened=${prs_opened:-0}" >> $GITHUB_OUTPUT
+          echo "successful_runs=${successful_runs:-0}" >> $GITHUB_OUTPUT
+      
+      - name: 📢 Send Weekly Report
+        uses: asychin/telegram-notify-action@v3.1.0
+        with:
+          telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          template: info
+          template_vars: |
+            {
+              "customMessage": "📊 <b>Weekly Repository Report</b>\\n\\n🏷️ <b>Repository:</b> ${{ github.repository }}\\n🔄 <b>PRs Opened:</b> ${{ steps.stats.outputs.prs_opened }}\\n✅ <b>Successful Runs:</b> ${{ steps.stats.outputs.successful_runs }}\\n📅 <b>Period:</b> $(date -d 'last monday' '+%Y-%m-%d') to $(date -d 'sunday' '+%Y-%m-%d')"
+            }
+```
+
+### 5. Event-Specific Authentication Rules
+
+```yaml
+# ✅ Use github.token for API calls (recommended)
+api_authentication:
+  preferred: ${{ github.token }}          # Built-in token with job permissions
+  alternative: ${{ secrets.GITHUB_TOKEN }} # Custom token (higher permissions)
+  
+  # Choose based on needs:
+  github_token:
+    - pros: ["Automatic permissions based on job config", "No setup required", "Secure by default"]
+    - cons: ["Limited to job permissions", "Cannot access private repos outside current"]
+    - use_when: "Standard repository monitoring and API access"
+  
+  secrets_github_token:  
+    - pros: ["Full repository access", "Can access external repositories", "Custom permissions"]
+    - cons: ["Requires manual setup", "Security risk if overprivileged", "Repository secret needed"]
+    - use_when: "Cross-repository access or advanced API operations"
 ```
 
 ## 🧪 Testing and Validation
@@ -1470,11 +1794,55 @@ curl -s https://raw.githubusercontent.com/asychin/telegram-notify-action/main/ex
     telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
     chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
     template: deploy  # ✅ Built-in template
-    template_vars: |  # ✅ JSON format
+    template_vars: |  # ✅ JSON format with null safety
       {
         "customMessage": "Deployed to ${{ github.ref_name }}!",
-        "deployStatus": "successful"
+        "deployStatus": "${{ job.status == 'success' && 'successful' || 'failed' }}"
       }
+```
+
+#### **✅ CORRECT: Null-Safe template_vars**
+```yaml
+# ✅ CORRECT - All step outputs have fallbacks
+- name: 📊 Get Statistics
+  id: stats
+  run: |
+    # This step might fail and produce null outputs
+    echo "total_runs=25" >> $GITHUB_OUTPUT
+    echo "success_runs=20" >> $GITHUB_OUTPUT
+    # failed_runs not set = null
+
+- name: 📢 Send Statistics Report
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    template: info
+    template_vars: |
+      {
+        "customMessage": "📊 Build Statistics Report",
+        "totalRuns": "${{ steps.stats.outputs.total_runs || '0' }}",
+        "successRuns": "${{ steps.stats.outputs.success_runs || '0' }}",
+        "failedRuns": "${{ steps.stats.outputs.failed_runs || '0' }}",
+        "successRate": "${{ steps.stats.outputs.success_rate || 'N/A' }}%"
+      }
+```
+
+#### **❌ WRONG: Null Values in template_vars**
+```yaml
+# ❌ WRONG - No fallback values
+- name: 📢 Send Statistics Report
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    template: info
+    template_vars: |
+      {
+        "customMessage": "📊 Build Statistics Report",
+        "totalRuns": "${{ steps.stats.outputs.total_runs }}",      # Could be null
+        "successRuns": "${{ steps.stats.outputs.success_runs }}",  # Could be null
+        "failedRuns": "${{ steps.stats.outputs.failed_runs }}"     # Could be null
+      }
+# Result: Template shows "Total Runs: null" instead of actual data
 ```
 
 #### **✅ CORRECT: Custom Message (No Template)**
@@ -1727,6 +2095,8 @@ name: 🔄 Complex Deployment Pipeline
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read        # ✅ Basic repository access for notifications
     steps:
     - name: 📊 Update Progress - Building
       uses: asychin/telegram-notify-action@v3.1.0
@@ -2018,6 +2388,13 @@ message_thread_id: ${{ secrets.TELEGRAM_BUILD_TOPIC_ID || secrets.TELEGRAM_MAIN_
 - [ ] **NO FORBIDDEN MONITORING**: Did NOT suggest database, API, server, or infrastructure monitoring
 - [ ] **Action buttons**: Added `inline_keyboard` for GitHub operations (view PR, merge, rerun)
 - [ ] **Multi-environment**: Conditional logic for different environments (prod/staging/dev)
+- [ ] **🛡️ Valid Permissions**: Only used valid GitHub Actions permissions (no `metadata: read`)
+- [ ] **🔒 Null Safety**: All dynamic values have fallback operators (`|| 'default'`)
+- [ ] **📋 template_vars Null Safety**: All step outputs in template_vars have fallbacks (`${{ steps.x.outputs.y || '0' }}`)
+- [ ] **🔍 JSON Validation**: template_vars generate valid JSON (no unescaped quotes, newlines, or null values)
+- [ ] **⚡ No Shell Commands**: No `$(command)` syntax in message content
+- [ ] **📡 API Access**: Included proper permissions for GitHub API endpoints
+- [ ] **🎯 Error Resilience**: Workflows continue gracefully on notification failures
 
 #### **🔍 For AUDIT scenarios:**
 - [ ] Read ALL documentation before analysis
@@ -2061,6 +2438,244 @@ For infrastructure monitoring, recommend dedicated tools like:
 
 telegram-notify-action should integrate with these tools to relay **their alerts** to Telegram, not replace them.
 
+## 🚨 **COMMON INTEGRATION PITFALLS & SOLUTIONS**
+
+### **❌ Problem 1: Invalid GitHub Actions Permissions**
+```yaml
+# ❌ WRONG - metadata: read doesn't exist
+permissions:
+  contents: read
+  actions: read
+  metadata: read  # Invalid permission!
+```
+**✅ Solution:** Use only valid permissions:
+```yaml
+# ✅ CORRECT - Only valid permissions
+permissions:
+  contents: read
+  actions: read     # For reading workflow runs
+```
+
+### **❌ Problem 2: Null Values in Messages**
+User workflows might pass null/undefined values to telegram-notify-action:
+```yaml
+# Example that produces null values
+message: |
+  📊 Total Runs: ${{ steps.analysis.outputs.runs }}  
+  # If analysis step fails, outputs.runs = null
+```
+**💡 Result:** Message shows "Total Runs: null"
+
+**✅ Solutions:**
+```yaml
+# Option A: Validate in workflow
+message: |
+  📊 Total Runs: ${{ steps.analysis.outputs.runs || 'N/A' }}
+
+# Option B: Use fallback values
+message: |
+  📊 Total Runs: ${{ steps.analysis.outputs.runs || '0' }}
+  
+# Option C: Conditional messaging
+message: |
+  ${{ steps.analysis.outputs.runs && format('📊 Total Runs: {0}', steps.analysis.outputs.runs) || '📊 Data unavailable' }}
+```
+
+### **❌ Problem 6: Null Values in template_vars JSON**
+This is a **CRITICAL** issue that often causes "dry data" in Telegram messages:
+```yaml
+# ❌ WRONG - NULL values break template rendering
+template_vars: |
+  {
+    "customMessage": "🔄 Workflow Runs: ${{ steps.workflow_stats.outputs.workflow_runs }}"
+  }
+# If workflow_stats.outputs.workflow_runs = null, generates:
+# {"customMessage": "🔄 Workflow Runs: null"}
+# Result: Template shows literal "null" text
+```
+
+**💡 Problem:** When step outputs return `null`, the JSON becomes invalid or contains literal "null" strings, breaking template variable substitution.
+
+**✅ Solutions:**
+```yaml
+# Option A: Add fallbacks in template_vars JSON
+template_vars: |
+  {
+    "customMessage": "🔄 Workflow Runs: ${{ steps.workflow_stats.outputs.workflow_runs || '0' }}",
+    "successCount": "${{ steps.stats.outputs.success || 'N/A' }}",
+    "failureCount": "${{ steps.stats.outputs.failures || '0' }}"
+  }
+
+# Option B: Validate step outputs before template_vars
+- name: 🔍 Validate outputs
+  id: validated_stats
+  run: |
+    echo "runs=${{ steps.stats.outputs.runs || '0' }}" >> $GITHUB_OUTPUT
+    echo "success=${{ steps.stats.outputs.success || '0' }}" >> $GITHUB_OUTPUT
+    
+- name: 📢 Send notification
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    template: success
+    template_vars: |
+      {
+        "customMessage": "🔄 Workflow Runs: ${{ steps.validated_stats.outputs.runs }}",
+        "successCount": "${{ steps.validated_stats.outputs.success }}"
+      }
+
+# Option C: Use conditional JSON generation
+template_vars: |
+  {
+    "customMessage": "${{ steps.stats.outputs.runs && format('🔄 Runs: {0}', steps.stats.outputs.runs) || '🔄 No data available' }}",
+    "status": "${{ job.status == 'success' && 'completed' || 'failed' }}"
+  }
+```
+
+### **❌ Problem 7: Complex Conditional Logic in template_vars**
+```yaml
+# ❌ WRONG - Complex conditions can break JSON
+template_vars: |
+  {
+    "customMessage": "${{ steps.stats.outputs.commits_count == '0' && '😴 Quiet week' || '🎉 Active week!' }}"
+  }
+```
+**💡 Problem:** GitHub Actions conditional logic with special characters can generate invalid JSON.
+
+**✅ Solutions:**
+```yaml
+# Option A: Pre-calculate in workflow step
+- name: 📊 Calculate message
+  id: calc_message
+  run: |
+    if [ "${{ steps.stats.outputs.commits_count }}" = "0" ]; then
+      echo "weekly_message=😴 Quiet week" >> $GITHUB_OUTPUT
+    else
+      echo "weekly_message=🎉 Active week!" >> $GITHUB_OUTPUT
+    fi
+
+- name: 📢 Send notification
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    template: info
+    template_vars: |
+      {
+        "customMessage": "${{ steps.calc_message.outputs.weekly_message }}"
+      }
+
+# Option B: Use simple fallback pattern
+template_vars: |
+  {
+    "customMessage": "${{ steps.stats.outputs.commits_count || '0' }} commits this week",
+    "activityLevel": "${{ steps.stats.outputs.commits_count != '0' && '🎉 Active' || '😴 Quiet' }}"
+  }
+```
+
+### **❌ Problem 3: Shell Commands in Messages**
+```yaml
+# ❌ WRONG - $(date) won't execute in action context
+message: |
+  ⏰ Check Time: $(date -u '+%Y-%m-%d %H:%M UTC')
+```
+**💡 Problem:** Shell commands execute on GitHub runner, not in action environment.
+
+**✅ Solutions:**
+```yaml
+# Option A: Pre-calculate in workflow step
+- name: Get timestamp
+  id: timestamp
+  run: echo "time=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_OUTPUT
+
+- name: Send notification
+  uses: asychin/telegram-notify-action@v3.1.0
+  with:
+    message: |
+      ⏰ Check Time: ${{ steps.timestamp.outputs.time }}
+
+# Option B: Use GitHub context variables
+message: |
+  ⏰ Check Time: ${{ github.event.head_commit.timestamp }}
+
+# Option C: Use template variables (when using template:)
+template: info
+message: |
+  ⏰ Check Time: {{currentTime}}
+```
+
+### **❌ Problem 4: GitHub API Permission Issues**
+```bash
+# Error: "Resource not accessible by integration"
+{"total_count":null,"message":"Resource not accessible by integration"}
+```
+**💡 Cause:** Insufficient permissions for GitHub Actions API access.
+
+**✅ Solutions:**
+```yaml
+# Add proper permissions to job
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read       # Essential for workflow runs API
+    steps:
+      # Your monitoring steps
+```
+
+### **❌ Problem 5: Date Range API Issues**
+GitHub Actions API date range filtering may not work as expected:
+```bash
+# This API endpoint may return unexpected results
+/actions/runs?created=2025-01-01..2025-01-31
+```
+**✅ Solution:** Use client-side filtering:
+```yaml
+- name: Get workflow data
+  run: |
+    # Get recent runs without date filter
+    all_runs=$(curl -s -H "Authorization: token ${{ github.token }}" \
+      "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100")
+    
+    # Filter by date using jq
+    filtered_runs=$(echo "$all_runs" | jq --arg date "2025-01-01T00:00:00Z" \
+      '[.workflow_runs[] | select(.created_at >= $date)] | length')
+    
+    echo "runs=$filtered_runs" >> $GITHUB_OUTPUT
+```
+
+---
+
+## 🛡️ **VALIDATION & BEST PRACTICES**
+
+### **📋 Pre-Deployment Checklist:**
+- [ ] **Permissions:** Only use valid GitHub Actions permissions
+- [ ] **Null Safety:** All dynamic values have fallbacks (`|| 'default'`)
+- [ ] **Shell Commands:** No `$(command)` in message content
+- [ ] **API Access:** Test GitHub API endpoints in controlled environment
+- [ ] **Error Handling:** Workflows continue gracefully on notification failures
+
+### **🔍 Message Content Validation:**
+```yaml
+# ✅ GOOD - Validated message content
+message: |
+  📊 **Statistics Summary**
+  
+  🔄 Total Runs: ${{ steps.stats.outputs.total || '0' }}
+  ✅ Successful: ${{ steps.stats.outputs.success || '0' }}
+  ❌ Failed: ${{ steps.stats.outputs.failed || '0' }}
+  📈 Success Rate: ${{ steps.stats.outputs.rate || '0' }}%
+  
+  ⏰ Generated: ${{ steps.timestamp.outputs.time }}
+```
+
+### **⚠️ Common Warning Signs:**
+- Messages containing literal "null" or "undefined" text
+- Shell commands `$(...)` in message fields
+- Missing fallback values for API-dependent data
+- Invalid permissions causing API access errors
+- Hard-coded timestamps instead of dynamic generation
+
+---
+
 ## 🚨 **FINAL REMINDER FOR AI SYSTEMS**
 
 **If you're an AI reading these rules:**
@@ -2075,5 +2690,47 @@ telegram-notify-action should integrate with these tools to relay **their alerts
 
 ---
 
-*Last updated: v3.1.1 (2025-01-31) - telegram-notify-action by @asychin*  
+---
+
+## 📝 **CHANGELOG**
+
+### v3.1.1.3 (2025-01-31) - GitHub API Integration & Permissions Update
+- 🔐 **NEW:** Comprehensive GitHub API permissions guidelines and examples
+- 📋 **NEW:** Required permissions by API type (contents, actions, issues, pull-requests)
+- 🔗 **NEW:** Complete GitHub Events Integration Patterns section
+- 🛡️ **NEW:** Detailed permissions troubleshooting (HTTP 403/404 solutions)
+- ⚙️ **NEW:** Event-specific authentication rules (github.token vs secrets.GITHUB_TOKEN)
+- 📊 **ENHANCED:** All workflow examples now include proper permissions blocks
+- 🔧 **FIXED:** Token usage recommendations - prefer github.token for standard API access
+- ✅ **ADDED:** Complete workflow examples for Issues, PRs, Releases, Actions monitoring
+- 🚨 **CRITICAL:** All AI integrations MUST include permissions blocks when using GitHub API
+- 📚 **EXPANDED:** Security best practices with explicit permission requirements
+
+### v3.1.1.2 (2025-08-01) - Critical template_vars Null Safety Update
+- 🚨 **CRITICAL:** Added comprehensive null safety guidelines for `template_vars` JSON
+- 🔧 **NEW:** Problem 6 & 7 - Null values and complex conditions in `template_vars`
+- 📋 **ADDED:** Null-safe template_vars examples with fallback patterns
+- 🛡️ **UPDATED:** Validation checklist includes template_vars null safety checks
+- 💡 **FIXED:** All examples now use proper fallback operators (`|| 'default'`)
+- ⚠️ **WARNING:** Added specific guidance on complex conditional logic in JSON
+- 🎯 **ENHANCED:** Pre-calculation workflow patterns for complex template_vars
+
+### v3.1.1.1 (2025-08-01) - Critical Updates Based on Real-World Issues
+- 🚨 **NEW:** Added "Common Integration Pitfalls & Solutions" section
+- 🛡️ **FIXED:** Invalid `metadata: read` permission (doesn't exist in GitHub Actions)
+- 🔒 **ADDED:** Null safety validation for dynamic message content
+- ⚡ **ADDED:** Shell command warnings and solutions
+- 📡 **ADDED:** GitHub API permission troubleshooting
+- 🎯 **ADDED:** Enhanced validation checklist with 5 new critical checks
+- 💡 **ADDED:** Best practices for error-resilient workflows
+
+### v3.1.1 (2025-01-31) - Original Release
+- Initial comprehensive AI integration rules
+- Template system documentation
+- Multi-language support guidelines
+- Progressive deployment patterns
+
+---
+
+*Last updated: v3.1.1.3 (2025-01-31) - telegram-notify-action by @asychin*  
 *Latest rules: https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules*

@@ -1,6 +1,6 @@
 # 📱 Telegram Notify Action - Enhanced
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](#)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](#)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
@@ -831,6 +831,75 @@ Add these secrets to your repository:
 
 - `TELEGRAM_BOT_TOKEN` - Your bot token
 - `TELEGRAM_CHAT_ID` - Your chat ID
+
+## 🔐 GitHub API Integration & Permissions
+
+### When You Need Permissions
+
+If your workflow uses GitHub API calls (monitoring, statistics, repository data), you **MUST** add a `permissions:` block to your job:
+
+```yaml
+jobs:
+  your-job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # ✅ Required - Basic repository access
+      actions: read # ✅ Add if using workflow runs API
+      issues: read # ✅ Add if using issues API
+      pull-requests: read # ✅ Add if using PRs API
+
+    steps:
+      - name: Get workflow data
+        run: |
+          # Use github.token for API calls
+          curl -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+```
+
+### Required Permissions by Use Case
+
+| **Use Case**              | **Required Permissions**                                                          | **Example**                         |
+| ------------------------- | --------------------------------------------------------------------------------- | ----------------------------------- |
+| **Basic Notifications**   | `contents: read`                                                                  | Simple success/failure messages     |
+| **Repository Monitoring** | `contents: read`<br/>`actions: read`                                              | Workflow status, build statistics   |
+| **Issues Tracking**       | `contents: read`<br/>`issues: read`                                               | Issue opened/closed notifications   |
+| **PR Monitoring**         | `contents: read`<br/>`pull-requests: read`                                        | PR status, review notifications     |
+| **Complex Monitoring**    | `contents: read`<br/>`actions: read`<br/>`issues: read`<br/>`pull-requests: read` | Full repository activity monitoring |
+
+### Common Issues & Solutions
+
+**Problem:** `HTTP 403 Forbidden` error from GitHub API  
+**Solution:** Add missing permissions to your job:
+
+```yaml
+permissions:
+  contents: read
+  actions: read # Add this for workflow runs API
+```
+
+**Problem:** `HTTP 404 Not Found` from Actions API  
+**Solution:** Check repository settings:
+
+- Repository → Settings → Actions → General
+- Ensure "Actions permissions" allows workflow runs
+- Check "Workflow permissions" has read access
+
+### Authentication Best Practices
+
+```yaml
+- name: Call GitHub API
+  run: |
+    # ✅ RECOMMENDED: Use github.token (automatic permissions)
+    curl -H "Authorization: token ${{ github.token }}" \
+      "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+
+    # ⚠️ ALTERNATIVE: Use custom token (requires setup)
+    curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+```
+
+**When to use `github.token`:** Standard repository monitoring (recommended)  
+**When to use `secrets.GITHUB_TOKEN`:** Cross-repository access or advanced operations
 
 ## 📝 Examples
 

@@ -1,6 +1,6 @@
 # 📱 Telegram Notify Action - 增强版
 
-[![版本](https://img.shields.io/badge/version-3.0.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-3.1.0-blue.svg)](#)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](#)
 [![许可证](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![测试](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
@@ -833,6 +833,75 @@ language: zh # 使用中文界面
 
 - `TELEGRAM_BOT_TOKEN` - 您的机器人令牌
 - `TELEGRAM_CHAT_ID` - 您的聊天 ID
+
+## 🔐 GitHub API 集成和权限
+
+### 何时需要权限
+
+如果您的工作流使用 GitHub API 调用（监控、统计、仓库数据），您**必须**为您的作业添加 `permissions:` 块：
+
+```yaml
+jobs:
+  your-job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # ✅ 必需 - 基本仓库访问
+      actions: read # ✅ 使用工作流运行 API 时添加
+      issues: read # ✅ 使用 issues API 时添加
+      pull-requests: read # ✅ 使用 PRs API 时添加
+
+    steps:
+      - name: 获取工作流数据
+        run: |
+          # 使用 github.token 进行 API 调用
+          curl -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+```
+
+### 按用例所需的权限
+
+| **用例**        | **必需权限**                                                                      | **示例**             |
+| --------------- | --------------------------------------------------------------------------------- | -------------------- |
+| **基本通知**    | `contents: read`                                                                  | 简单的成功/失败消息  |
+| **仓库监控**    | `contents: read`<br/>`actions: read`                                              | 工作流状态、构建统计 |
+| **Issues 跟踪** | `contents: read`<br/>`issues: read`                                               | Issue 打开/关闭通知  |
+| **PR 监控**     | `contents: read`<br/>`pull-requests: read`                                        | PR 状态、审查通知    |
+| **复杂监控**    | `contents: read`<br/>`actions: read`<br/>`issues: read`<br/>`pull-requests: read` | 完整的仓库活动监控   |
+
+### 常见问题和解决方案
+
+**问题：** GitHub API 返回 `HTTP 403 Forbidden` 错误  
+**解决方案：** 为您的作业添加缺失的权限：
+
+```yaml
+permissions:
+  contents: read
+  actions: read # 为工作流运行 API 添加此项
+```
+
+**问题：** Actions API 返回 `HTTP 404 Not Found` 错误  
+**解决方案：** 检查仓库设置：
+
+- 仓库 → Settings → Actions → General
+- 确保 "Actions permissions" 允许工作流运行
+- 检查 "Workflow permissions" 具有读取访问权限
+
+### 身份验证最佳实践
+
+```yaml
+- name: 调用 GitHub API
+  run: |
+    # ✅ 推荐：使用 github.token（自动权限）
+    curl -H "Authorization: token ${{ github.token }}" \
+      "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+
+    # ⚠️ 替代方案：使用自定义令牌（需要设置）
+    curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      "https://api.github.com/repos/${{ github.repository }}/actions/runs"
+```
+
+**何时使用 `github.token`：** 标准仓库监控（推荐）  
+**何时使用 `secrets.GITHUB_TOKEN`：** 跨仓库访问或高级操作
 
 ## 📝 示例
 
