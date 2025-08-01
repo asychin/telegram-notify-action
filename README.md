@@ -53,12 +53,53 @@ Choose your preferred language:
 ### 🤖 AI-Powered Integration
 *📄 [AI Integration Rules](./.ai-integration-rules) | [Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)*
 
-- 🔮 **Auto-Integration** - AI-powered automatic integration into any repository
-- 🧠 **Smart Analysis** - Intelligent project structure analysis and workflow detection
-- 💬 **Interactive Setup** - Guided configuration with user preference questions
-- 🎯 **Optimal Configuration** - Automatically selects best templates and settings
-- 📋 **Pull Request Generation** - Creates complete integration PR with documentation
-- ✅ **Multi-language** - Support for English, Russian, and Chinese
+Get telegram-notify-action automatically integrated into your project by AI assistants (ChatGPT, Claude, Copilot, etc.)!
+
+#### ⚡ Quick Start with AI
+
+**Option 1: Use AI Integration Rules**
+```bash
+# Download AI rules to your repository
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+
+# Then ask any AI:
+# "Use the .ai-integration-rules file to add Telegram notifications to my project"
+```
+
+**Option 2: Direct AI Command**
+```
+Ask any AI assistant:
+"Use https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+to integrate Telegram notifications into my GitHub project"
+```
+
+#### 🎯 What AI Will Do
+
+- 🔍 **Analyze** your repository structure and existing workflows
+- ❓ **Ask questions** about your notification preferences and requirements
+- 🛠️ **Generate** optimized workflow files with correct templates and variables
+- 📋 **Provide** setup instructions for Telegram bot and secrets
+- ✅ **Validate** everything against current v3.1.0 standards
+
+#### 🔧 For Existing Implementations
+
+Already have telegram-notify-action but with errors? AI can audit and fix it:
+
+```
+Ask AI: "Audit my telegram-notify-action setup and fix all errors according to v3.1.0 standards"
+[Provide your workflow files]
+```
+
+AI will:
+- 🔍 Find all errors (wrong templates, deprecated parameters, format issues)
+- 📋 Create detailed error report with line numbers
+- 🛠️ Generate corrected versions with explanations
+- 📖 Cross-reference against official documentation
+
+#### 🌍 Supported Languages
+- 🇺🇸 English - Full AI integration support
+- 🇷🇺 Русский - Полная поддержка ИИ интеграции  
+- 🇨🇳 中文 - 完整的AI集成支持
 
 ### Advanced Features
 

@@ -260,9 +260,138 @@ The AI integration ensures:
 
 ### 🚀 Getting Started with AI Integration
 
-> **Coming Soon:** AI-powered integration will be available through GitHub Marketplace and as a standalone tool. Stay tuned for updates!
+**AI-powered integration is now available!** Use our comprehensive AI integration rules to get telegram-notify-action automatically set up by any AI assistant.
 
-For now, use the comprehensive manual integration examples above or contact us for enterprise AI integration services.
+#### ⚡ Quick Start with AI
+
+**Option 1: Download AI Rules to Your Repository**
+```bash
+# Download the latest AI integration rules
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+
+# Then ask any AI assistant (ChatGPT, Claude, Copilot, etc.):
+"Use the .ai-integration-rules file in my repository to add Telegram notifications to my project"
+```
+
+**Option 2: Direct URL Reference**
+```
+Ask any AI assistant:
+"Use the AI integration rules from https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+to integrate telegram-notify-action into my GitHub project"
+```
+
+#### 🤖 What AI Assistants Will Do
+
+When you provide the AI integration rules, AI assistants will:
+
+1. **📋 Ask Comprehensive Questions**
+   - What types of notifications do you want? (build/deploy/test/monitoring/etc.)
+   - What level of detail? (basic/standard/detailed/progressive)
+   - Visual preferences? (minimal/standard/rich emojis)
+   - Which environments? (dev/staging/production)
+   - Existing workflows to modify?
+   - Telegram bot setup status?
+
+2. **🔍 Analyze Your Repository**
+   - Project structure and technology stack
+   - Existing workflow files and CI/CD setup
+   - Current notification patterns
+   - Deployment environments and patterns
+
+3. **🛠️ Generate Perfect Integration**
+   - Workflow files with correct templates and variables
+   - Proper JSON formatting for `template_vars`
+   - No deprecated parameters or wrong templates
+   - Security best practices for secrets
+   - Setup instructions for Telegram bot
+
+4. **✅ Validate Everything**
+   - Only built-in templates: `success`, `error`, `warning`, `info`, `deploy`, `test`, `release`
+   - Current v3.1.0 parameter compatibility
+   - Correct variable scopes (`{{}}` vs `${{}}`)
+   - No parameter conflicts
+
+#### 🔧 For Existing Implementations (Audit & Fix)
+
+Already have telegram-notify-action but experiencing issues? AI can audit and fix your setup:
+
+```
+Ask any AI assistant:
+"Please audit my telegram-notify-action setup using the rules from 
+https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+and fix all errors according to v3.1.0 standards"
+
+[Then provide your workflow files]
+```
+
+**AI will systematically:**
+
+1. **📊 Create Detailed Error Report**
+   - Template errors (non-existent custom templates)
+   - Deprecated parameters (`message_thread_id`, old versions)
+   - Format errors (bash-style vs JSON `template_vars`)
+   - Parameter conflicts (`template` + `message` together)
+   - Variable scope errors (`{{}}` in wrong contexts)
+   - Syntax errors (Handlebars, invalid YAML)
+
+2. **📚 Cross-Reference Documentation**
+   - Validate against current template system
+   - Check variable availability and usage
+   - Version compatibility verification
+
+3. **🛠️ Generate Corrected Code**
+   - Before/after comparisons for each fix
+   - Detailed explanation of each change
+   - Migration instructions
+   - Final validation against all rules
+
+#### 🎯 Example AI Interaction
+
+```
+👤 You: "Use .ai-integration-rules to add Telegram notifications to my Node.js project"
+
+🤖 AI: "I'll help you integrate telegram-notify-action! First, let me understand your requirements:
+
+📋 Integration Scope:
+1. What do you want notifications about?
+   - [ ] Build/compilation results
+   - [ ] Deployment status  
+   - [ ] Test results
+   - [ ] Release announcements
+   [... full questionnaire ...]
+
+Please answer all questions so I can create the perfect integration for you."
+
+👤 You: [Provides answers]
+
+🤖 AI: "Perfect! Based on your answers, I'll create:
+- Deployment notifications using 'deploy' template
+- Progressive message updates with message_id
+- Rich emoji formatting for production environment
+
+[Generates correct workflow files with explanations]"
+```
+
+#### 🌍 Multi-Language Support
+
+The AI integration rules support multiple languages:
+- **English** - Full documentation and examples
+- **Русский** - Complete Russian language support
+- **中文** - Full Chinese language documentation
+
+#### 🚨 AI Integration Benefits
+
+**✅ Advantages of Using AI Integration:**
+- **Zero errors** - AI follows strict validation rules
+- **Best practices** - Always uses latest standards
+- **Customized** - Tailored to your specific needs
+- **Fast setup** - Complete integration in minutes
+- **Educational** - Learn correct patterns through generated code
+- **Future-proof** - Updated with latest features
+
+**🔗 Resources:**
+- **[AI Integration Rules File](./.ai-integration-rules)** - Complete rules for AI assistants
+- **[Latest Rules Online](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)** - Always up-to-date version
 
 ## 📖 Input Parameters
 

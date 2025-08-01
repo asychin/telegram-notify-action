@@ -261,9 +261,137 @@ AI 集成确保：
 
 ### 🚀 开始使用 AI 集成
 
-> **即将推出：** AI 驱动的集成将通过 GitHub Marketplace 和独立工具提供。敬请期待更新！
+**AI 集成现已可用！** 使用我们全面的 AI 集成规则，让任何 AI 助手自动设置 telegram-notify-action。
 
-目前，请使用上述全面的手动集成示例，或联系我们获取企业 AI 集成服务。
+#### ⚡ AI 快速开始
+
+**选项 1：下载 AI 规则到您的仓库**
+```bash
+# 下载最新的 AI 集成规则
+curl -o .ai-integration-rules https://raw.githubusercontent.com/asychin/telegram-notify-action/main/.ai-integration-rules
+
+# 然后请求任何 AI 助手（ChatGPT、Claude、Copilot 等）：
+"使用我仓库中的 .ai-integration-rules 文件为我的项目添加 Telegram 通知"
+```
+
+**选项 2：直接引用 URL**
+```
+请求任何 AI 助手：
+"使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+的 AI 集成规则将 telegram-notify-action 集成到我的 GitHub 项目中"
+```
+
+#### 🤖 AI 助手将执行的操作
+
+当您提供 AI 集成规则时，AI 助手将：
+
+1. **📋 询问全面问题**
+   - 您想要什么类型的通知？（构建/部署/测试/监控/等）
+   - 详细程度？（基础/标准/详细/渐进式）
+   - 视觉偏好？（最小化/标准/丰富表情符号）
+   - 哪些环境？（开发/暂存/生产）
+   - 要修改的现有工作流？
+   - Telegram 机器人设置状态？
+
+2. **🔍 分析您的仓库**
+   - 项目结构和技术栈
+   - 现有工作流文件和 CI/CD 设置
+   - 当前通知模式
+   - 部署环境和模式
+
+3. **🛠️ 生成完美集成**
+   - 使用正确模板和变量的工作流文件
+   - `template_vars` 的正确 JSON 格式
+   - 无废弃参数或错误模板
+   - 密钥的安全最佳实践
+   - Telegram 机器人设置说明
+
+4. **✅ 验证一切**
+   - 仅内置模板：`success`、`error`、`warning`、`info`、`deploy`、`test`、`release`
+   - 当前 v3.1.0 参数兼容性
+   - 正确的变量作用域（`{{}}` vs `${{}}`）
+   - 无参数冲突
+
+#### 🔧 针对现有实现（审计和修复）
+
+已经有 telegram-notify-action 但遇到问题？AI 可以审计和修复您的设置：
+
+```
+请求任何 AI 助手：
+"请使用来自 https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules 
+的规则审计我的 telegram-notify-action 设置，并根据 v3.1.0 标准修复所有错误"
+
+[然后提供您的工作流文件]
+```
+
+**AI 将系统性地：**
+
+1. **📊 创建详细错误报告**
+   - 模板错误（不存在的自定义模板）
+   - 废弃参数（`message_thread_id`、旧版本）
+   - 格式错误（bash 样式 vs JSON `template_vars`）
+   - 参数冲突（`template` + `message` 同时使用）
+   - 变量作用域错误（`{{}}` 在错误上下文中）
+   - 语法错误（Handlebars、无效 YAML）
+
+2. **📚 交叉参考文档**
+   - 对照当前模板系统验证
+   - 检查变量可用性和使用
+   - 版本兼容性验证
+
+3. **🛠️ 生成修正代码**
+   - 每个修复的前后对比
+   - 每个更改的详细解释
+   - 迁移说明
+   - 对照所有规则的最终验证
+
+#### 🎯 AI 交互示例
+
+```
+👤 您："使用 .ai-integration-rules 为我的 Node.js 项目添加 Telegram 通知"
+
+🤖 AI："我将帮助您集成 telegram-notify-action！首先，让我了解您的需求：
+
+📋 集成范围：
+1. 您想要关于什么的通知？
+   - [ ] 构建/编译结果
+   - [ ] 部署状态
+   - [ ] 测试结果
+   - [ ] 发布公告
+   [... 完整问卷 ...]
+
+请回答所有问题，这样我就能为您创建完美的集成。"
+
+👤 您：[提供答案]
+
+🤖 AI："完美！基于您的答案，我将创建：
+- 使用 'deploy' 模板的部署通知
+- 使用 message_id 的渐进式消息更新
+- 适用于生产环境的丰富表情符号格式
+
+[生成带解释的正确工作流文件]"
+```
+
+#### 🌍 多语言支持
+
+AI 集成规则支持多种语言：
+- **English** - 完整文档和示例
+- **Русский** - 完整俄语语言支持
+- **中文** - 完整中文语言文档
+
+#### 🚨 AI 集成优势
+
+**✅ 使用 AI 集成的优势：**
+- **零错误** - AI 遵循严格的验证规则
+- **最佳实践** - 始终使用最新标准
+- **定制化** - 根据您的具体需求量身定制
+- **快速设置** - 几分钟内完成完整集成
+- **教育性** - 通过生成的代码学习正确模式
+- **面向未来** - 随最新功能更新
+
+**🔗 资源：**
+- **[AI 集成规则文件](../../.ai-integration-rules)** - AI 助手的完整规则
+- **[最新在线规则](https://github.com/asychin/telegram-notify-action/blob/main/.ai-integration-rules)** - 始终最新版本
 
 ## 📖 输入参数
 
