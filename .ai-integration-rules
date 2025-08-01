@@ -247,6 +247,18 @@ template_selection:
     recommended_templates: [info, deploy, success, error]
     approach: "Progressive notifications with message updates (message_id)"
     example: "Start with info, update with deploy/success/error, use message_id"
+
+  monitoring_system:
+    triggers: [health checks, system monitoring, scheduled tasks]
+    recommended_templates: [warning, error, info]
+    approach: "Scheduled monitoring with custom messages and critical alerting"
+    example: "Cron-based health checks with conditional critical alerts"
+    
+  progressive_deployment:
+    triggers: [complex CI/CD pipelines, multi-stage deployments]
+    recommended_templates: [info, deploy, success, error]
+    approach: "Single message updates with progress tracking"
+    example: "Start notification → update progress → final result, all same message_id"
 ```
 
 ## 🛠️ Implementation Strategies
@@ -305,15 +317,164 @@ dynamic_integration:
     template: comprehensive summary with timings
 ```
 
-#### C. Enterprise Integration (Complex Projects)
+#### C. Progressive Deployment Integration (Recommended)
+```yaml
+progressive_deployment:
+  # Step 1: Start notification with message_id capture
+  start_notification:
+    - name: 📢 Start Deployment Notification
+      id: start_notification
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message: |
+          🚀 <b>Deployment Started</b>
+          
+          <b>📋 Repository:</b> ${{ github.repository }}
+          <b>🌿 Branch:</b> ${{ github.ref_name }}
+          <b>👤 Actor:</b> ${{ github.actor }}
+          
+          📊 <b>Progress:</b> <code>[🟩⬜⬜⬜⬜] 20%</code>
+          
+          🔍 <b>Status:</b> Starting deployment...
+
+  # Step 2: Update same message during build
+  update_build:
+    - name: 📢 Update - Build Stage
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        message: |
+          🚀 <b>Deployment Progress</b>
+          
+          <b>📋 Repository:</b> ${{ github.repository }}
+          <b>🌿 Branch:</b> ${{ github.ref_name }}
+          <b>👤 Actor:</b> ${{ github.actor }}
+          
+          📊 <b>Progress:</b> <code>[🟩🟩🟩⬜⬜] 60%</code>
+          
+          🔧 <b>Status:</b> Building application...
+
+  # Step 3: Final update with result
+  final_notification:
+    - name: 📢 Final Result
+      if: always()
+      uses: asychin/telegram-notify-action@v3.1.0
+      with:
+        telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message_id: ${{ steps.start_notification.outputs.message_id }}
+        template: ${{ job.status == 'success' && 'deploy' || 'error' }}
+        template_vars: |
+          {
+            "deployStatus": "${{ job.status == 'success' && 'successful' || 'failed' }}",
+            "customMessage": "Deployment ${{ job.status == 'success' && 'completed successfully!' || 'failed!' }}"
+          }
+```
+
+#### D. Monitoring System Integration (Recommended)
+```yaml
+monitoring_system:
+  # Scheduled health checks
+  health_monitoring:
+    name: 🔍 System Health Check
+    on:
+      schedule:
+        - cron: "*/15 * * * *"  # Every 15 minutes
+      workflow_dispatch:
+    
+    jobs:
+      health_check:
+        runs-on: ubuntu-latest
+        steps:
+          - name: 🏥 Check System Health
+            id: health_check
+            run: |
+              # Your health check logic here
+              echo "status=healthy" >> $GITHUB_OUTPUT
+              echo "response_time=245" >> $GITHUB_OUTPUT
+              echo "error_count=0" >> $GITHUB_OUTPUT
+
+          - name: 📢 Health Status Report
+            uses: asychin/telegram-notify-action@v3.1.0
+            with:
+              telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+              chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+              template: info
+              template_vars: |
+                {
+                  "customMessage": "🏥 System Health: ${{ steps.health_check.outputs.status }}\n📊 Response Time: ${{ steps.health_check.outputs.response_time }}ms\n🚨 Errors: ${{ steps.health_check.outputs.error_count }}"
+                }
+
+          - name: 🚨 Critical Alert
+            if: steps.health_check.outputs.status != 'healthy'
+            uses: asychin/telegram-notify-action@v3.1.0
+            with:
+              telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+              chat_id: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+              template: error
+              template_vars: |
+                {
+                  "customMessage": "🚨 CRITICAL SYSTEM ALERT\n\n💥 Health Check Failed\n⏰ Time: $(date)\n🔗 Repository: ${{ github.repository }}"
+                }
+              inline_keyboard: |
+                [
+                  [
+                    {"text": "🔧 Fix Now", "url": "${{ github.server_url }}/${{ github.repository }}/actions"},
+                    {"text": "📊 Logs", "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+                  ]
+                ]
+
+  # Weekly summary report
+  weekly_report:
+    name: 📊 Weekly System Report
+    on:
+      schedule:
+        - cron: "0 9 * * 1"  # Every Monday at 9 AM
+    
+    jobs:
+      generate_report:
+        runs-on: ubuntu-latest
+        steps:
+          - name: 📊 Generate Weekly Stats
+            id: stats
+            run: |
+              echo "uptime=99.8" >> $GITHUB_OUTPUT
+              echo "avg_response=180" >> $GITHUB_OUTPUT
+              echo "incidents=2" >> $GITHUB_OUTPUT
+
+          - name: 📈 Weekly Report
+            uses: asychin/telegram-notify-action@v3.1.0
+            with:
+              telegram_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+              chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+              message: |
+                📊 <b>Weekly System Report</b>
+                <i>$(date -d 'last monday' '+%Y-%m-%d') - $(date -d 'sunday' '+%Y-%m-%d')</i>
+
+                🎯 <b>Uptime:</b> ${{ steps.stats.outputs.uptime }}%
+                ⚡ <b>Avg Response:</b> ${{ steps.stats.outputs.avg_response }}ms
+                🚨 <b>Incidents:</b> ${{ steps.stats.outputs.incidents }}
+
+                🌿 <b>Environment:</b> <code>${{ github.ref_name }}</code>
+
+                ${{ steps.stats.outputs.uptime >= 99.5 && '🎉 Excellent system performance this week!' || '⚠️ System performance needs attention.' }}
+```
+
+#### E. Enterprise Integration (Complex Projects)
 ```yaml
 enterprise_integration:
   features:
-    - multi-environment notifications
+    - progressive deployment notifications (message updates)
+    - comprehensive monitoring systems (scheduled checks)
+    - multi-environment support with conditional logic
     - service-specific progress tracking  
     - failure analysis and debugging info
-    - rollback notifications
-    - health check integration
+    - rollback notifications with action buttons
+    - health check integration with alerting
     - custom keyboards for manual actions
 ```
 
@@ -570,9 +731,25 @@ Ask the user these REQUIRED questions:
 **⚡ Delivery Method:**
 7. "📨 How to send notifications?"
    - [ ] Separate messages for each event
-   - [ ] Update single message (progressive)
+   - [ ] Update single message (progressive) ← RECOMMENDED
    - [ ] Thread/topic organization
    - [ ] Different chats for different types
+
+**🔍 Monitoring & Health Checks:**
+8. "📊 Do you want system monitoring notifications?"
+   - [ ] No monitoring needed
+   - [ ] Basic health checks (manual trigger)
+   - [ ] Scheduled monitoring (15min intervals) ← RECOMMENDED
+   - [ ] Comprehensive monitoring (health + performance + alerts)
+   - [ ] Weekly/monthly summary reports
+
+**🎯 Advanced Features:**
+9. "🚀 Which advanced patterns interest you?"
+   - [ ] Progressive deployment updates (single message updates)
+   - [ ] Real-time progress bars during CI/CD
+   - [ ] Critical alerting system with action buttons
+   - [ ] Multi-environment conditional notifications
+   - [ ] Scheduled reporting system
 
 **🚨 WAIT FOR ALL ANSWERS BEFORE PROCEEDING TO STEP 3!**
 
@@ -866,12 +1043,20 @@ Please answer ALL questions before I create your integration."
 👤 User: [Provides all answers]
 
 🤖 AI: "Perfect! Based on your answers, I'll create a custom integration with:
-- Deploy notifications using the 'deploy' template
-- Progressive updates with message_id
-- Rich emoji formatting
-- Production environment focus
+- Progressive deployment notifications (single message updates)
+- Real-time progress bars during CI/CD stages
+- Deploy template for final results
+- Scheduled health monitoring every 15 minutes
+- Critical alerting system with action buttons
+- Rich emoji formatting for production environment
 
-[Generates CORRECT code based on answers]"
+I'll generate:
+1. Progressive deployment workflow (message_id updates)
+2. Monitoring system workflow (scheduled health checks)
+3. Setup instructions for multiple chat IDs (alerts vs reports)
+4. Action buttons for quick responses to issues
+
+[Generates CORRECT code with both deployment and monitoring workflows]"
 ```
 
 ### **❌ WRONG AI Behavior (What NOT to do)**
@@ -1132,6 +1317,10 @@ message: |
 - [ ] Version `@v3.1.0` or newer
 - [ ] GitHub variables `${{}}` in JSON/shell contexts
 - [ ] Template variables `{{}}` only in `message:`/`caption:` WITH `template:`
+- [ ] **Progressive notifications**: Used `message_id` for updates (recommended)
+- [ ] **Monitoring system**: Included scheduled health checks if requested
+- [ ] **Action buttons**: Added `inline_keyboard` for critical alerts
+- [ ] **Multi-environment**: Conditional logic for different environments
 
 #### **🔍 For AUDIT scenarios:**
 - [ ] Read ALL documentation before analysis
