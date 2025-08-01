@@ -1,6 +1,6 @@
 # 📱 Telegram Notify Action - Enhanced
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](#)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](#)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
@@ -211,10 +211,11 @@ A powerful and feature-rich GitHub Action for sending notifications to Telegram 
 
 ### Retry Configuration
 
-| Parameter     | Description                   | Default | Example |
-| ------------- | ----------------------------- | ------- | ------- |
-| `max_retries` | Maximum retry attempts        | `3`     | `5`     |
-| `retry_delay` | Initial retry delay (seconds) | `1`     | `2`     |
+| Parameter                 | Description                                     | Default | Example |
+| ------------------------- | ----------------------------------------------- | ------- | ------- |
+| `max_retries`             | Maximum retry attempts for regular errors      | `5`     | `5`     |
+| `retry_delay`             | Initial retry delay (seconds)                   | `1`     | `2`     |
+| `max_rate_limit_retries`  | Maximum retry attempts for rate limit errors   | `8`     | `10`    |
 
 ### Conditional Sending
 
@@ -321,19 +322,88 @@ template_vars: |
   }
 ```
 
-### GitHub Context Variables
+### Automatic Variables
 
-The following GitHub context variables are automatically available:
+The action provides three types of automatic variables:
 
-- `repository` - Repository name
-- `refName` - Branch/tag name
-- `sha` - Commit SHA
+#### GitHub Context Variables
+Basic GitHub workflow information automatically available:
+- `repository` - Repository name (`user/repo`)
+- `refName` - Branch/tag name (`main`, `develop`)
+- `sha` - Full commit SHA
+- `shortSha` - Short commit SHA (7 characters)
 - `actor` - User who triggered the workflow
 - `workflow` - Workflow name
 - `job` - Job name
 - `runId` - Workflow run ID
 - `runNumber` - Workflow run number
 - `eventName` - Event that triggered the workflow
+- `repositoryName` - Repository name only (without owner)
+- `repositoryOwnerName` - Repository owner name only
+
+#### Event Context Variables (NEW in v3)
+Event-specific variables automatically extracted based on the GitHub event:
+
+**For `issues` events:**
+- `author` - Issue author
+- `issueNumber` - Issue number
+- `issueTitle` - Issue title
+- `issueState` - Issue state
+- `issueBody` - Issue description
+- `labels` - Comma-separated list of labels
+- `assignees` - Comma-separated list of assignees
+- `createdAt` - Issue creation date
+- `updatedAt` - Issue last update date
+
+**For `pull_request` events:**
+- `author` - PR author
+- `prNumber` - Pull request number
+- `prTitle` - Pull request title
+- `prState` - Pull request state
+- `prBody` - Pull request description
+- `prUrl` - Pull request URL
+- `baseBranch` - Target branch
+- `headBranch` - Source branch
+- `isDraft` - Is draft PR
+- `mergeable` - Is mergeable
+- `labels` - Comma-separated list of labels
+- `assignees` - Comma-separated list of assignees
+
+**For `push` events:**
+- `pusher` - User who pushed
+- `commitCount` - Number of commits
+- `lastCommitMessage` - Last commit message
+- `lastCommitAuthor` - Last commit author
+- `lastCommitId` - Last commit ID
+
+**For `release` events:**
+- `releaseAuthor` - Release author
+- `releaseName` - Release name
+- `releaseTag` - Release tag
+- `releaseBody` - Release notes
+- `isPrerelease` - Is prerelease
+- `isDraft` - Is draft release
+- `releaseCreatedAt` - Release creation date
+
+**For `workflow_run` events:**
+- `workflowName` - Workflow name
+- `workflowStatus` - Workflow status
+- `workflowConclusion` - Workflow conclusion
+- `workflowId` - Workflow ID
+- `workflowRunNumber` - Workflow run number
+- `workflowActor` - Workflow actor
+
+#### URL Variables (NEW in v3)
+Ready-to-use GitHub URLs:
+- `runUrl` - Current workflow run URL
+- `commitUrl` - Current commit URL
+- `workflowUrl` - Workflow definition URL
+- `compareUrl` - Compare URL with base branch
+- `issuesUrl` - Repository issues URL
+- `pullRequestsUrl` - Repository pull requests URL
+- `releasesUrl` - Repository releases URL
+
+> **Note**: All these variables are automatically available in templates without requiring manual configuration!
 
 ## 📁 File Upload Support
 
@@ -695,28 +765,58 @@ This project is licensed under the MIT License - see the [LICENSE](../../LICENSE
 
 Enable debug logging by setting the `ACTIONS_STEP_DEBUG` secret to `true` in your repository.
 
-## 🆕 What's New in v2.0.0
+## 🆕 What's New in v3.0.0
 
-### Enhanced File Upload
+### 🎯 Automatic Event Context (NEW!)
+
+- **Smart Event Detection** - Automatically extracts relevant variables based on GitHub event type
+- **Issue Variables** - Author, title, labels, assignees automatically available for `issues` events
+- **PR Variables** - PR details, branches, draft status for `pull_request` events  
+- **Push Variables** - Commit count, last commit info for `push` events
+- **Release Variables** - Release details, notes, tags for `release` events
+- **No Configuration Required** - All variables available without manual setup
+
+### 🌐 Ready-to-Use URL Variables (NEW!)
+
+- **Pre-built URLs** - `{{runUrl}}`, `{{commitUrl}}`, `{{workflowUrl}}` and more
+- **Simplified Templates** - No need to construct URLs manually
+- **Consistent Formatting** - All URLs follow the same pattern
+- **GitHub Enterprise Support** - Works with custom GitHub servers
+
+### 🔄 Enhanced Retry Logic
+
+- **Separate Rate Limiting** - Independent retry counter for rate limit errors
+- **Smart Backoff** - Different strategies for different error types
+- **Configurable Limits** - `max_rate_limit_retries` parameter
+- **Better Error Messages** - More informative retry logs
+
+### 📤 Enhanced File Upload
 
 - 📤 **Base64 Upload Support** - Send files directly from base64 encoded data
 - 🖼️ **Smart Image Processing** - Automatic C2PA metadata detection
 - 🎛️ **Force Photo Mode** - Override automatic file type conversion with `force_as_photo`
 - 🔍 **Intelligent Processing** - Optimized file handling for better Telegram compatibility
 
-### Technical Improvements
+### 🛡️ Advanced Security & Features
 
-- ✅ **16 comprehensive tests** covering all new functionality
-- 🧪 **Full test coverage** for base64 and force_as_photo features
-- 🛡️ **Robust error handling** for invalid base64 data
-- 📊 **Enhanced validation** for file parameters
+- 🔒 **Business Connections** - Support for Telegram Business API
+- ✨ **Message Effects** - Support for message effects (stars, hearts, etc.)
+- 📊 **Extended GitHub Context** - 20+ additional GitHub variables available
+- 🏃 **Runner Information** - OS, architecture, environment details
 
-### Developer Experience
+### 🧪 Testing & Quality
 
-- 📖 **Updated documentation** with extensive examples
-- 🎯 **Clear usage guidelines** for C2PA metadata handling
-- ⚠️ **Helpful warnings** for potential processing issues
-- 🔧 **Better debugging** information
+- ✅ **Comprehensive test suite** covering all functionality
+- 🛡️ **Robust error handling** for all edge cases
+- 📊 **Enhanced validation** for all parameters
+- 🔧 **Better debugging** with detailed logs
+
+### 📖 Documentation
+
+- 📚 **Complete rewrite** - All documentation updated for v3
+- 🌍 **Multi-language** - English, Russian, Chinese documentation
+- 📋 **More examples** - Extensive usage examples for all features
+- 🎯 **Clear migration guide** - Easy upgrade from v2
 
 ## 📞 Support
 
